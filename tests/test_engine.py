@@ -40,7 +40,7 @@ def _assert(cond, msg):
 def test_all_configs_score_all_projects():
     """Every reference config produces a score for every sample project (eligible or not)."""
     projects = load_projects(PROJECTS)
-    for cfg in ("wyoming.json", "mndot.json", "aldot.json", "louisiana.json"):
+    for cfg in ("wyoming.json", "mndot.json", "aldot.json", "louisiana.json", "idaho.json", "illinois.json", "virginia.json", "washington.json", "north_dakota.json"):
         m = PriorityModel.from_file(CONFIGS / cfg)
         result = m.rank(projects)
         total = len(result.scored) + len(result.excluded)
@@ -77,7 +77,7 @@ def test_louisiana_excludes_non_npias():
 def test_audit_trail_complete():
     """Every project in every model must have an audit trail covering every criterion."""
     projects = load_projects(PROJECTS)
-    for cfg in ("wyoming.json", "mndot.json", "aldot.json", "louisiana.json"):
+    for cfg in ("wyoming.json", "mndot.json", "aldot.json", "louisiana.json", "idaho.json", "illinois.json", "virginia.json", "washington.json", "north_dakota.json"):
         m = PriorityModel.from_file(CONFIGS / cfg)
         result = m.rank(projects)
         for p in result.scored:
@@ -100,7 +100,7 @@ def test_deterministic():
 def test_score_contributions_sum_to_base():
     """For non-formula models, sum of weighted contributions should equal base_score."""
     projects = load_projects(PROJECTS)
-    for cfg in ("wyoming.json", "mndot.json", "aldot.json", "louisiana.json"):
+    for cfg in ("wyoming.json", "mndot.json", "aldot.json", "louisiana.json", "idaho.json", "illinois.json", "virginia.json", "washington.json", "north_dakota.json"):
         m = PriorityModel.from_file(CONFIGS / cfg)
         if m.weighting_model == "formula":
             continue
@@ -152,6 +152,9 @@ def main():
         test_safe_eval_arithmetic,
         test_safe_eval_rejects_unsafe,
         test_eligibility_gate_disabled_by_default,
+        test_sprint6_five_new_states_present,
+        test_sprint6_illinois_formula_evaluates,
+        test_sprint6_north_dakota_dual_layer,
     ]
     passed = 0
     failed = []
@@ -173,6 +176,58 @@ def main():
         print(f"FAILED: {', '.join(failed)}")
     print("=" * 60)
     sys.exit(0 if not failed else 1)
+
+
+
+
+
+def test_sprint6_five_new_states_present():
+    """Sprint 6: Verify the 5 new ACRP case-example state configs load and have expected weighting models."""
+    projects = load_projects(PROJECTS)
+    expected = {
+        "idaho.json": "multiplicative",
+        "illinois.json": "formula",
+        "virginia.json": "additive_100pt",
+        "washington.json": "additive_100pt",
+        "north_dakota.json": "dual_objective_subjective",
+    }
+    for fname, wm in expected.items():
+        m = PriorityModel.from_file(CONFIGS / fname)
+        _assert(m.config["weighting_model"] == wm,
+                f"{fname} expected weighting_model={wm}, got {m.config['weighting_model']}")
+        result = m.rank(projects)
+        _assert(len(result.scored) > 0, f"{fname} produced no scored projects")
+        # Top project should be primary-runway safety project P001 (or P004 obstruction removal)
+        top_id = result.scored[0].project_id
+        _assert(top_id in ("P001", "P004", "P005", "P006", "P012"),
+                f"{fname} top should be a safety/primary-runway project; got {top_id}")
+
+
+def test_sprint6_illinois_formula_evaluates():
+    """Sprint 6: Illinois formula weighting model evaluates without raising."""
+    projects = load_projects(PROJECTS)
+    m = PriorityModel.from_file(CONFIGS / "illinois.json")
+    _assert(m.config.get("global_formula"), "Illinois must have global_formula")
+    result = m.rank(projects)
+    _assert(len(result.scored) == len(projects),
+            f"Illinois formula scored {len(result.scored)}/{len(projects)} projects")
+    # All scores should be positive (formula always produces > 0 for these inputs)
+    for row in result.scored:
+        _assert(row.final_score > 0,
+                f"Illinois project {row.project_id} produced non-positive score {row.final_score}")
+
+
+def test_sprint6_north_dakota_dual_layer():
+    """Sprint 6: North Dakota dual_objective_subjective produces objective layer with rankings."""
+    projects = load_projects(PROJECTS)
+    m = PriorityModel.from_file(CONFIGS / "north_dakota.json")
+    result = m.rank(projects)
+    _assert(len(result.scored) == len(projects),
+            f"ND scored {len(result.scored)}/{len(projects)}")
+    # Verify revenue-producing project (P017 fuel facility) does NOT outrank safety projects in objective layer
+    scores = {row.project_id: row.final_score for row in result.scored}
+    _assert(scores.get("P001", 0) > scores.get("P017", 0),
+            "ND objective layer: safety P001 must outrank revenue-producing P017")
 
 
 if __name__ == "__main__":

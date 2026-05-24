@@ -1,0 +1,232 @@
+{
+  "schema_version": "1.0.0",
+  "metadata": {
+    "name": "North Dakota Aeronautics Commission Project Prioritization",
+    "state": "North Dakota",
+    "agency": "North Dakota Aeronautics Commission (NDAC)",
+    "model_version": "2022 (ACRP Syn 123 case-example encoding)",
+    "last_updated": "2022-04-28",
+    "source_citation": "ACRP Synthesis 123 (2023), Chapter 4 — State of North Dakota case example, pp. 37-39. Sourced from interview with Kyle Wanner, Executive Director, NDAC, April 28, 2022. NDAC's process is explicitly described as 'both objective and subjective, which the state director believes is critical.'",
+    "decisions_log": [
+      {
+        "date": "2026-05-24",
+        "author": "APH m49 Sprint 6 reference encoder",
+        "decision": "Encoded North Dakota as dual_objective_subjective weighting_model — the canonical ACRP example for this pattern.",
+        "rationale": "NDAC explicitly bifurcates: (1) objective merit ranking of safety/preservation/federal-leverage projects; (2) subjective override allowing NDAC to fund lower-objective-ranked projects with high economic impact, justified to commissioners. Encoded all 11 ACRP-list factors in the objective layer with discretion_override_allowed=true in the tradeoff_layer.",
+        "source": "ACRP Synthesis 123 p. 37 — 'NDAC's process is both objective and subjective, which the state director believes is critical'"
+      },
+      {
+        "date": "2026-05-24",
+        "author": "APH m49 Sprint 6 reference encoder",
+        "decision": "Used the 11 ACRP-list factors verbatim per ACRP Syn 123 p. 38 'NDAC is one of the states that uses all 11 factors listed in the survey.'",
+        "rationale": "ACRP explicitly lists ND's 11 factors: Regulatory mandate; Safety; Security; Level of customer service or capacity; Airport size; Revenue generation/cost reduction; Environmental/community; Sustainable development; Asset preservation; Contribution to goals; Risk factors.",
+        "source": "ACRP Synthesis 123 p. 38"
+      }
+    ]
+  },
+  "weighting_model": "dual_objective_subjective",
+  "criteria": [
+    {
+      "id": "regulatory_mandate",
+      "label": "Regulatory Mandate / Compliance",
+      "description": "Project addresses regulatory mandate or compliance directive.",
+      "bucket": "Objective Layer",
+      "max_points": 10,
+      "acrp_category": "regulatory_mandate",
+      "scoring_style": "select_one",
+      "project_field": "purpose",
+      "subcategories": [
+        { "id": "mandated", "label": "Mandated by statute or FAA directive", "score": 10, "field_match": { "field": "purpose", "operator": "in", "value": ["safety", "security"] } },
+        { "id": "strongly_recommended", "label": "Strongly recommended (design standard)", "score": 5 },
+        { "id": "not_mandated", "label": "Not mandated", "score": 0 }
+      ]
+    },
+    {
+      "id": "safety",
+      "label": "Safety",
+      "description": "Safety is a high priority per NDAC. Safety issues at runway/RSA, obstructions, and approach surfaces score highest.",
+      "bucket": "Objective Layer",
+      "max_points": 15,
+      "acrp_category": "safety_security",
+      "scoring_style": "select_one",
+      "project_field": "purpose",
+      "subcategories": [
+        { "id": "safety_primary", "label": "Primary safety purpose", "score": 15, "field_match": { "field": "purpose", "operator": "eq", "value": "safety" } },
+        { "id": "safety_secondary", "label": "Secondary safety benefit", "score": 7 },
+        { "id": "safety_neutral", "label": "Neutral", "score": 0 }
+      ]
+    },
+    {
+      "id": "security",
+      "label": "Security",
+      "description": "Security is one of NDAC's 11 factors.",
+      "bucket": "Objective Layer",
+      "max_points": 5,
+      "acrp_category": "safety_security",
+      "scoring_style": "select_one",
+      "project_field": "purpose",
+      "subcategories": [
+        { "id": "security_primary", "label": "Primary security purpose", "score": 5, "field_match": { "field": "purpose", "operator": "eq", "value": "security" } },
+        { "id": "security_none", "label": "Not security-related", "score": 0 }
+      ]
+    },
+    {
+      "id": "capacity_level_of_service",
+      "label": "Customer Service / Capacity",
+      "description": "Improves level of service or addresses capacity.",
+      "bucket": "Objective Layer",
+      "max_points": 6,
+      "acrp_category": "level_of_service",
+      "scoring_style": "select_one",
+      "project_field": "purpose",
+      "subcategories": [
+        { "id": "capacity_primary", "label": "Primary capacity / level-of-service improvement", "score": 6, "field_match": { "field": "purpose", "operator": "eq", "value": "capacity" } },
+        { "id": "capacity_partial", "label": "Partial improvement", "score": 3 },
+        { "id": "capacity_none", "label": "Neutral", "score": 0 }
+      ]
+    },
+    {
+      "id": "airport_size",
+      "label": "Airport Size",
+      "description": "Recognizes airport tier.",
+      "bucket": "Objective Layer",
+      "max_points": 5,
+      "acrp_category": "system_plan_alignment",
+      "scoring_style": "select_one",
+      "project_field": "airport_classification",
+      "subcategories": [
+        { "id": "commercial_service", "label": "Commercial Service", "score": 5, "field_match": { "field": "airport_classification", "operator": "eq", "value": "commercial_service" } },
+        { "id": "business", "label": "Business / Regional", "score": 3, "field_match": { "field": "airport_classification", "operator": "eq", "value": "business" } },
+        { "id": "intermediate_ga", "label": "Community GA", "score": 2, "field_match": { "field": "airport_classification", "operator": "eq", "value": "intermediate_ga" } },
+        { "id": "local_ga", "label": "Local", "score": 1, "field_match": { "field": "airport_classification", "operator": "eq", "value": "local_ga" } }
+      ]
+    },
+    {
+      "id": "revenue_generation",
+      "label": "Revenue Generation / Cost Reduction",
+      "description": "NDAC requires a business plan for state/local-only revenue-producing projects (hangars, fuel systems). These are LOWER priority in the objective layer but may be elevated in subjective layer if economic impact justifies it.",
+      "bucket": "Objective Layer",
+      "max_points": 4,
+      "acrp_category": "revenue_cost",
+      "scoring_style": "select_one",
+      "project_field": "purpose",
+      "subcategories": [
+        { "id": "revenue_strong", "label": "Strong revenue / cost benefit with business plan", "score": 4 },
+        { "id": "revenue_moderate", "label": "Moderate", "score": 2 },
+        { "id": "revenue_none", "label": "None", "score": 0 }
+      ]
+    },
+    {
+      "id": "environmental_community",
+      "label": "Environmental / Community",
+      "description": "Environmental or community benefits and impacts.",
+      "bucket": "Objective Layer",
+      "max_points": 5,
+      "acrp_category": "environment",
+      "scoring_style": "select_one",
+      "subcategories": [
+        { "id": "positive_benefit", "label": "Positive environmental or community benefit", "score": 5 },
+        { "id": "neutral", "label": "Neutral", "score": 2 },
+        { "id": "mitigation_required", "label": "Significant mitigation required", "score": 0 }
+      ]
+    },
+    {
+      "id": "sustainable_development",
+      "label": "Sustainable Development Initiative",
+      "description": "Project advances a sustainable development goal.",
+      "bucket": "Objective Layer",
+      "max_points": 5,
+      "acrp_category": "sustainability",
+      "scoring_style": "select_one",
+      "subcategories": [
+        { "id": "sustainability_strong", "label": "Strong sustainability initiative", "score": 5 },
+        { "id": "moderate", "label": "Moderate", "score": 2 },
+        { "id": "none", "label": "None", "score": 0 }
+      ]
+    },
+    {
+      "id": "asset_preservation",
+      "label": "Asset Preservation",
+      "description": "System preservation (maintaining existing pavement) is a HIGH priority per NDAC. New pavement is a LOWER priority.",
+      "bucket": "Objective Layer",
+      "max_points": 15,
+      "acrp_category": "asset_preservation",
+      "scoring_style": "tiered_score",
+      "project_field": "purpose",
+      "subcategories": [
+        { "id": "pavement_preservation", "label": "Pavement preservation (rehab)", "score": 15, "field_match": { "field": "purpose", "operator": "eq", "value": "rehabilitation" } },
+        { "id": "maintenance", "label": "General maintenance", "score": 10, "field_match": { "field": "purpose", "operator": "eq", "value": "maintenance" } },
+        { "id": "reconstruction", "label": "Reconstruction (assets failed)", "score": 6, "field_match": { "field": "purpose", "operator": "eq", "value": "reconstruction" } },
+        { "id": "new_pavement", "label": "New pavement (lower priority)", "score": 2, "field_match": { "field": "purpose", "operator": "eq", "value": "capacity" } }
+      ]
+    },
+    {
+      "id": "system_goals",
+      "label": "Contribution to Goals and Objectives",
+      "description": "Project advances NDAC strategic goals or NDASP goals.",
+      "bucket": "Objective Layer",
+      "max_points": 5,
+      "acrp_category": "system_plan_alignment",
+      "scoring_style": "accumulating",
+      "subcategories": [
+        { "id": "ndac_goal", "label": "Advances an NDAC strategic goal", "score": 3, "field_match": { "field": "system_plan_supported", "operator": "eq", "value": true } },
+        { "id": "ndasp_goal", "label": "Advances a North Dakota Airport System Plan goal", "score": 2 }
+      ]
+    },
+    {
+      "id": "risk_factors",
+      "label": "Risk Factors",
+      "description": "Environmental, financial, schedule, or operational risk if project not done.",
+      "bucket": "Objective Layer",
+      "max_points": 5,
+      "acrp_category": "risk",
+      "scoring_style": "tiered_score",
+      "project_field": "urgency",
+      "subcategories": [
+        { "id": "urgent", "label": "Urgent (failure imminent)", "score": 5, "field_match": { "field": "urgency", "operator": "eq", "value": "urgent" } },
+        { "id": "time_sensitive", "label": "Time-sensitive (1-2 years)", "score": 3, "field_match": { "field": "urgency", "operator": "eq", "value": "time_sensitive" } },
+        { "id": "medium", "label": "Medium urgency", "score": 2, "field_match": { "field": "urgency", "operator": "eq", "value": "medium_urgency" } },
+        { "id": "low", "label": "Low urgency", "score": 0, "field_match": { "field": "urgency", "operator": "eq", "value": "low_urgency" } }
+      ]
+    },
+    {
+      "id": "federal_funding_leverage",
+      "label": "Federal Funding Leverage (Bonus)",
+      "description": "Per NDAC: 'Leveraging federal funding ranks high. If they get a federal grant, it automatically gets high priority for a match.'",
+      "bucket": "Objective Layer",
+      "max_points": 20,
+      "acrp_category": "revenue_cost",
+      "scoring_style": "select_one",
+      "project_field": "federal_funding_type",
+      "subcategories": [
+        { "id": "federal_grant_secured", "label": "Federal grant secured (auto-match priority)", "score": 20, "field_match": { "field": "federal_funding_type", "operator": "eq", "value": "discretionary" } },
+        { "id": "federal_entitlement", "label": "Federal entitlement", "score": 12, "field_match": { "field": "federal_funding_type", "operator": "eq", "value": "entitlement" } },
+        { "id": "state_apportionment", "label": "State apportionment", "score": 6, "field_match": { "field": "federal_funding_type", "operator": "eq", "value": "state_apportionment" } },
+        { "id": "no_federal", "label": "State/local only", "score": 0, "field_match": { "field": "federal_funding_type", "operator": "eq", "value": "no_federal" } }
+      ]
+    }
+  ],
+  "adjustments": {
+    "tradeoff_layer": {
+      "enabled": true,
+      "urgency_sort": true,
+      "financial_impact_sort": true,
+      "discretion_override_allowed": true
+    },
+    "revenue_producing_bump": {
+      "enabled": true,
+      "bonus_amount": 5,
+      "applies_to_project_types": ["fuel_system", "hangar", "business_plan_supported"]
+    }
+  },
+  "governance": {
+    "decision_authority": "North Dakota Aeronautics Commission (NDAC) commissioners",
+    "decision_cadence": "annual",
+    "statute_required": false,
+    "statute_citation": "ND state aeronautics law sets the standard for annual review but does not govern how grants are issued — described in ACRP Syn 123 as 'general and vague so it can be flexible.'",
+    "scoring_authority": "NDAC Executive Director and staff",
+    "approval_process": "Objective layer ranks projects by merit. Subjective layer allows NDAC to fund lower-ranked projects when justified (e.g., large economic impact). NDAC recommends a list, opens it for public comment, then commissioners vote. Process is intentionally flexible.",
+    "model_review_cycle_years": 5
+  },
+  "disclaimer": "Encoding mirrors ACRP Synthesis 123 (2023) summary of NDAC's 11-criterion dual objective/subjective process. ACRP does not publish NDAC's exact per-criterion point allocations; point values are inferred from documented relative priorities (safety high; preservation high; federal leverage high; revenue-producing low at the objective layer, with subjective layer recovering them). Verify against NDAC's internal scoring matrix before adoption."
+}
