@@ -1,0 +1,162 @@
+{
+  "schema_version": "1.0.0",
+  "metadata": {
+    "name": "ALDOT Airport Project Priority Rating System",
+    "state": "Alabama",
+    "agency": "Alabama Department of Transportation, Aeronautics Bureau",
+    "model_version": "current",
+    "last_updated": "2024-01-01",
+    "source_citation": "ALDOT Airport Project Priority Rating System. Encoded from source PDF at Priority_Model/Example Prioritization Models/ALDOT Airport Project Priority Rating System.pdf (extracted via OCR; project-type tables A–F are simplified to representative tiers).",
+    "decisions_log": [
+      {
+        "date": "2026-05-06",
+        "author": "APH m49 reference encoder",
+        "decision": "Encoded ALDOT model as additive_100pt with three categories totaling 100",
+        "rationale": "Source document explicitly: 'CATEGORY I — PROJECT TYPE (40 points) / Category II — Airport Usage (30 points) / Category III — Sponsor Responsibility (30 points)'.",
+        "source": "ALDOT Airport Project Priority Rating System"
+      },
+      {
+        "date": "2026-05-06",
+        "author": "APH m49 reference encoder",
+        "decision": "Used flat_lookup scoring style for Project Type with 40+ subcategories representing the source's six lookup tables (A–F)",
+        "rationale": "ALDOT's project-type scoring is a literal lookup table — each project type has a fixed point value with no further weighting.",
+        "source": "ALDOT tables A–F"
+      }
+    ]
+  },
+  "weighting_model": "additive_100pt",
+  "criteria": [
+    {
+      "id": "project_type",
+      "label": "Project Type",
+      "description": "Granular lookup of project types into six sub-categories (Runways, Taxiways, Aprons, Landside Access, Land Acquisition, Other Infrastructure). Each project gets the highest applicable point value.",
+      "max_points": 40,
+      "acrp_category": "asset_preservation",
+      "scoring_style": "flat_lookup",
+      "project_field": "project_type",
+      "subcategories": [
+        { "id": "primary_rwy_obstruction_removal", "label": "Primary Runway — Remove approach area obstructions", "score": 40, "notes": "State Licensing Standards, Part 77 and/or RPZ" },
+        { "id": "primary_rwy_rsa", "label": "Primary Runway — Expand/enlarge RSAs", "score": 40 },
+        { "id": "primary_rwy_design_standards", "label": "Primary Runway — Clearing FAA Airport Design Standards (OFZ, OFA, TSS)", "score": 40 },
+        { "id": "primary_rwy_unsafe_surface", "label": "Primary Runway — Correct unsafe surface failures", "score": 39 },
+        { "id": "primary_rwy_rehab", "label": "Primary Runway — Rehabilitation or overlay", "score": 39 },
+        { "id": "primary_rwy_markings", "label": "Primary Runway — Markings", "score": 37 },
+        { "id": "primary_rwy_maintenance", "label": "Primary Runway — Maintenance (crack sealing, seal coat)", "score": 37 },
+        { "id": "primary_rwy_upgrade_standards", "label": "Upgrade primary runway to State/FAA standards", "score": 36 },
+        { "id": "primary_rwy_extension", "label": "Primary Runway — Extension", "score": 36 },
+        { "id": "primary_rwy_strengthen", "label": "Primary Runway — Strengthen for larger critical aircraft", "score": 35 },
+        { "id": "displace_threshold", "label": "Displace/relocate threshold", "score": 34 },
+        { "id": "secondary_rwy_obstruction_removal", "label": "Secondary Runway — Remove approach area obstructions", "score": 30 },
+        { "id": "secondary_rwy_rsa", "label": "Secondary Runway — Expand/enlarge RSAs", "score": 30 },
+        { "id": "secondary_rwy_design_standards", "label": "Secondary Runway — Clearing FAA Design Standards", "score": 29 },
+        { "id": "secondary_rwy_rehab", "label": "Secondary runway rehabilitation or overlay", "score": 28 },
+        { "id": "secondary_rwy_markings", "label": "Secondary runway markings", "score": 27 },
+        { "id": "secondary_rwy_maintenance", "label": "Secondary runway maintenance", "score": 27 },
+        { "id": "secondary_rwy_upgrade_standards", "label": "Upgrade secondary runway to State/FAA standards", "score": 26 },
+        { "id": "secondary_rwy_extension", "label": "Secondary Runway — Extension", "score": 23 },
+        { "id": "secondary_rwy_strengthen", "label": "Secondary Runway — Strengthen for larger critical aircraft", "score": 22 },
+        { "id": "new_runway", "label": "Add new runway", "score": 20 },
+        { "id": "twy_parallel_deviation", "label": "Correct parallel taxiway deviation from FAA design standards", "score": 37 },
+        { "id": "twy_with_rwy_extension_primary", "label": "Construct taxiway with runway extension to primary runway", "score": 36 },
+        { "id": "twy_unsafe_surface_primary", "label": "Correct unsafe primary taxiway surface failures", "score": 35 },
+        { "id": "twy_rehab_primary", "label": "Primary taxiway rehabilitation or overlay", "score": 35 },
+        { "id": "twy_partial_parallel", "label": "Construct partial parallel taxiway", "score": 32 },
+        { "id": "twy_turnarounds_runup", "label": "Construct turnarounds and/or aircraft run-up areas", "score": 32 },
+        { "id": "twy_connector", "label": "Construct connector taxiway(s)", "score": 32 },
+        { "id": "twy_maintenance_primary", "label": "Primary taxiway maintenance", "score": 30 },
+        { "id": "twy_markings_primary", "label": "Primary taxiway markings", "score": 30 },
+        { "id": "twy_secondary_with_rwy_ext", "label": "Secondary taxiway with runway extension to secondary runway", "score": 25 },
+        { "id": "twy_secondary_parallel_deviation", "label": "Correct secondary parallel taxiway deviation from FAA standards", "score": 24 },
+        { "id": "twy_unsafe_surface_secondary", "label": "Correct unsafe secondary taxiway surface failures", "score": 24 },
+        { "id": "twy_rehab_secondary", "label": "Secondary taxiway rehabilitation or overlay", "score": 23 },
+        { "id": "twy_maintenance_secondary", "label": "Secondary taxiway maintenance", "score": 22 },
+        { "id": "twy_markings_secondary", "label": "Secondary taxiway markings", "score": 22 },
+        { "id": "twy_hangar_access", "label": "Hangar access taxiway", "score": 21 },
+        { "id": "apron_rehab", "label": "Apron rehabilitation or overlay", "score": 35 },
+        { "id": "apron_upgrade_standards", "label": "Upgrade terminal area apron to meet standards", "score": 25 },
+        { "id": "apron_new_open_area", "label": "Construct new apron to open new area of airport", "score": 25 },
+        { "id": "apron_expand_capacity", "label": "Expand aircraft parking apron for capacity", "score": 22 },
+        { "id": "apron_strengthen", "label": "Strengthen apron for critical aircraft", "score": 21 },
+        { "id": "landside_security_fencing", "label": "Install security fencing/equipment", "score": 35 },
+        { "id": "landside_perimeter_fencing", "label": "Install perimeter (wildlife) fencing", "score": 32 },
+        { "id": "landside_maintain_road", "label": "Maintain auto access road", "score": 20 },
+        { "id": "landside_maintain_parking", "label": "Maintain auto parking area", "score": 20 },
+        { "id": "landside_road_terminal", "label": "Construct airport access road to terminal area", "score": 14 },
+        { "id": "landside_road_hangar", "label": "Construct airport access road to hangar area", "score": 14 },
+        { "id": "landside_upgrade_road", "label": "Upgrade auto access road to meet standards", "score": 10 },
+        { "id": "landside_upgrade_parking", "label": "Upgrade auto parking area to meet standards", "score": 10 },
+        { "id": "landside_increase_parking", "label": "Increase capacity of auto parking area", "score": 5 },
+        { "id": "land_obstruction_removal", "label": "Land for obstruction removal within approach areas", "score": 40 },
+        { "id": "land_primary_rwy_standards", "label": "Land for primary runway state licensing/FAA design standards", "score": 40 },
+        { "id": "land_primary_rwy_extension", "label": "Land for future primary runway extension", "score": 36 },
+        { "id": "land_other_part77", "label": "Land for other Part 77 obstruction removal/marking", "score": 30 },
+        { "id": "land_capacity", "label": "Land for operational capacity constraints", "score": 28 },
+        { "id": "land_noise", "label": "Land for noise control related projects", "score": 26 },
+        { "id": "land_awos", "label": "Land for AWOS", "score": 24 },
+        { "id": "land_secondary_rwy_standards", "label": "Land for secondary runway state licensing/FAA standards", "score": 24 },
+        { "id": "land_secondary_rwy_extension", "label": "Land for future secondary runway extension", "score": 22 },
+        { "id": "land_new_airport", "label": "Land for new airport", "score": 20 },
+        { "id": "land_industrial_commercial", "label": "Land for industrial/commercial development", "score": 15 },
+        { "id": "infra_arff", "label": "ARFF vehicles and equipment", "score": 35 },
+        { "id": "infra_drainage", "label": "Drainage improvements", "score": 30 },
+        { "id": "infra_env_mitigation", "label": "Environmental Mitigation", "score": 30 },
+        { "id": "infra_new_fuel", "label": "New fuel facilities", "score": 16 },
+        { "id": "infra_upgrade_fuel", "label": "Upgrade existing fuel facilities", "score": 15 },
+        { "id": "infra_env_remediation", "label": "Environmental remediation", "score": 10 },
+        { "id": "infra_utilities", "label": "Install/maintain utilities (water, sewer, electricity)", "score": 2 }
+      ]
+    },
+    {
+      "id": "airport_usage",
+      "label": "Airport Usage",
+      "description": "Based aircraft tier (most recent inspection). Engine selects the highest matching tier. Economic-development bonus is encoded as a separate adjustment.",
+      "max_points": 20,
+      "acrp_category": "demand_accommodation",
+      "scoring_style": "select_one",
+      "subcategories": [
+        { "id": "based_100plus", "label": "100 or more based aircraft", "score": 20, "field_match": { "field": "based_aircraft", "operator": "gte", "value": 100 } },
+        { "id": "based_75_99", "label": "75–99 based aircraft", "score": 18, "field_match": { "field": "based_aircraft", "operator": "gte", "value": 75 } },
+        { "id": "based_50_74", "label": "50–74 based aircraft", "score": 15, "field_match": { "field": "based_aircraft", "operator": "gte", "value": 50 } },
+        { "id": "based_25_50", "label": "25–49 based aircraft", "score": 10, "field_match": { "field": "based_aircraft", "operator": "gte", "value": 25 } },
+        { "id": "based_10_24", "label": "10–24 based aircraft", "score": 5, "field_match": { "field": "based_aircraft", "operator": "gte", "value": 10 } },
+        { "id": "based_0_9", "label": "0–9 based aircraft", "score": 3, "field_match": { "field": "based_aircraft", "operator": "gte", "value": 0 } }
+      ]
+    },
+    {
+      "id": "sponsor_responsibility",
+      "label": "Sponsor Responsibility",
+      "description": "Compliance and stewardship responsibilities of the airport sponsor.",
+      "max_points": 30,
+      "acrp_category": "regulatory_mandate",
+      "scoring_style": "select_many",
+      "negative_scores_allowed": true,
+      "subcategories": [
+        { "id": "license_compliance", "label": "Licensing — Compliance (or project corrects deficiency)", "score": 10 },
+        { "id": "license_partial", "label": "Licensing — Partial compliance with corrective actions underway", "score": 5 },
+        { "id": "license_noncompliance", "label": "Licensing — Non-compliance with no corrective actions", "score": -10 },
+        { "id": "min_standards_on_file", "label": "Minimum standards adopted and on file with ALDOT", "score": 1 },
+        { "id": "height_zoning_on_file", "label": "Height zoning enacted and on file with ALDOT", "score": 1 },
+        { "id": "cip_phased_with_priority", "label": "Phased project with ALDOT priority and in current CIP", "score": 15 },
+        { "id": "cip_in_current", "label": "Project is in current CIP", "score": 5 },
+        { "id": "pavement_management_program", "label": "Pavement Maintenance Program implemented", "score": 3 },
+        { "id": "system_plan_not_supported", "label": "Project NOT supported by state system plan", "score": -20 }
+      ]
+    }
+  ],
+  "set_asides": [],
+  "adjustments": {
+    "revenue_producing_bump": {
+      "enabled": true,
+      "bonus_amount": 10,
+      "applies_to_project_types": ["economic_development_demonstrated"]
+    }
+  },
+  "governance": {
+    "decision_authority": "ALDOT Aeronautics Bureau",
+    "decision_cadence": "annual",
+    "statute_required": false,
+    "scoring_authority": "ALDOT Aeronautics staff",
+    "approval_process": "Sponsors submit applications. ALDOT scores each project across the three categories. Airport classification (International, National, GA-Regional, GA-Community, Local) is reported alongside scores to illustrate funding distribution within each classification."
+  },
+  "disclaimer": "This model encoding is derived from the ALDOT Airport Project Priority Rating System. Project-type lookup tables A–F are encoded as a single flat_lookup; in implementation the engine should use field_match against project metadata."
+}
