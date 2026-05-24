@@ -1,0 +1,202 @@
+{
+  "schema_version": "1.0.0",
+  "metadata": {
+    "name": "Washington State Aviation Grant Prioritization",
+    "state": "Washington",
+    "agency": "Washington State Department of Transportation (WSDOT), Aviation Division",
+    "model_version": "2022 (ACRP Syn 123 case-example encoding)",
+    "last_updated": "2022-05-06",
+    "source_citation": "ACRP Synthesis 123 (2023), Chapter 4 — State of Washington case example, pp. 41-42. Sourced from interview with David Fleckenstein, Director of Aviation, WSDOT, May 6, 2022. ACRP notes Washington uses all 11 evaluation criteria from the synthesis survey and includes statutory criteria, weighted scoring, with statute dictating award rules but not prioritization methodology.",
+    "decisions_log": [
+      {
+        "date": "2026-05-24",
+        "author": "APH m49 Sprint 6 reference encoder",
+        "decision": "Encoded Washington as additive_100pt model with 11 criteria mirroring the full ACRP 11-factor list, plus two set-asides (10% transformation/sustainability, 25% non-NPIAS).",
+        "rationale": "ACRP Syn 123 documents Washington uses 'a spreadsheet with formulas and all 11 evaluation criteria.' The 10% airport-transformation-grant set-aside (established 2019) and 25% non-NPIAS allocation are unique features; encoded as set_asides.",
+        "source": "ACRP Synthesis 123 p. 42"
+      }
+    ]
+  },
+  "weighting_model": "additive_100pt",
+  "criteria": [
+    {
+      "id": "regulatory_mandate",
+      "label": "Regulatory Mandate",
+      "description": "Project addresses a regulatory mandate or compliance directive.",
+      "max_points": 15,
+      "acrp_category": "regulatory_mandate",
+      "scoring_style": "tiered_score",
+      "project_field": "purpose",
+      "subcategories": [
+        { "id": "mandate_yes", "label": "Mandated by statute or FAA directive", "score": 15, "field_match": { "field": "purpose", "operator": "in", "value": ["safety", "security"] } },
+        { "id": "mandate_partial", "label": "Strongly recommended (advisory circular, design standard)", "score": 8, "field_match": { "field": "purpose", "operator": "eq", "value": "rehabilitation" } },
+        { "id": "mandate_no", "label": "Not mandated", "score": 0 }
+      ]
+    },
+    {
+      "id": "safety",
+      "label": "Safety",
+      "description": "Project addresses safety deficiencies or enhancements.",
+      "max_points": 15,
+      "acrp_category": "safety_security",
+      "scoring_style": "select_one",
+      "project_field": "purpose",
+      "subcategories": [
+        { "id": "safety_primary", "label": "Primary safety purpose", "score": 15, "field_match": { "field": "purpose", "operator": "eq", "value": "safety" } },
+        { "id": "safety_secondary", "label": "Secondary safety benefit", "score": 6, "field_match": { "field": "purpose", "operator": "in", "value": ["maintenance", "rehabilitation"] } },
+        { "id": "safety_neutral", "label": "Neutral", "score": 0 }
+      ]
+    },
+    {
+      "id": "security",
+      "label": "Security",
+      "description": "Project addresses physical or cyber security.",
+      "max_points": 5,
+      "acrp_category": "safety_security",
+      "scoring_style": "select_one",
+      "project_field": "purpose",
+      "subcategories": [
+        { "id": "security_primary", "label": "Primary security purpose", "score": 5, "field_match": { "field": "purpose", "operator": "eq", "value": "security" } },
+        { "id": "security_none", "label": "Not security-related", "score": 0 }
+      ]
+    },
+    {
+      "id": "capacity_level_of_service",
+      "label": "Customer Service / Capacity",
+      "description": "Improves level of service or addresses capacity.",
+      "max_points": 8,
+      "acrp_category": "level_of_service",
+      "scoring_style": "select_one",
+      "project_field": "purpose",
+      "subcategories": [
+        { "id": "capacity_primary", "label": "Primary capacity / level-of-service improvement", "score": 8, "field_match": { "field": "purpose", "operator": "eq", "value": "capacity" } },
+        { "id": "capacity_partial", "label": "Partial improvement", "score": 4, "field_match": { "field": "purpose", "operator": "eq", "value": "airport_enhancement" } },
+        { "id": "capacity_none", "label": "Neutral", "score": 0 }
+      ]
+    },
+    {
+      "id": "airport_size",
+      "label": "Airport Size",
+      "description": "Recognizes airport tier per WSDOT system plan.",
+      "max_points": 8,
+      "acrp_category": "system_plan_alignment",
+      "scoring_style": "select_one",
+      "project_field": "airport_classification",
+      "subcategories": [
+        { "id": "commercial_service", "label": "Commercial Service", "score": 8, "field_match": { "field": "airport_classification", "operator": "eq", "value": "commercial_service" } },
+        { "id": "business_reliever", "label": "Business / Regional", "score": 6, "field_match": { "field": "airport_classification", "operator": "eq", "value": "business" } },
+        { "id": "intermediate_ga", "label": "Community GA", "score": 4, "field_match": { "field": "airport_classification", "operator": "eq", "value": "intermediate_ga" } },
+        { "id": "local_ga", "label": "Local / Backcountry", "score": 2, "field_match": { "field": "airport_classification", "operator": "eq", "value": "local_ga" } }
+      ]
+    },
+    {
+      "id": "revenue_generation",
+      "label": "Revenue Generation / Cost Reduction",
+      "description": "Project generates revenue or reduces operating costs (Washington supports this with its Community Aviation Revitalization Board revolving loan program).",
+      "max_points": 8,
+      "acrp_category": "revenue_cost",
+      "scoring_style": "select_one",
+      "project_field": "purpose",
+      "subcategories": [
+        { "id": "revenue_strong", "label": "Strong revenue generation or cost reduction", "score": 8, "field_match": { "field": "purpose", "operator": "in", "value": ["capacity", "airport_enhancement"] } },
+        { "id": "revenue_moderate", "label": "Moderate revenue / cost benefit", "score": 4 },
+        { "id": "revenue_none", "label": "Neutral", "score": 0 }
+      ]
+    },
+    {
+      "id": "environmental_community",
+      "label": "Environmental / Community Benefit",
+      "description": "Environmental or community benefits and impacts.",
+      "max_points": 6,
+      "acrp_category": "environment",
+      "scoring_style": "select_one",
+      "project_field": "purpose",
+      "subcategories": [
+        { "id": "positive_benefit", "label": "Positive environmental or community benefit", "score": 6 },
+        { "id": "neutral", "label": "Neutral", "score": 3 },
+        { "id": "mitigation_required", "label": "Significant mitigation required", "score": 0 }
+      ]
+    },
+    {
+      "id": "sustainability",
+      "label": "Sustainability / Airport Transformation",
+      "description": "Washington reserves 10% of grant funds for airport transformation grants targeting solar, LED conversion, EV infrastructure, electrical-service ducts, and other sustainability projects.",
+      "max_points": 8,
+      "acrp_category": "sustainability",
+      "scoring_style": "select_one",
+      "project_field": "purpose",
+      "subcategories": [
+        { "id": "transformation_eligible", "label": "Eligible airport transformation project", "score": 8, "field_match": { "field": "purpose", "operator": "eq", "value": "airport_enhancement" } },
+        { "id": "moderate", "label": "Moderate sustainability benefit", "score": 4 },
+        { "id": "none", "label": "None", "score": 0 }
+      ]
+    },
+    {
+      "id": "asset_preservation",
+      "label": "Asset Preservation",
+      "description": "Maintains existing facilities. Washington has prioritized pavement preservation as 'most funds are going toward pavement preservation' per ACRP.",
+      "max_points": 12,
+      "acrp_category": "asset_preservation",
+      "scoring_style": "tiered_score",
+      "project_field": "purpose",
+      "subcategories": [
+        { "id": "pavement_preservation", "label": "Pavement preservation (rehab)", "score": 12, "field_match": { "field": "purpose", "operator": "eq", "value": "rehabilitation" } },
+        { "id": "maintenance", "label": "General maintenance", "score": 8, "field_match": { "field": "purpose", "operator": "eq", "value": "maintenance" } },
+        { "id": "reconstruction", "label": "Reconstruction (assets failed)", "score": 6, "field_match": { "field": "purpose", "operator": "eq", "value": "reconstruction" } },
+        { "id": "new_build", "label": "New build (no preservation benefit)", "score": 0, "field_match": { "field": "purpose", "operator": "eq", "value": "capacity" } }
+      ]
+    },
+    {
+      "id": "system_goals",
+      "label": "Contribution to Agency / System Plan Goals",
+      "description": "Advances WSDOT goals or Washington State Aviation System Plan goals.",
+      "max_points": 8,
+      "acrp_category": "system_plan_alignment",
+      "scoring_style": "accumulating",
+      "subcategories": [
+        { "id": "wsdot_goal", "label": "Advances a WSDOT strategic goal", "score": 4, "field_match": { "field": "system_plan_supported", "operator": "eq", "value": true } },
+        { "id": "wasp_goal", "label": "Advances a Washington State Aviation System Plan goal", "score": 4, "field_match": { "field": "wysasp_state_goal_met", "operator": "eq", "value": true } }
+      ]
+    },
+    {
+      "id": "risk_factors",
+      "label": "Risk Factors",
+      "description": "Environmental, financial, schedule, or operational risk factors associated with NOT doing the project.",
+      "max_points": 7,
+      "acrp_category": "risk",
+      "scoring_style": "tiered_score",
+      "project_field": "urgency",
+      "subcategories": [
+        { "id": "urgent", "label": "Urgent (failure imminent)", "score": 7, "field_match": { "field": "urgency", "operator": "eq", "value": "urgent" } },
+        { "id": "time_sensitive", "label": "Time-sensitive (within 1-2 years)", "score": 5, "field_match": { "field": "urgency", "operator": "eq", "value": "time_sensitive" } },
+        { "id": "medium", "label": "Medium urgency", "score": 3, "field_match": { "field": "urgency", "operator": "eq", "value": "medium_urgency" } },
+        { "id": "low", "label": "Low urgency", "score": 1, "field_match": { "field": "urgency", "operator": "eq", "value": "low_urgency" } }
+      ]
+    }
+  ],
+  "set_asides": [
+    {
+      "id": "transformation_grants",
+      "label": "Airport Transformation Grants (Sustainability)",
+      "allocation_pct": 10,
+      "eligibility_filter": "Sustainability projects: solar, LED conversion, electric vehicle infrastructure, duct work for future electrical service.",
+      "field_filter": { "field": "purpose", "operator": "eq", "value": "airport_enhancement" }
+    },
+    {
+      "id": "non_npias_set_aside",
+      "label": "Non-NPIAS Airports",
+      "allocation_pct": 25,
+      "eligibility_filter": "Airports not in the National Plan of Integrated Airport Systems."
+    }
+  ],
+  "governance": {
+    "decision_authority": "WSDOT Aviation Division, Director of Aviation",
+    "decision_cadence": "annual",
+    "statute_required": true,
+    "statute_citation": "Washington statute dictates how grants are awarded but does not dictate the prioritization process.",
+    "scoring_authority": "WSDOT Grants Program Manager",
+    "approval_process": "Grants Program Manager collects all grant requests in a spreadsheet with formulas, scores them against all 11 evaluation criteria, then discusses with the Director of Aviation. One process used for all grants. Director adjusts based on amount of funding available.",
+    "model_review_cycle_years": 3
+  },
+  "disclaimer": "Encoding mirrors ACRP Synthesis 123 (2023) summary of Washington's 11-criterion process. Per-criterion point allocations are inferred from typical practice; ACRP does not publish WSDOT's exact spreadsheet weights. The 10% transformation set-aside and 25% non-NPIAS share are documented. Verify against WSDOT Aviation's current grant solicitation before adoption."
+}
