@@ -1,0 +1,3590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>State Funding Priority Model Builder — APH m49</title>
+<meta name="author" content="John Marcus Cocanougher">
+<meta name="copyright" content="© 2026 John Marcus Cocanougher. All rights reserved.">
+<style>
+  :root {
+    --primary: #1B3A5C;
+    --primary-light: #2A5A8C;
+    --accent: #E8851E;
+    --accent-gold: #F5B731;
+    --teal: #2A8C82;
+    --success: #28a745;
+    --warning: #ffc107;
+    --danger: #dc3545;
+    --gray-50: #f8f9fa;
+    --gray-100: #e9ecef;
+    --gray-200: #dee2e6;
+    --gray-300: #ced4da;
+    --gray-400: #adb5bd;
+    --gray-600: #6c757d;
+    --gray-700: #495057;
+    --gray-800: #343a40;
+    --radius: 8px;
+    --shadow: 0 2px 8px rgba(0,0,0,.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--gray-50); color: var(--gray-800);
+    font-size: 14px; line-height: 1.5;
+  }
+  header {
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    color: #fff; padding: 18px 28px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.2);
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 12px;
+  }
+  header h1 { font-size: 1.4rem; font-weight: 700; }
+  header .subtitle { font-size: .82rem; opacity: .85; margin-top: 2px; }
+  header .module-tag {
+    background: var(--accent); color: #fff; font-weight: 700;
+    padding: 2px 10px; border-radius: 12px; font-size: .72rem;
+    letter-spacing: .5px; margin-left: 10px; vertical-align: middle;
+  }
+
+  /* Profile bar */
+  .profile-bar {
+    background: #fff; border-bottom: 1px solid var(--gray-200);
+    padding: 10px 28px;
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  }
+  .profile-bar label { font-size: .8rem; color: var(--gray-600); font-weight: 600; }
+  .profile-select {
+    padding: 6px 10px; border: 1px solid var(--gray-300);
+    border-radius: 6px; background: #fff; font-size: .88rem;
+    min-width: 240px; font-family: inherit;
+  }
+  .profile-modified { color: var(--warning); font-size: .78rem; font-weight: 600; }
+  .profile-clean { color: var(--gray-400); font-size: .78rem; }
+
+  /* Buttons */
+  .btn {
+    padding: 7px 14px; border: none; border-radius: 6px; cursor: pointer;
+    font-size: .82rem; font-weight: 600; font-family: inherit;
+    transition: all .15s; display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-primary:hover { background: var(--primary-light); }
+  .btn-accent { background: var(--accent); color: #fff; }
+  .btn-accent:hover { background: #d27416; }
+  .btn-secondary { background: var(--gray-100); color: var(--gray-700); border: 1px solid var(--gray-300); }
+  .btn-secondary:hover { background: var(--gray-200); }
+  .btn-danger { background: #fff; color: var(--danger); border: 1px solid var(--danger); }
+  .btn-danger:hover { background: var(--danger); color: #fff; }
+  .btn-sm { padding: 4px 10px; font-size: .75rem; }
+  .btn:disabled { opacity: .5; cursor: not-allowed; }
+
+  /* Layout */
+  .main {
+    display: grid; grid-template-columns: minmax(0, 1fr) 380px;
+    gap: 16px; padding: 16px 28px;
+  }
+  @media (max-width: 1100px) { .main { grid-template-columns: 1fr; } }
+
+  /* Tabs */
+  .tabs { display: flex; gap: 2px; margin-bottom: 14px; flex-wrap: wrap;
+          border-bottom: 1px solid var(--gray-200); }
+  .tab-btn {
+    padding: 9px 16px; border: none; background: transparent;
+    color: var(--gray-600); font-size: .85rem; font-weight: 600;
+    cursor: pointer; border-radius: 6px 6px 0 0;
+    border-bottom: 2px solid transparent;
+    font-family: inherit;
+  }
+  .tab-btn:hover { color: var(--primary); background: var(--gray-100); }
+  .tab-btn.active { color: var(--primary); border-bottom-color: var(--accent); }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* Cards */
+  .card {
+    background: #fff; border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 18px; margin-bottom: 14px;
+  }
+  .card h2 { font-size: 1.05rem; color: var(--primary); margin-bottom: 10px;
+             border-bottom: 2px solid var(--accent); padding-bottom: 6px;
+             display: inline-block; }
+  .card h3 { font-size: .92rem; color: var(--gray-700); margin: 12px 0 8px; }
+  .card p.help { color: var(--gray-600); font-size: .82rem; margin-bottom: 10px; }
+
+  /* Form fields */
+  .field { margin-bottom: 12px; }
+  .field label { display: block; font-size: .78rem; color: var(--gray-700);
+                  font-weight: 600; margin-bottom: 4px; }
+  .field input[type="text"], .field input[type="number"], .field select,
+  .field textarea {
+    width: 100%; padding: 7px 10px; border: 1px solid var(--gray-300);
+    border-radius: 6px; font-size: .85rem; font-family: inherit;
+    background: #fff;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus {
+    outline: none; border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(232,133,30,.15);
+  }
+  .field textarea { resize: vertical; min-height: 60px; }
+  .field.row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .field-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+
+  /* Tables */
+  table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+  th, td { padding: 7px 8px; border-bottom: 1px solid var(--gray-200);
+            text-align: left; vertical-align: top; }
+  th { font-weight: 700; color: var(--gray-700); background: var(--gray-50);
+        position: sticky; top: 0; }
+  tr:hover td { background: var(--gray-50); }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  td.center, th.center { text-align: center; }
+
+  /* Criteria editor */
+  .criterion-card {
+    border: 1px solid var(--gray-200); border-radius: 6px;
+    padding: 12px; margin-bottom: 10px; background: var(--gray-50);
+  }
+  .criterion-card.expanded { background: #fff; box-shadow: var(--shadow); }
+  .criterion-header {
+    display: grid; grid-template-columns: 1fr auto auto auto;
+    gap: 10px; align-items: center;
+  }
+  .criterion-title { font-weight: 700; color: var(--primary); }
+  .criterion-detail { font-size: .76rem; color: var(--gray-600); margin-top: 2px; }
+  .criterion-body { margin-top: 12px; padding-top: 12px;
+                     border-top: 1px solid var(--gray-200); }
+  .subcategory-row {
+    display: grid; grid-template-columns: 1fr 80px 50px;
+    gap: 8px; padding: 5px 0; align-items: center;
+  }
+  .subcategory-row input[type="text"] { font-size: .8rem; }
+  .subcategory-row input[type="number"] { font-size: .8rem; text-align: right; }
+
+  /* Preview pane */
+  .preview-pane {
+    position: sticky; top: 16px;
+    background: #fff; border-radius: var(--radius); box-shadow: var(--shadow);
+    padding: 16px; max-height: calc(100vh - 100px); overflow-y: auto;
+  }
+  .preview-pane h2 { font-size: 1rem; color: var(--primary);
+                      border-bottom: 2px solid var(--accent);
+                      padding-bottom: 6px; margin-bottom: 12px; }
+  .preview-summary {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;
+  }
+  .stat { background: var(--gray-50); border-radius: 6px; padding: 8px 10px; }
+  .stat-label { font-size: .68rem; color: var(--gray-600);
+                  text-transform: uppercase; letter-spacing: .5px; }
+  .stat-value { font-size: 1.1rem; font-weight: 700; color: var(--primary); }
+  .ranking-table td { padding: 4px 6px; font-size: .78rem; }
+  .ranking-table td.score { font-weight: 700; color: var(--primary); width: 50px; }
+  .ranking-table td.id { color: var(--gray-600); width: 40px; font-size: .72rem; }
+  .ranking-row.excluded td { color: var(--danger); opacity: .7; }
+  .ranking-row.excluded td.score { color: var(--danger); }
+
+  /* Pills */
+  .pill {
+    display: inline-block; padding: 1px 8px; font-size: .68rem;
+    border-radius: 10px; font-weight: 600;
+  }
+  .pill-acrp { background: rgba(42,140,130,.15); color: var(--teal); }
+  .pill-bucket { background: rgba(232,133,30,.15); color: var(--accent); }
+  .pill-style { background: rgba(27,58,92,.1); color: var(--primary); }
+
+  /* Disclaimers / footer */
+  footer {
+    padding: 18px 28px; color: var(--gray-600); font-size: .75rem;
+    border-top: 1px solid var(--gray-200); margin-top: 16px; background: #fff;
+  }
+  .badge-saved { color: var(--success); font-weight: 600; }
+  .badge-modified { color: var(--warning); font-weight: 600; }
+
+  /* Action bar */
+  .action-bar {
+    background: #fff; padding: 10px 28px;
+    border-bottom: 1px solid var(--gray-200);
+    display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+  }
+  .action-bar .spacer { flex: 1; }
+
+  /* Hidden file input */
+  .hidden-input { display: none; }
+
+  /* Empty state */
+  .empty {
+    padding: 30px; text-align: center; color: var(--gray-600);
+    border: 2px dashed var(--gray-300); border-radius: 8px;
+    background: var(--gray-50);
+  }
+
+  /* Status colors for rankings */
+  .score-positive { color: var(--success); }
+  .score-zero     { color: var(--gray-600); }
+  .score-negative { color: var(--danger); }
+
+  /* ── Wizard overlay ─────────────────────────────── */
+  .wizard-overlay {
+    display: none; position: fixed; inset: 0; z-index: 1000;
+    background: rgba(0,0,0,.55);
+    align-items: stretch; justify-content: center; padding: 30px;
+  }
+  .wizard-modal {
+    background: #fff; border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,.35);
+    width: min(900px, 100%); max-height: 100%; display: flex; flex-direction: column;
+  }
+  .wizard-header {
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    color: #fff; padding: 14px 22px; border-radius: 12px 12px 0 0;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .wizard-header h2 { font-size: 1.05rem; font-weight: 700; }
+  .wizard-header .step-label { font-size: .8rem; opacity: .85; margin-top: 2px; }
+  .wizard-body { padding: 24px 28px; overflow-y: auto; flex: 1; }
+  .wizard-body h2 { font-size: 1.25rem; color: var(--primary); margin-bottom: 8px;
+                     border-bottom: 2px solid var(--accent); padding-bottom: 6px; display: inline-block; }
+  .wizard-body h3 { font-size: .9rem; color: var(--gray-700); margin: 10px 0 6px; }
+  .wizard-body p { margin-bottom: 10px; line-height: 1.6; color: var(--gray-700); }
+  .wizard-body code { background: var(--gray-100); padding: 1px 5px; border-radius: 3px; font-size: .82rem; }
+  .wizard-footer { border-top: 1px solid var(--gray-200); padding: 14px 22px;
+                    display: flex; justify-content: space-between; align-items: center;
+                    background: var(--gray-50); border-radius: 0 0 12px 12px; }
+  .wizard-footer .right { display: flex; gap: 8px; }
+  .wf-hint { background: rgba(232,133,30,.08); border-left: 3px solid var(--accent);
+              padding: 8px 12px; font-size: .82rem; color: var(--gray-700);
+              border-radius: 0 4px 4px 0; margin-top: 10px; }
+  .wf-card { background: var(--gray-50); border: 1px solid var(--gray-200);
+              border-radius: 8px; padding: 12px 14px; margin-bottom: 10px; }
+  .wf-card h3 { margin-top: 0; }
+  .wf-pill { display: inline-block; background: rgba(42,140,130,.15); color: var(--teal);
+              font-size: .68rem; padding: 1px 6px; border-radius: 10px; font-weight: 600; }
+  .wf-criteria-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+  .wf-criteria-card { border: 2px solid var(--gray-200); border-radius: 8px;
+                       padding: 10px 12px; cursor: pointer; background: #fff; transition: all .15s; }
+  .wf-criteria-card:hover { border-color: var(--accent); }
+  .wf-criteria-card.selected { border-color: var(--accent); background: rgba(232,133,30,.04); }
+  .wf-criteria-head { display: flex; gap: 8px; align-items: center; }
+  .wf-criteria-desc { font-size: .78rem; color: var(--gray-600); margin: 6px 0; }
+  .wf-criteria-states { display: flex; gap: 4px; flex-wrap: wrap; }
+  .wf-state-chip { background: var(--gray-100); padding: 2px 8px; border-radius: 8px;
+                    font-size: .7rem; color: var(--gray-700); font-weight: 600; }
+  .wf-state-chip em { color: var(--accent); font-style: normal; }
+  .wf-radio-grid { display: grid; gap: 8px; margin-top: 10px; }
+  .wf-radio-card { border: 2px solid var(--gray-200); border-radius: 8px; padding: 12px;
+                    cursor: pointer; display: flex; gap: 10px; align-items: flex-start; transition: all .15s; }
+  .wf-radio-card:hover { border-color: var(--accent); }
+  .wf-radio-card.selected { border-color: var(--accent); background: rgba(232,133,30,.04); }
+  .wf-weights-table { width: 100%; }
+  .wf-gap-row { padding: 8px 10px; border-radius: 5px; margin-bottom: 5px; font-size: .85rem; }
+  .wf-gap-row.good { background: rgba(40,167,69,.1); border-left: 3px solid var(--success); }
+  .wf-gap-row.bad  { background: rgba(220,53,69,.08); border-left: 3px solid var(--danger); }
+  .wf-gap-row.warn { background: rgba(255,193,7,.12); border-left: 3px solid var(--warning); }
+  .wf-rec-row { display: flex; gap: 10px; padding: 10px 12px;
+                 border: 1px solid var(--gray-200); border-radius: 6px; margin-bottom: 6px; cursor: pointer; }
+  .wf-rec-row:hover { background: var(--gray-50); }
+  .wf-rec-row input[type="checkbox"] { margin-top: 4px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>
+      State Funding Priority Model Builder
+      <span class="module-tag">m49</span>
+    </h1>
+    <div class="subtitle">
+      Design, modify, and govern state aviation funding-prioritization models.
+      Grounded in ACRP Synthesis 123.
+    </div>
+  </div>
+  <div style="font-size: .78rem; opacity: .85;">© 2026 J. Marcus Cocanougher</div>
+</header>
+
+<!-- Profile bar -->
+<div class="profile-bar">
+  <label>Active model:</label>
+  <select id="profileSelect" class="profile-select"></select>
+  <span id="modifiedIndicator" class="profile-clean">Saved</span>
+  <button class="btn btn-primary btn-sm" onclick="saveActive()">💾 Save</button>
+  <button class="btn btn-secondary btn-sm" onclick="renameActive()">✎ Rename</button>
+  <button class="btn btn-secondary btn-sm" onclick="cloneActive()">⊕ Clone</button>
+  <button class="btn btn-danger btn-sm" onclick="deleteActive()">✕ Delete</button>
+</div>
+
+<!-- Action bar -->
+<div class="action-bar">
+  <button class="btn btn-primary" onclick="openWizardBuild()">🪄 Build New (Wizard)</button>
+  <button class="btn btn-primary" onclick="openWizardModify()">🔍 Modify Existing</button>
+  <span style="border-left: 1px solid var(--gray-300); height: 22px; margin: 0 4px"></span>
+  <button class="btn btn-accent" onclick="newFromTemplate('wyoming')">🆕 Wyoming</button>
+  <button class="btn btn-accent" onclick="newFromTemplate('mndot')">🆕 MnDOT</button>
+  <button class="btn btn-accent" onclick="newFromTemplate('aldot')">🆕 ALDOT</button>
+  <button class="btn btn-accent" onclick="newFromTemplate('louisiana')">🆕 Louisiana</button>
+  <button class="btn btn-secondary" onclick="newBlankModel()">➕ Blank</button>
+  <span class="spacer"></span>
+  <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">📥 Import JSON</button>
+  <button class="btn btn-secondary" onclick="exportActive()">📤 Export JSON</button>
+  <button class="btn btn-secondary" onclick="exportExcel()">📊 Excel</button>
+  <button class="btn btn-secondary" onclick="exportPolicyWyoming()">📄 Policy (PRM)</button>
+  <button class="btn btn-secondary" onclick="exportPolicyLouisiana()">📄 Policy (Admin)</button>
+  <input type="file" id="importFile" class="hidden-input" accept=".json" onchange="importJSON(this)">
+</div>
+
+<!-- Wizard overlay -->
+<div id="wizardOverlay" class="wizard-overlay">
+  <div class="wizard-modal">
+    <div class="wizard-header">
+      <div>
+        <h2>m49 Priority Model — Co-Design Wizard</h2>
+        <div id="wizardStepLabel" class="step-label">Step 1 of 16</div>
+      </div>
+      <button id="wizardCancel" class="btn btn-secondary btn-sm">✕ Close</button>
+    </div>
+    <div id="wizardBody" class="wizard-body"></div>
+    <div class="wizard-footer">
+      <button id="wizardPrev" class="btn btn-secondary">← Previous</button>
+      <div class="right">
+        <button id="wizardNext" class="btn btn-primary">Next →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Main grid: editor + live preview -->
+<div class="main">
+  <!-- LEFT: tabbed editor -->
+  <div>
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="metadata">Metadata</button>
+      <button class="tab-btn" data-tab="criteria">Criteria</button>
+      <button class="tab-btn" data-tab="weighting">Weighting</button>
+      <button class="tab-btn" data-tab="setasides">Set-asides</button>
+      <button class="tab-btn" data-tab="adjustments">Adjustments</button>
+      <button class="tab-btn" data-tab="governance">Governance</button>
+      <button class="tab-btn" data-tab="raw">Raw JSON</button>
+    </div>
+
+    <!-- Metadata tab -->
+    <div id="tab-metadata" class="tab-content active">
+      <div class="card">
+        <h2>Model Identity</h2>
+        <div class="field">
+          <label>Model Name</label>
+          <input type="text" id="m_name" oninput="onMetaInput(this)">
+        </div>
+        <div class="field row">
+          <div>
+            <label>State</label>
+            <input type="text" id="m_state" oninput="onMetaInput(this)">
+          </div>
+          <div>
+            <label>Agency</label>
+            <input type="text" id="m_agency" oninput="onMetaInput(this)">
+          </div>
+        </div>
+        <div class="field row">
+          <div>
+            <label>Model Version</label>
+            <input type="text" id="m_model_version" oninput="onMetaInput(this)">
+          </div>
+          <div>
+            <label>Last Updated</label>
+            <input type="text" id="m_last_updated" oninput="onMetaInput(this)">
+          </div>
+        </div>
+        <div class="field">
+          <label>Source Citation</label>
+          <textarea id="m_source_citation" oninput="onMetaInput(this)"></textarea>
+        </div>
+        <div class="field">
+          <label>Disclaimer</label>
+          <textarea id="m_disclaimer" oninput="onMetaInput(this)"></textarea>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Decisions Log</h2>
+        <p class="help">Append-only audit log. Every change worth defending to a commission goes here.</p>
+        <div id="decisionsLog"></div>
+        <button class="btn btn-secondary btn-sm" onclick="addDecision()">+ Add Decision</button>
+      </div>
+    </div>
+
+    <!-- Criteria tab -->
+    <div id="tab-criteria" class="tab-content">
+      <div class="card">
+        <h2>Scoring Criteria</h2>
+        <p class="help">
+          Click a criterion to edit its subcategories and scores. Each criterion can map to one of
+          ACRP Synthesis 123's 14 evaluation categories for cross-state comparison.
+        </p>
+        <div id="criteriaList"></div>
+        <button class="btn btn-secondary btn-sm" onclick="addCriterion()">+ Add Criterion</button>
+      </div>
+    </div>
+
+    <!-- Weighting tab -->
+    <div id="tab-weighting" class="tab-content">
+      <div class="card">
+        <h2>Weighting Model</h2>
+        <p class="help">
+          How criterion scores combine into a final project score. Choose the pattern that matches
+          your state's existing model or commission's preferences.
+        </p>
+        <div class="field">
+          <label>Weighting Model</label>
+          <select id="weightingModel" onchange="onWeightingChange()">
+            <option value="multiplicative">multiplicative — Wyoming pattern (weight × subcategory score)</option>
+            <option value="additive_100pt">additive_100pt — MnDOT/ALDOT pattern (sum of capped points)</option>
+            <option value="formula">formula — Illinois pattern (custom expression)</option>
+            <option value="dual_objective_subjective">dual_objective_subjective — North Dakota pattern</option>
+          </select>
+        </div>
+        <div id="globalFormulaWrap" style="display:none">
+          <div class="field">
+            <label>Global Formula</label>
+            <input type="text" id="globalFormula" oninput="onGlobalFormulaInput()" placeholder="e.g., (4*A + 2*C + 0.7*P + 0.7*T)/4.2 + X">
+            <p class="help">Reference criterion ids in the formula. Safe expression evaluator (arithmetic only).</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Per-Criterion Weights</h2>
+        <p class="help">Adjust a weight and watch the live preview re-rank instantly.</p>
+        <table id="weightingTable">
+          <thead>
+            <tr>
+              <th>Criterion</th>
+              <th>ACRP Category</th>
+              <th>Bucket</th>
+              <th class="num">Weight / Max Pts</th>
+            </tr>
+          </thead>
+          <tbody id="weightingBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Set-asides tab -->
+    <div id="tab-setasides" class="tab-content">
+      <div class="card">
+        <h2>Funding Set-asides</h2>
+        <p class="help">
+          Reserve a portion of state funds for specific categories before ranking is applied.
+          Examples: Washington's 25% non-NPIAS reservation, Louisiana's 21.622% ACE Program for air carriers.
+        </p>
+        <div id="setAsidesList"></div>
+        <button class="btn btn-secondary btn-sm" onclick="addSetAside()">+ Add Set-aside</button>
+      </div>
+
+      <div class="card">
+        <h2>Eligibility Gate</h2>
+        <p class="help">Optional pre-scoring filter (Louisiana pattern). Projects failing the gate are excluded.</p>
+        <div class="field">
+          <label><input type="checkbox" id="gateEnabled" onchange="onGateToggle()"> Enable eligibility gate</label>
+        </div>
+        <div id="eligibilityFilters"></div>
+        <button class="btn btn-secondary btn-sm" onclick="addEligibilityFilter()">+ Add Filter</button>
+      </div>
+    </div>
+
+    <!-- Adjustments tab -->
+    <div id="tab-adjustments" class="tab-content">
+      <div class="card">
+        <h2>Score Adjustments</h2>
+        <p class="help">Optional post-scoring adjustments applied after base scoring.</p>
+
+        <h3>Revenue-Producing Project Bump</h3>
+        <p class="help">Bonus for projects that don't compete well for FAA funds (~33% of states use this per ACRP).</p>
+        <label><input type="checkbox" id="adj_rev_enabled" onchange="onAdjChange()"> Enabled</label>
+        <div class="field" style="margin-top: 8px">
+          <label>Bonus Amount</label>
+          <input type="number" id="adj_rev_amount" step="1" oninput="onAdjChange()">
+        </div>
+        <div class="field">
+          <label>Project type tags (comma-separated, matches against project_type field)</label>
+          <input type="text" id="adj_rev_tags" oninput="onAdjChange()" placeholder="e.g., hangar, fuel, terminal">
+        </div>
+
+        <h3>Low Federal Priority Bonus (Illinois pattern)</h3>
+        <p class="help">When integrated with m9 AIP Eligibility, projects with FAA NPRS scores below threshold get a state-side bump.</p>
+        <label><input type="checkbox" id="adj_lfp_enabled" onchange="onAdjChange()"> Enabled</label>
+        <div class="field row" style="margin-top: 8px">
+          <div>
+            <label>NPRS Threshold</label>
+            <input type="number" id="adj_lfp_threshold" step="1" oninput="onAdjChange()">
+          </div>
+          <div>
+            <label>Bonus Amount</label>
+            <input type="number" id="adj_lfp_amount" step="1" oninput="onAdjChange()">
+          </div>
+        </div>
+
+        <h3>Tradeoff Layer (North Dakota pattern)</h3>
+        <p class="help">Post-scoring sequencing rules.</p>
+        <label><input type="checkbox" id="adj_tl_enabled" onchange="onAdjChange()"> Enabled</label><br>
+        <label><input type="checkbox" id="adj_tl_urgency" onchange="onAdjChange()"> Sort by urgency within score tiers</label><br>
+        <label><input type="checkbox" id="adj_tl_finance" onchange="onAdjChange()"> Sort by financial impact</label><br>
+        <label><input type="checkbox" id="adj_tl_override" onchange="onAdjChange()"> Allow commissioner override</label>
+      </div>
+    </div>
+
+    <!-- Governance tab -->
+    <div id="tab-governance" class="tab-content">
+      <div class="card">
+        <h2>Governance &amp; Cadence</h2>
+        <p class="help">The metadata that turns a model into adoptable policy.</p>
+        <div class="field row">
+          <div>
+            <label>Decision Authority</label>
+            <input type="text" id="g_decision_authority" oninput="onGovInput()">
+          </div>
+          <div>
+            <label>Decision Cadence</label>
+            <select id="g_decision_cadence" onchange="onGovInput()">
+              <option value="annual">Annual</option>
+              <option value="quarterly">Quarterly</option>
+              <option value="monthly">Monthly</option>
+              <option value="rolling">Rolling</option>
+              <option value="biennial">Biennial</option>
+            </select>
+          </div>
+        </div>
+        <div class="field row">
+          <div>
+            <label>Statute Required?</label>
+            <select id="g_statute_required" onchange="onGovInput()">
+              <option value="false">No</option>
+              <option value="true">Yes</option>
+            </select>
+          </div>
+          <div>
+            <label>Statute Citation</label>
+            <input type="text" id="g_statute_citation" oninput="onGovInput()">
+          </div>
+        </div>
+        <div class="field row">
+          <div>
+            <label>Model Review Cycle (years)</label>
+            <input type="number" id="g_model_review_cycle" oninput="onGovInput()" step="1" min="1">
+          </div>
+          <div>
+            <label>Scoring Authority</label>
+            <input type="text" id="g_scoring_authority" oninput="onGovInput()">
+          </div>
+        </div>
+        <div class="field">
+          <label>Approval Process</label>
+          <textarea id="g_approval_process" oninput="onGovInput()"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Raw JSON tab -->
+    <div id="tab-raw" class="tab-content">
+      <div class="card">
+        <h2>Raw Configuration JSON</h2>
+        <p class="help">
+          The canonical source of truth. Editing here updates all tabs after you click Apply.
+          The same JSON is consumed by the Python engine, the JS engine, and the policy-manual
+          and Excel generators.
+        </p>
+        <textarea id="rawJSON" rows="30" style="width:100%; font-family:monospace; font-size:.78rem"></textarea>
+        <div style="margin-top: 10px; display:flex; gap:8px;">
+          <button class="btn btn-primary btn-sm" onclick="applyRawJSON()">Apply</button>
+          <button class="btn btn-secondary btn-sm" onclick="renderAll()">Reset from active model</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: live preview -->
+  <div class="preview-pane">
+    <h2>Live Ranking Preview</h2>
+    <div class="preview-summary">
+      <div class="stat">
+        <div class="stat-label">Scored</div>
+        <div class="stat-value" id="stat-scored">—</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Excluded</div>
+        <div class="stat-value" id="stat-excluded">—</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Top score</div>
+        <div class="stat-value" id="stat-top">—</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Bottom score</div>
+        <div class="stat-value" id="stat-bottom">—</div>
+      </div>
+    </div>
+    <p class="help" style="font-size:.72rem; color:var(--gray-600)">
+      Ranking 25 synthetic projects. Change any weight, scoring tier, or adjustment and this
+      table updates instantly using the same JS engine that's tested against priority_engine.py.
+    </p>
+    <table class="ranking-table">
+      <thead>
+        <tr>
+          <th class="center" style="width: 35px">#</th>
+          <th class="num" style="width: 55px">Score</th>
+          <th>Project</th>
+        </tr>
+      </thead>
+      <tbody id="rankingBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<footer>
+  Built with <strong>priority_engine.js</strong> (sprint 2). Source documents: Wyoming PRM 2021;
+  MnDOT State Prioritization Model Guide; ALDOT Airport Project Priority Rating System;
+  Louisiana DOTD Aviation Program Policy Manual (2024); ACRP Synthesis 123 (2023).
+  Disclaimer: planning-level analysis only; does not constitute engineering design or official FAA determination.
+</footer>
+
+<!-- ─── Embedded reference data (auto-generated by build_embedded_data.py) ─── -->
+<script>  // BEGIN_EMBEDDED_DATA
+  // Auto-generated by build_embedded_data.py — do not edit by hand.
+  // Reference configs (4 reference state models):
+  window.PM_REFERENCE_CONFIGS = {
+  "aldot": {
+    "schema_version": "1.0.0",
+    "metadata": {
+      "name": "ALDOT Airport Project Priority Rating System",
+      "state": "Alabama",
+      "agency": "Alabama Department of Transportation, Aeronautics Bureau",
+      "model_version": "current",
+      "last_updated": "2024-01-01",
+      "source_citation": "ALDOT Airport Project Priority Rating System. Encoded from source PDF at Priority_Model/Example Prioritization Models/ALDOT Airport Project Priority Rating System.pdf (extracted via OCR; project-type tables A\u2013F are simplified to representative tiers).",
+      "decisions_log": [
+        {
+          "date": "2026-05-06",
+          "author": "APH m49 reference encoder",
+          "decision": "Encoded ALDOT model as additive_100pt with three categories totaling 100",
+          "rationale": "Source document explicitly: 'CATEGORY I \u2014 PROJECT TYPE (40 points) / Category II \u2014 Airport Usage (30 points) / Category III \u2014 Sponsor Responsibility (30 points)'.",
+          "source": "ALDOT Airport Project Priority Rating System"
+        },
+        {
+          "date": "2026-05-06",
+          "author": "APH m49 reference encoder",
+          "decision": "Used flat_lookup scoring style for Project Type with 40+ subcategories representing the source's six lookup tables (A\u2013F)",
+          "rationale": "ALDOT's project-type scoring is a literal lookup table \u2014 each project type has a fixed point value with no further weighting.",
+          "source": "ALDOT tables A\u2013F"
+        }
+      ]
+    },
+    "weighting_model": "additive_100pt",
+    "criteria": [
+      {
+        "id": "project_type",
+        "label": "Project Type",
+        "description": "Granular lookup of project types into six sub-categories (Runways, Taxiways, Aprons, Landside Access, Land Acquisition, Other Infrastructure). Each project gets the highest applicable point value.",
+        "max_points": 40,
+        "acrp_category": "asset_preservation",
+        "scoring_style": "flat_lookup",
+        "project_field": "project_type",
+        "subcategories": [
+          {
+            "id": "primary_rwy_obstruction_removal",
+            "label": "Primary Runway \u2014 Remove approach area obstructions",
+            "score": 40,
+            "notes": "State Licensing Standards, Part 77 and/or RPZ"
+          },
+          {
+            "id": "primary_rwy_rsa",
+            "label": "Primary Runway \u2014 Expand/enlarge RSAs",
+            "score": 40
+          },
+          {
+            "id": "primary_rwy_design_standards",
+            "label": "Primary Runway \u2014 Clearing FAA Airport Design Standards (OFZ, OFA, TSS)",
+            "score": 40
+          },
+          {
+            "id": "primary_rwy_unsafe_surface",
+            "label": "Primary Runway \u2014 Correct unsafe surface failures",
+            "score": 39
+          },
+          {
+            "id": "primary_rwy_rehab",
+            "label": "Primary Runway \u2014 Rehabilitation or overlay",
+            "score": 39
+          },
+          {
+            "id": "primary_rwy_markings",
+            "label": "Primary Runway \u2014 Markings",
+            "score": 37
+          },
+          {
+            "id": "primary_rwy_maintenance",
+            "label": "Primary Runway \u2014 Maintenance (crack sealing, seal coat)",
+            "score": 37
+          },
+          {
+            "id": "primary_rwy_upgrade_standards",
+            "label": "Upgrade primary runway to State/FAA standards",
+            "score": 36
+          },
+          {
+            "id": "primary_rwy_extension",
+            "label": "Primary Runway \u2014 Extension",
+            "score": 36
+          },
+          {
+            "id": "primary_rwy_strengthen",
+            "label": "Primary Runway \u2014 Strengthen for larger critical aircraft",
+            "score": 35
+          },
+          {
+            "id": "displace_threshold",
+            "label": "Displace/relocate threshold",
+            "score": 34
+          },
+          {
+            "id": "secondary_rwy_obstruction_removal",
+            "label": "Secondary Runway \u2014 Remove approach area obstructions",
+            "score": 30
+          },
+          {
+            "id": "secondary_rwy_rsa",
+            "label": "Secondary Runway \u2014 Expand/enlarge RSAs",
+            "score": 30
+          },
+          {
+            "id": "secondary_rwy_design_standards",
+            "label": "Secondary Runway \u2014 Clearing FAA Design Standards",
+            "score": 29
+          },
+          {
+            "id": "secondary_rwy_rehab",
+            "label": "Secondary runway rehabilitation or overlay",
+            "score": 28
+          },
+          {
+            "id": "secondary_rwy_markings",
+            "label": "Secondary runway markings",
+            "score": 27
+          },
+          {
+            "id": "secondary_rwy_maintenance",
+            "label": "Secondary runway maintenance",
+            "score": 27
+          },
+          {
+            "id": "secondary_rwy_upgrade_standards",
+            "label": "Upgrade secondary runway to State/FAA standards",
+            "score": 26
+          },
+          {
+            "id": "secondary_rwy_extension",
+            "label": "Secondary Runway \u2014 Extension",
+            "score": 23
+          },
+          {
+            "id": "secondary_rwy_strengthen",
+            "label": "Secondary Runway \u2014 Strengthen for larger critical aircraft",
+            "score": 22
+          },
+          {
+            "id": "new_runway",
+            "label": "Add new runway",
+            "score": 20
+          },
+          {
+            "id": "twy_parallel_deviation",
+            "label": "Correct parallel taxiway deviation from FAA design standards",
+            "score": 37
+          },
+          {
+            "id": "twy_with_rwy_extension_primary",
+            "label": "Construct taxiway with runway extension to primary runway",
+            "score": 36
+          },
+          {
+            "id": "twy_unsafe_surface_primary",
+            "label": "Correct unsafe primary taxiway surface failures",
+            "score": 35
+          },
+          {
+            "id": "twy_rehab_primary",
+            "label": "Primary taxiway rehabilitation or overlay",
+            "score": 35
+          },
+          {
+            "id": "twy_partial_parallel",
+            "label": "Construct partial parallel taxiway",
+            "score": 32
+          },
+          {
+            "id": "twy_turnarounds_runup",
+            "label": "Construct turnarounds and/or aircraft run-up areas",
+            "score": 32
+          },
+          {
+            "id": "twy_connector",
+            "label": "Construct connector taxiway(s)",
+            "score": 32
+          },
+          {
+            "id": "twy_maintenance_primary",
+            "label": "Primary taxiway maintenance",
+            "score": 30
+          },
+          {
+            "id": "twy_markings_primary",
+            "label": "Primary taxiway markings",
+            "score": 30
+          },
+          {
+            "id": "twy_secondary_with_rwy_ext",
+            "label": "Secondary taxiway with runway extension to secondary runway",
+            "score": 25
+          },
+          {
+            "id": "twy_secondary_parallel_deviation",
+            "label": "Correct secondary parallel taxiway deviation from FAA standards",
+            "score": 24
+          },
+          {
+            "id": "twy_unsafe_surface_secondary",
+            "label": "Correct unsafe secondary taxiway surface failures",
+            "score": 24
+          },
+          {
+            "id": "twy_rehab_secondary",
+            "label": "Secondary taxiway rehabilitation or overlay",
+            "score": 23
+          },
+          {
+            "id": "twy_maintenance_secondary",
+            "label": "Secondary taxiway maintenance",
+            "score": 22
+          },
+          {
+            "id": "twy_markings_secondary",
+            "label": "Secondary taxiway markings",
+            "score": 22
+          },
+          {
+            "id": "twy_hangar_access",
+            "label": "Hangar access taxiway",
+            "score": 21
+          },
+          {
+            "id": "apron_rehab",
+            "label": "Apron rehabilitation or overlay",
+            "score": 35
+          },
+          {
+            "id": "apron_upgrade_standards",
+            "label": "Upgrade terminal area apron to meet standards",
+            "score": 25
+          },
+          {
+            "id": "apron_new_open_area",
+            "label": "Construct new apron to open new area of airport",
+            "score": 25
+          },
+          {
+            "id": "apron_expand_capacity",
+            "label": "Expand aircraft parking apron for capacity",
+            "score": 22
+          },
+          {
+            "id": "apron_strengthen",
+            "label": "Strengthen apron for critical aircraft",
+            "score": 21
+          },
+          {
+            "id": "landside_security_fencing",
+            "label": "Install security fencing/equipment",
+            "score": 35
+          },
+          {
+            "id": "landside_perimeter_fencing",
+            "label": "Install perimeter (wildlife) fencing",
+            "score": 32
+          },
+          {
+            "id": "landside_maintain_road",
+            "label": "Maintain auto access road",
+            "score": 20
+          },
+          {
+            "id": "landside_maintain_parking",
+            "label": "Maintain auto parking area",
+            "score": 20
+          },
+          {
+            "id": "landside_road_terminal",
+            "label": "Construct airport access road to terminal area",
+            "score": 14
+          },
+          {
+            "id": "landside_road_hangar",
+            "label": "Construct airport access road to hangar area",
+            "score": 14
+          },
+          {
+            "id": "landside_upgrade_road",
+            "label": "Upgrade auto access road to meet standards",
+            "score": 10
+          },
+          {
+            "id": "landside_upgrade_parking",
+            "label": "Upgrade auto parking area to meet standards",
+            "score": 10
+          },
+          {
+            "id": "landside_increase_parking",
+            "label": "Increase capacity of auto parking area",
+            "score": 5
+          },
+          {
+            "id": "land_obstruction_removal",
+            "label": "Land for obstruction removal within approach areas",
+            "score": 40
+          },
+          {
+            "id": "land_primary_rwy_standards",
+            "label": "Land for primary runway state licensing/FAA design standards",
+            "score": 40
+          },
+          {
+            "id": "land_primary_rwy_extension",
+            "label": "Land for future primary runway extension",
+            "score": 36
+          },
+          {
+            "id": "land_other_part77",
+            "label": "Land for other Part 77 obstruction removal/marking",
+            "score": 30
+          },
+          {
+            "id": "land_capacity",
+            "label": "Land for operational capacity constraints",
+            "score": 28
+          },
+          {
+            "id": "land_noise",
+            "label": "Land for noise control related projects",
+            "score": 26
+          },
+          {
+            "id": "land_awos",
+            "label": "Land for AWOS",
+            "score": 24
+          },
+          {
+            "id": "land_secondary_rwy_standards",
+            "label": "Land for secondary runway state licensing/FAA standards",
+            "score": 24
+          },
+          {
+            "id": "land_secondary_rwy_extension",
+            "label": "Land for future secondary runway extension",
+            "score": 22
+          },
+          {
+            "id": "land_new_airport",
+            "label": "Land for new airport",
+            "score": 20
+          },
+          {
+            "id": "land_industrial_commercial",
+            "label": "Land for industrial/commercial development",
+            "score": 15
+          },
+          {
+            "id": "infra_arff",
+            "label": "ARFF vehicles and equipment",
+            "score": 35
+          },
+          {
+            "id": "infra_drainage",
+            "label": "Drainage improvements",
+            "score": 30
+          },
+          {
+            "id": "infra_env_mitigation",
+            "label": "Environmental Mitigation",
+            "score": 30
+          },
+          {
+            "id": "infra_new_fuel",
+            "label": "New fuel facilities",
+            "score": 16
+          },
+          {
+            "id": "infra_upgrade_fuel",
+            "label": "Upgrade existing fuel facilities",
+            "score": 15
+          },
+          {
+            "id": "infra_env_remediation",
+            "label": "Environmental remediation",
+            "score": 10
+          },
+          {
+            "id": "infra_utilities",
+            "label": "Install/maintain utilities (water, sewer, electricity)",
+            "score": 2
+          }
+        ]
+      },
+      {
+        "id": "airport_usage",
+        "label": "Airport Usage",
+        "description": "Based aircraft tier (most recent inspection). Engine selects the highest matching tier. Economic-development bonus is encoded as a separate adjustment.",
+        "max_points": 20,
+        "acrp_category": "demand_accommodation",
+        "scoring_style": "select_one",
+        "subcategories": [
+          {
+            "id": "based_100plus",
+            "label": "100 or more based aircraft",
+            "score": 20,
+            "field_match": {
+              "field": "based_aircraft",
+              "operator": "gte",
+              "value": 100
+            }
+          },
+          {
+            "id": "based_75_99",
+            "label": "75\u201399 based aircraft",
+            "score": 18,
+            "field_match": {
+              "field": "based_aircraft",
+              "operator": "gte",
+              "value": 75
+            }
+          },
+          {
+            "id": "based_50_74",
+            "label": "50\u201374 based aircraft",
+            "score": 15,
+            "field_match": {
+              "field": "based_aircraft",
+              "operator": "gte",
+              "value": 50
+            }
+          },
+          {
+            "id": "based_25_50",
+            "label": "25\u201349 based aircraft",
+            "score": 10,
+            "field_match": {
+              "field": "based_aircraft",
+              "operator": "gte",
+              "value": 25
+            }
+          },
+          {
+            "id": "based_10_24",
+            "label": "10\u201324 based aircraft",
+            "score": 5,
+            "field_match": {
+              "field": "based_aircraft",
+              "operator": "gte",
+              "value": 10
+            }
+          },
+          {
+            "id": "based_0_9",
+            "label": "0\u20139 based aircraft",
+            "score": 3,
+            "field_match": {
+              "field": "based_aircraft",
+              "operator": "gte",
+              "value": 0
+            }
+          }
+        ]
+      },
+      {
+        "id": "sponsor_responsibility",
+        "label": "Sponsor Responsibility",
+        "description": "Compliance and stewardship responsibilities of the airport sponsor.",
+        "max_points": 30,
+        "acrp_category": "regulatory_mandate",
+        "scoring_style": "select_many",
+        "negative_scores_allowed": true,
+        "subcategories": [
+          {
+            "id": "license_compliance",
+            "label": "Licensing \u2014 Compliance (or project corrects deficiency)",
+            "score": 10
+          },
+          {
+            "id": "license_partial",
+            "label": "Licensing \u2014 Partial compliance with corrective actions underway",
+            "score": 5
+          },
+          {
+            "id": "license_noncompliance",
+            "label": "Licensing \u2014 Non-compliance with no corrective actions",
+            "score": -10
+          },
+          {
+            "id": "min_standards_on_file",
+            "label": "Minimum standards adopted and on file with ALDOT",
+            "score": 1
+          },
+          {
+            "id": "height_zoning_on_file",
+            "label": "Height zoning enacted and on file with ALDOT",
+            "score": 1
+          },
+          {
+            "id": "cip_phased_with_priority",
+            "label": "Phased project with ALDOT priority and in current CIP",
+            "score": 15
+          },
+          {
+            "id": "cip_in_current",
+            "label": "Project is in current CIP",
+            "score": 5
+          },
+          {
+            "id": "pavement_management_program",
+            "label": "Pavement Maintenance Program implemented",
+            "score": 3
+          },
+          {
+            "id": "system_plan_not_supported",
+            "label": "Project NOT supported by state system plan",
+            "score": -20
+          }
+        ]
+      }
+    ],
+    "set_asides": [],
+    "adjustments": {
+      "revenue_producing_bump": {
+        "enabled": true,
+        "bonus_amount": 10,
+        "applies_to_project_types": [
+          "economic_development_demonstrated"
+        ]
+      }
+    },
+    "governance": {
+      "decision_authority": "ALDOT Aeronautics Bureau",
+      "decision_cadence": "annual",
+      "statute_required": false,
+      "scoring_authority": "ALDOT Aeronautics staff",
+      "approval_process": "Sponsors submit applications. ALDOT scores each project across the three categories. Airport classification (International, National, GA-Regional, GA-Community, Local) is reported alongside scores to illustrate funding distribution within each classification."
+    },
+    "disclaimer": "This model encoding is derived from the ALDOT Airport Project Priority Rating System. Project-type lookup tables A\u2013F are encoded as a single flat_lookup; in implementation the engine should use field_match against project metadata."
+  },
+  "louisiana": {
+    "schema_version": "1.0.0",
+    "metadata": {
+      "name": "Louisiana Airport Construction and Development Priority Program",
+      "state": "Louisiana",
+      "agency": "Louisiana Department of Transportation and Development, Aviation Division",
+      "model_version": "FY2024-2025",
+      "last_updated": "2024-07-01",
+      "source_citation": "Louisiana Aviation Program Policy Manual, Effective July 1, 2024, Version 1.2. Reference: LA Adm Code Title 70, Part IX. Encoded from source PDF at Priority_Model/Example Prioritization Models/Louisiana-aviation-program-policy-manual-july-1-2024.pdf.",
+      "decisions_log": [
+        {
+          "date": "2026-05-06",
+          "author": "APH m49 reference encoder",
+          "decision": "Encoded Louisiana model with eligibility_gate enabled (two-step process)",
+          "rationale": "Louisiana's process is explicitly two-step per the source: 'Step One \u2013 determine project eligibility / Step Two \u2013 confirm all required information is available'. The eligibility_gate captures step one before scoring runs.",
+          "source": "Louisiana Aviation Policy Manual; NASP Symposium - LADOTD deck"
+        },
+        {
+          "date": "2026-05-06",
+          "author": "APH m49 reference encoder",
+          "decision": "Used additive_100pt with four categories per the LADOTD deck",
+          "rationale": "LADOTD's NASP presentation explicitly identifies four categories: Project Type, Facility Usage, Sponsor Compliance, Special Considerations. Specific point allocations within each category live in LA Adm Code Title 70 Part IX Ch 3 and require the user to populate from their adopted statute.",
+          "source": "NASP Symposium - LADOTD Prioritization deck"
+        },
+        {
+          "date": "2026-05-06",
+          "author": "APH m49 reference encoder",
+          "decision": "Set air carrier set-aside via ACE program percentage",
+          "rationale": "Louisiana's Air Carrier Enhancement (ACE) Program reserves 21.622% of total air carrier allocation amount through the prioritized program for FY2025-2026.",
+          "source": "Louisiana Aviation Policy Manual Ch 1.2"
+        }
+      ]
+    },
+    "eligibility_gate": {
+      "enabled": true,
+      "filters": [
+        {
+          "id": "airport_sponsor_eligible",
+          "label": "Eligible Airport Sponsor",
+          "rule": "Sponsor must be a state agency, city, town, parish, airport authority, airport commission, airport district, or other political subdivision that owns/operates/leases/controls a public-use airport or landing area.",
+          "on_fail": "exclude"
+        },
+        {
+          "id": "public_use_airport",
+          "label": "Public-Use Airport",
+          "rule": "Project must be at a publicly owned, public-use airport in the Louisiana Airport System (excludes non-NPIAS rural strips by default).",
+          "field_check": {
+            "field": "airport_classification",
+            "operator": "ne",
+            "value": "non_npias"
+          },
+          "on_fail": "exclude"
+        },
+        {
+          "id": "non_prioritized_excluded",
+          "label": "Non-Prioritized Project Categories",
+          "rule": "Projects falling under Manual Table 1.2 (Non-Prioritized Projects) are excluded from the priority program.",
+          "on_fail": "exclude"
+        },
+        {
+          "id": "minimum_application_criteria",
+          "label": "Minimum Pre-Application Criteria",
+          "rule": "Project must meet the minimum criteria outlined in Manual Table 2.8 (Airport Project Pre-Application Minimum Criteria).",
+          "on_fail": "flag_for_review"
+        }
+      ]
+    },
+    "weighting_model": "additive_100pt",
+    "criteria": [
+      {
+        "id": "project_type",
+        "label": "Project Type",
+        "description": "Category I \u2014 what the project is. Specific point values live in LA Adm Code Title 70 Part IX Ch 3 and Manual Table 3.3 Project Components. Defaults below are placeholder tiers using regex matches against project_type; states adopting this model should replace with statute-specific values.",
+        "max_points": 35,
+        "acrp_category": "asset_preservation",
+        "scoring_style": "tiered_score",
+        "subcategories": [
+          {
+            "id": "safety_critical",
+            "label": "Safety-critical airside (RSA, OFA, RPZ, obstruction removal, ARFF)",
+            "score": 35,
+            "field_match": {
+              "field": "project_type",
+              "operator": "matches",
+              "value": "(rsa|obstruction|rpz|emas|arff|navaid_papi|navaid_awos)"
+            }
+          },
+          {
+            "id": "preservation",
+            "label": "Preservation (rehab, maintenance, drainage, mitigation)",
+            "score": 28,
+            "field_match": {
+              "field": "project_type",
+              "operator": "matches",
+              "value": "(rehab|maintenance|drainage|mitigation|seal)"
+            }
+          },
+          {
+            "id": "expansion",
+            "label": "Expansion / new (extension, strengthen, expand, new)",
+            "score": 18,
+            "field_match": {
+              "field": "project_type",
+              "operator": "matches",
+              "value": "(extension|strengthen|expand|new_runway|partial_parallel|connector)"
+            }
+          },
+          {
+            "id": "planning",
+            "label": "Planning and environmental",
+            "score": 12,
+            "field_match": {
+              "field": "project_type",
+              "operator": "matches",
+              "value": "(master_plan|environmental|nepa)"
+            }
+          },
+          {
+            "id": "landside_other",
+            "label": "Landside / other infrastructure",
+            "score": 5,
+            "field_match": {
+              "field": "project_type",
+              "operator": "matches",
+              "value": "(landside|fencing|fuel|terminal|hangar)"
+            }
+          }
+        ]
+      },
+      {
+        "id": "facility_usage",
+        "label": "Facility Usage",
+        "description": "Category II \u2014 based on Louisiana Aviation System Plan (LASP) classification, based aircraft, and operations levels.",
+        "max_points": 25,
+        "acrp_category": "demand_accommodation",
+        "scoring_style": "select_one",
+        "project_field": "airport_classification",
+        "subcategories": [
+          {
+            "id": "commercial_service",
+            "label": "Air Carrier / Commercial Service (Part 139)",
+            "score": 25
+          },
+          {
+            "id": "business",
+            "label": "Business Airport",
+            "score": 18
+          },
+          {
+            "id": "intermediate_ga",
+            "label": "GA Intermediate / Regional",
+            "score": 12
+          },
+          {
+            "id": "local_ga",
+            "label": "GA Local",
+            "score": 8
+          },
+          {
+            "id": "non_npias",
+            "label": "Non-NPIAS / Rural (typically excluded by gate)",
+            "score": 3
+          }
+        ]
+      },
+      {
+        "id": "sponsor_compliance",
+        "label": "Sponsor Compliance",
+        "description": "Category III \u2014 sponsor's compliance posture: inspection score, certification status, grant performance history.",
+        "max_points": 25,
+        "acrp_category": "regulatory_mandate",
+        "scoring_style": "select_many",
+        "negative_scores_allowed": true,
+        "subcategories": [
+          {
+            "id": "inspection_pass",
+            "label": "Most recent public-use airport inspection passed",
+            "score": 10
+          },
+          {
+            "id": "self_inspection_program",
+            "label": "Active airport self-inspection program",
+            "score": 5
+          },
+          {
+            "id": "based_aircraft_documented",
+            "label": "Based aircraft scoring documented per Manual 5.8",
+            "score": 2
+          },
+          {
+            "id": "operations_documented",
+            "label": "Operations scoring documented per Manual 5.9",
+            "score": 3
+          },
+          {
+            "id": "grant_performance_good",
+            "label": "No outstanding grant performance discrepancies",
+            "score": 5
+          },
+          {
+            "id": "grant_performance_issues",
+            "label": "Active grant performance discrepancies (per Manual Table 8.5)",
+            "score": -10
+          }
+        ]
+      },
+      {
+        "id": "special_considerations",
+        "label": "Special Considerations",
+        "description": "Category IV \u2014 local funding contribution, leveraging factors, and other special considerations per Manual Section 3.2.2.",
+        "max_points": 15,
+        "acrp_category": "revenue_cost",
+        "scoring_style": "select_many",
+        "subcategories": [
+          {
+            "id": "local_match_above_required",
+            "label": "Sponsor local funding contribution exceeds required match",
+            "score": 10
+          },
+          {
+            "id": "leverages_federal",
+            "label": "Project leverages federal funds",
+            "score": 5
+          },
+          {
+            "id": "emergency_storm_damage",
+            "label": "Storm damage / emergency project (Manual Ch 9)",
+            "score": 5
+          },
+          {
+            "id": "multi_modal_benefit",
+            "label": "Multimodal commerce benefit",
+            "score": 3
+          }
+        ]
+      }
+    ],
+    "set_asides": [
+      {
+        "id": "ace_program",
+        "label": "Air Carrier Enhancement (ACE) Program",
+        "allocation_pct": 21.622,
+        "eligibility_filter": "Air carrier airports under the prioritized airport construction and development priority program. Statute-defined allocation percentages per Manual Appendix A.",
+        "field_filter": {
+          "field": "airport_classification",
+          "operator": "eq",
+          "value": "air_carrier"
+        }
+      }
+    ],
+    "adjustments": {},
+    "governance": {
+      "decision_authority": "Louisiana DOTD Aviation Division (with legislative approval per LA Adm Code Title 70 Part IX)",
+      "decision_cadence": "annual",
+      "statute_required": true,
+      "statute_citation": "LA Adm Code Title 70, Part IX, Subpart A, Chapter 3 (Airport Construction and Development Priority Program). LA Revised Statutes Title 2, Aeronautics.",
+      "model_review_cycle_years": 1,
+      "scoring_authority": "DOTD Aviation Division Development line of business",
+      "approval_process": "Two-step process: (1) eligibility determination, (2) confirmation of required information. Programmed projects shall be included within the Airport Construction and Development Priority Program. Funding flows through total approved calculated amounts for each airport and category. Subject to legislative approval; airport sponsors review draft program before legislative submission."
+    },
+    "disclaimer": "This model encoding is derived from the Louisiana Aviation Program Policy Manual (July 2024) and references LA Adm Code Title 70 Part IX. Specific point allocations within each category are placeholder tiers; states adopting this model should replace with their statute's exact values. The ACE Program 21.622% allocation reflects FY2025-2026 percentages and changes annually."
+  },
+  "mndot": {
+    "schema_version": "1.0.0",
+    "metadata": {
+      "name": "MnDOT Aeronautics State Funding Prioritization Model",
+      "state": "Minnesota",
+      "agency": "Minnesota Department of Transportation, Office of Aeronautics",
+      "model_version": "2024",
+      "last_updated": "2024-01-01",
+      "source_citation": "MnDOT Aeronautics State Funding Prioritization Model Guide. Encoded from source PDF at Priority_Model/Example Prioritization Models/MnDOT State Prioritization Model Guide.pdf. Five criteria are tracked as MnSASP performance metrics in MnDOT's interactive dashboards.",
+      "decisions_log": [
+        {
+          "date": "2026-05-06",
+          "author": "APH m49 reference encoder",
+          "decision": "Encoded MnDOT model as additive_100pt with 60-pt System Plan Alignment bucket and 40-pt MnDOT Priorities bucket",
+          "rationale": "Source document explicitly states 'SEVEN CRITERIA ON A 100-POINT SCALE / 60 Points - System Plan Alignment / 40 Points - MnDOT Priorities'.",
+          "source": "MnDOT State Prioritization Model Guide"
+        },
+        {
+          "date": "2026-05-06",
+          "author": "APH m49 reference encoder",
+          "decision": "Enabled negative_scores_allowed on five criteria",
+          "rationale": "MnDOT uses -5/-10 scores for non-compliance (e.g., obstructions identified with no programmed fix scores -10).",
+          "source": "MnDOT State Prioritization Model Guide"
+        }
+      ]
+    },
+    "weighting_model": "additive_100pt",
+    "criteria": [
+      {
+        "id": "master_plan_alp",
+        "label": "Master Plan / ALP",
+        "description": "Evaluates whether airport has updated Master Plan/ALP per MnSASP targets and whether project is in the plan.",
+        "bucket": "System Plan Alignment",
+        "max_points": 10,
+        "acrp_category": "system_plan_alignment",
+        "scoring_style": "tiered_score",
+        "negative_scores_allowed": true,
+        "external_metric_source": "https://mnsasp-mndot.hub.arcgis.com/",
+        "project_field": "master_plan_status",
+        "subcategories": [
+          {
+            "id": "updated_and_included",
+            "label": "Updated ALP/Master Plan on file and project request is in plan",
+            "score": 10
+          },
+          {
+            "id": "programmed_or_in_process",
+            "label": "Airport has programmed ALP/Master Plan update or is in process",
+            "score": 5
+          },
+          {
+            "id": "inadequate_no_update",
+            "label": "Inadequate ALP/Master Plan with no updates programmed",
+            "score": -5
+          }
+        ]
+      },
+      {
+        "id": "airspace_obstructions",
+        "label": "Airspace Obstructions (Part 77)",
+        "description": "Evaluates whether airport's Part 77 surfaces are clear of obstructions per MnDOT licensing OR whether project clears them.",
+        "bucket": "System Plan Alignment",
+        "max_points": 10,
+        "acrp_category": "safety_security",
+        "scoring_style": "tiered_score",
+        "negative_scores_allowed": true,
+        "external_metric_source": "https://mnsasp-mndot.hub.arcgis.com/",
+        "project_field": "part77_obstructions",
+        "subcategories": [
+          {
+            "id": "clears_obstructions",
+            "label": "Submitted project will clear obstructions in Part 77 surfaces",
+            "score": 10
+          },
+          {
+            "id": "no_obstructions",
+            "label": "Airport has no obstructions in Part 77 surfaces",
+            "score": 5
+          },
+          {
+            "id": "another_clearing_project",
+            "label": "Airport has at least one submitted obstruction clearing project",
+            "score": 5
+          },
+          {
+            "id": "obstructions_no_fix",
+            "label": "Obstructions identified in Part 77 surfaces with no programmed fix",
+            "score": -10
+          }
+        ]
+      },
+      {
+        "id": "clear_zones",
+        "label": "Clear Zones",
+        "description": "Evaluates ownership/CZAP status for MnDOT-defined clear zones.",
+        "bucket": "System Plan Alignment",
+        "max_points": 10,
+        "acrp_category": "safety_security",
+        "scoring_style": "tiered_score",
+        "negative_scores_allowed": true,
+        "external_metric_source": "https://mnsasp-mndot.hub.arcgis.com/",
+        "project_field": "clear_zone_status",
+        "subcategories": [
+          {
+            "id": "project_acquires_cz",
+            "label": "Project will acquire MnDOT clear zone land",
+            "score": 10
+          },
+          {
+            "id": "full_protection",
+            "label": "100% clear zone ownership or approved CZAP on file",
+            "score": 5
+          },
+          {
+            "id": "active_acquisition_or_czap",
+            "label": "Land acquisition project submitted OR actively coordinating CZAP",
+            "score": 5
+          },
+          {
+            "id": "partial_no_czap",
+            "label": "Partial/no clear zone ownership without CZAP and no programmed fix",
+            "score": -10
+          }
+        ]
+      },
+      {
+        "id": "work_type",
+        "label": "Work Type (Preservation vs. Expansion)",
+        "description": "MnDOT prioritizes preservation of existing assets over expansion. Pavement-condition-deficiency-driven scoring.",
+        "bucket": "System Plan Alignment",
+        "max_points": 20,
+        "acrp_category": "asset_preservation",
+        "scoring_style": "tiered_score",
+        "negative_scores_allowed": true,
+        "external_metric_source": "https://mnsasp-mndot.hub.arcgis.com/",
+        "subcategories": [
+          {
+            "id": "remediates_pavement_deficiency",
+            "label": "Airport has identified pavement deficiency per MnSASP metric AND project remediates it",
+            "score": 20
+          },
+          {
+            "id": "addresses_other_pavement",
+            "label": "Airport has adequate pavement; project addresses other pavement issues",
+            "score": 15
+          },
+          {
+            "id": "maintains_other_assets",
+            "label": "Adequate pavement; project maintains other airport assets (e.g., lighting)",
+            "score": 10
+          },
+          {
+            "id": "new_or_expansion",
+            "label": "Project constructs new facilities or expands existing infrastructure",
+            "score": 0
+          },
+          {
+            "id": "pavement_deficiency_no_fix",
+            "label": "Pavement deficiency identified with no programmed fix",
+            "score": -10
+          }
+        ]
+      },
+      {
+        "id": "zoning",
+        "label": "Zoning",
+        "description": "Evaluates whether airport has proper zoning established with MnDOT Aeronautics.",
+        "bucket": "System Plan Alignment",
+        "max_points": 10,
+        "acrp_category": "risk",
+        "scoring_style": "tiered_score",
+        "negative_scores_allowed": true,
+        "external_metric_source": "https://mnsasp-mndot.hub.arcgis.com/",
+        "project_field": "zoning_status",
+        "subcategories": [
+          {
+            "id": "adequate",
+            "label": "Adequate zoning established and on file with MnDOT",
+            "score": 10
+          },
+          {
+            "id": "establishing_or_updating",
+            "label": "Establishing or updating zoning to comply with MnDOT",
+            "score": 5
+          },
+          {
+            "id": "no_adequate_zoning",
+            "label": "No adequate zoning and no programmed mitigation project",
+            "score": -10
+          }
+        ]
+      },
+      {
+        "id": "airport_component",
+        "label": "Airport Component",
+        "description": "Where on the airport the project is directed; primary runway weighted highest.",
+        "bucket": "MnDOT Priorities",
+        "max_points": 20,
+        "acrp_category": "asset_preservation",
+        "scoring_style": "select_one",
+        "project_field": "project_component",
+        "subcategories": [
+          {
+            "id": "primary_runway",
+            "label": "Primary Runway",
+            "score": 20
+          },
+          {
+            "id": "twy_serving_primary",
+            "label": "Taxiway Serving Primary Runway",
+            "score": 18
+          },
+          {
+            "id": "secondary_runway",
+            "label": "Secondary Runway",
+            "score": 16
+          },
+          {
+            "id": "apron",
+            "label": "Apron",
+            "score": 14
+          },
+          {
+            "id": "twy_serving_secondary",
+            "label": "Taxiway Serving Secondary Runway",
+            "score": 14
+          },
+          {
+            "id": "other_airfield",
+            "label": "Other Airfield Location",
+            "score": 12
+          },
+          {
+            "id": "taxilane",
+            "label": "Taxilane",
+            "score": 10
+          },
+          {
+            "id": "terminal_or_fuel",
+            "label": "Terminal Building or Fuel Facilities",
+            "score": 8
+          },
+          {
+            "id": "hangar",
+            "label": "Hangar",
+            "score": 6
+          },
+          {
+            "id": "other_buildings",
+            "label": "Other Buildings",
+            "score": 6
+          },
+          {
+            "id": "landside",
+            "label": "Landside",
+            "score": 4
+          },
+          {
+            "id": "unknown",
+            "label": "Unknown",
+            "score": 0
+          }
+        ]
+      },
+      {
+        "id": "licensing_compliance",
+        "label": "Licensing Compliance",
+        "description": "Evaluates compliance with Minnesota Rules 8800.1600 Public Airport Licensing or remediation thereof.",
+        "bucket": "MnDOT Priorities",
+        "max_points": 20,
+        "acrp_category": "regulatory_mandate",
+        "scoring_style": "tiered_score",
+        "negative_scores_allowed": true,
+        "project_field": "licensing_status",
+        "subcategories": [
+          {
+            "id": "compliant",
+            "label": "Airport compliant with all state licensing standards",
+            "score": 10
+          },
+          {
+            "id": "partial_compliance",
+            "label": "Partial compliance with corrective actions underway",
+            "score": 5
+          },
+          {
+            "id": "noncompliance",
+            "label": "Non-compliance with no corrective actions",
+            "score": -10
+          }
+        ]
+      }
+    ],
+    "set_asides": [],
+    "adjustments": {},
+    "governance": {
+      "decision_authority": "MnDOT Office of Aeronautics",
+      "decision_cadence": "annual",
+      "statute_required": false,
+      "model_review_cycle_years": 5,
+      "scoring_authority": "MnDOT Aeronautics staff",
+      "approval_process": "MnDOT Aeronautics applies the model to state-only funding requests for MnDOT-defined capital expenditures. Performance for five of the seven criteria is tracked publicly in MnSASP Hub dashboards. Tied to MnDOT's Project Selection Policy and Minnesota GO recommendations."
+    },
+    "disclaimer": "This model encoding is derived from MnDOT's State Funding Prioritization Model Guide. The prioritization model only considers state-only funding requests for MnDOT-defined capital expenditures."
+  },
+  "wyoming": {
+    "schema_version": "1.0.0",
+    "metadata": {
+      "name": "Wyoming Priority Rating Model",
+      "state": "Wyoming",
+      "agency": "WYDOT Aeronautics Division",
+      "model_version": "2021",
+      "last_updated": "2021-07-20",
+      "source_citation": "Wyoming Aeronautics Commission, Priority Rating Model for Project Evaluation, July 20, 2021. Encoded from source PDF at Priority_Model/Example Prioritization Models/Wyoming Prioritization Model 2021.pdf.",
+      "decisions_log": [
+        {
+          "date": "2026-05-06",
+          "author": "APH m49 reference encoder",
+          "decision": "Encoded Wyoming PRM 2021 as multiplicative 7-category model totaling 105 points",
+          "rationale": "Wyoming explicitly states: 'numerical rating is assigned, and then multiplied by the category weight to determine a final category numerical value. The seven category values are then summed' \u2014 fits multiplicative weighting model.",
+          "source": "Wyoming PRM 2021, p. 4"
+        }
+      ]
+    },
+    "weighting_model": "multiplicative",
+    "criteria": [
+      {
+        "id": "purpose_of_project",
+        "label": "Purpose of Project",
+        "description": "Defines and classifies the primary purpose of the project. Maintain-before-build philosophy gives Maintenance equal weight to Security.",
+        "weight": 5,
+        "acrp_category": "regulatory_mandate",
+        "scoring_style": "select_one",
+        "project_field": "purpose",
+        "subcategories": [
+          {
+            "id": "safety",
+            "label": "Safety",
+            "score": 4,
+            "condition": "Improvements to existing infrastructure, facilities, equipment that support safety of operations."
+          },
+          {
+            "id": "security",
+            "label": "Security",
+            "score": 3,
+            "condition": "Facilities/equipment for secure movement around airport."
+          },
+          {
+            "id": "maintenance",
+            "label": "Maintenance",
+            "score": 3,
+            "condition": "Pavement preservation, rehabilitation, NAVAID maintenance, etc. \u2014 'maintain before build'."
+          },
+          {
+            "id": "airport_enhancement",
+            "label": "Airport Enhancement",
+            "score": 2,
+            "condition": "New/expanded facilities, capacity, NAVAIDs, building construction."
+          },
+          {
+            "id": "planning",
+            "label": "Planning",
+            "score": 2,
+            "condition": "Master plans, ALPs, NEPA, special studies."
+          }
+        ]
+      },
+      {
+        "id": "project_component",
+        "label": "Project Component",
+        "description": "Where on the airport is the project directed. Primary airside facilities prioritized over secondary, then aprons, then taxilanes/landside.",
+        "weight": 3,
+        "acrp_category": "asset_preservation",
+        "scoring_style": "select_one",
+        "project_field": "project_component",
+        "subcategories": [
+          {
+            "id": "airside_primary",
+            "label": "Airside Primary Runway/Taxiway and Equipment",
+            "score": 4,
+            "condition": "Primary runway, primary taxiway, life-safety equipment."
+          },
+          {
+            "id": "airside_secondary",
+            "label": "Airside Secondary Runway/Taxiway",
+            "score": 3,
+            "condition": "Secondary runway/taxiway facilities."
+          },
+          {
+            "id": "airside_apron_struct_equip",
+            "label": "Airside Aprons, Structures, Equipment",
+            "score": 2,
+            "condition": "Aprons, structures/facilities, non-safety equipment."
+          },
+          {
+            "id": "airside_taxilane_landside_other",
+            "label": "Airside Taxilanes, Landside, and Other",
+            "score": 1,
+            "condition": "Taxilanes (other than apron), landside, planning, ops/admin vehicles."
+          }
+        ]
+      },
+      {
+        "id": "type_of_federal_funding",
+        "label": "Type of Federal Funding",
+        "description": "Wyoming Aeronautics Commission emphasizes matching all federal funding regardless of PRM ranking; this category reflects that priority.",
+        "weight": 5,
+        "acrp_category": "revenue_cost",
+        "scoring_style": "select_one",
+        "project_field": "federal_funding_type",
+        "subcategories": [
+          {
+            "id": "discretionary",
+            "label": "Discretionary Funding",
+            "score": 4,
+            "condition": "Federal discretionary or Congressional allocation."
+          },
+          {
+            "id": "state_apportionment",
+            "label": "State Apportionment Funding",
+            "score": 3,
+            "condition": "Annual state apportionment for non-primary federally eligible airports."
+          },
+          {
+            "id": "entitlement",
+            "label": "Entitlement Funding",
+            "score": 2,
+            "condition": "NPIAS entitlement; non-competitive."
+          },
+          {
+            "id": "no_federal",
+            "label": "No Federal Funds",
+            "score": 0,
+            "condition": "Project receives no federal funding."
+          }
+        ]
+      },
+      {
+        "id": "systems_impact",
+        "label": "Systems Impact",
+        "description": "Project's contribution to WySASP state goals, local goals, and Wyoming Aeronautics Commission priorities.",
+        "weight": 4,
+        "acrp_category": "system_plan_alignment",
+        "scoring_style": "accumulating",
+        "subcategories": [
+          {
+            "id": "wysasp_state_goal",
+            "label": "Achieving or maintaining a WySASP state goal",
+            "score": 1,
+            "field_match": {
+              "field": "wysasp_state_goal_met",
+              "operator": "eq",
+              "value": true
+            }
+          },
+          {
+            "id": "wysasp_local_goal",
+            "label": "Achieving or maintaining a WySASP local goal",
+            "score": 1,
+            "field_match": {
+              "field": "wysasp_local_goal_met",
+              "operator": "eq",
+              "value": true
+            }
+          },
+          {
+            "id": "commission_priority",
+            "label": "Achieving or maintaining a Commission priority",
+            "score": 1,
+            "field_match": {
+              "field": "commission_priority_met",
+              "operator": "eq",
+              "value": true
+            }
+          }
+        ]
+      },
+      {
+        "id": "project_timing",
+        "label": "Project Timing",
+        "description": "Urgency of project completion. Awarded based on Division's professional judgment of sponsor justification.",
+        "weight": 4,
+        "acrp_category": "operational_effectiveness",
+        "scoring_style": "select_one",
+        "project_field": "urgency",
+        "subcategories": [
+          {
+            "id": "urgent",
+            "label": "Urgent (Division-determined)",
+            "score": 5,
+            "condition": "Emergency repair, regulatory compliance deadline, funding loss risk."
+          },
+          {
+            "id": "group_maintenance",
+            "label": "Group Maintenance",
+            "score": 4,
+            "condition": "Cycle optimization on regularly occurring projects."
+          },
+          {
+            "id": "time_sensitive",
+            "label": "Time-sensitive (sponsor-justified)",
+            "score": 3
+          },
+          {
+            "id": "medium_urgency",
+            "label": "Medium Urgency (within 2-3 years)",
+            "score": 2
+          },
+          {
+            "id": "low_urgency",
+            "label": "Low Urgency (within 5 years)",
+            "score": 1
+          },
+          {
+            "id": "no_urgency",
+            "label": "No Urgency",
+            "score": 0
+          }
+        ]
+      },
+      {
+        "id": "airport_usage",
+        "label": "Airport Usage",
+        "description": "Larger airports benefit more users. Uses WySASP airport classification.",
+        "weight": 3,
+        "acrp_category": "demand_accommodation",
+        "scoring_style": "select_one",
+        "project_field": "airport_classification",
+        "subcategories": [
+          {
+            "id": "commercial_service",
+            "label": "Commercial Service Airport",
+            "score": 4
+          },
+          {
+            "id": "business",
+            "label": "Business Airport",
+            "score": 3
+          },
+          {
+            "id": "intermediate_ga",
+            "label": "GA Intermediate",
+            "score": 2
+          },
+          {
+            "id": "local_ga",
+            "label": "GA Local",
+            "score": 1
+          }
+        ]
+      },
+      {
+        "id": "status_of_airport_protection",
+        "label": "Status of Airport Protection",
+        "description": "Land use protections for RPZ and airport influence area. Accumulates across four sub-elements up to a max of 9 points. NOTE: Land Ownership (max 4 pts) is exclusive \u2014 only the highest-applicable tier counts. Other sub-elements add independently.",
+        "weight": 1,
+        "acrp_category": "risk",
+        "scoring_style": "accumulating",
+        "subcategories": [
+          {
+            "id": "land_ownership_full",
+            "label": "RPZ 100% fee title (or \u226520yr lease)",
+            "score": 4,
+            "field_match": {
+              "field": "clear_zone_status",
+              "operator": "eq",
+              "value": "full_protection"
+            }
+          },
+          {
+            "id": "land_ownership_partial_high",
+            "label": "RPZ 75-99% protected",
+            "score": 2,
+            "field_match": {
+              "field": "clear_zone_status",
+              "operator": "eq",
+              "value": "active_acquisition_or_czap"
+            }
+          },
+          {
+            "id": "land_ownership_partial_low",
+            "label": "RPZ 25-75% protected",
+            "score": 1,
+            "field_match": {
+              "field": "clear_zone_status",
+              "operator": "eq",
+              "value": "partial_no_czap"
+            }
+          },
+          {
+            "id": "airspace_protections",
+            "label": "Airspace and zoning protections in place",
+            "score": 3,
+            "field_match": {
+              "field": "zoning_status",
+              "operator": "eq",
+              "value": "adequate"
+            }
+          },
+          {
+            "id": "airspace_partial",
+            "label": "Airspace zoning being established",
+            "score": 1,
+            "field_match": {
+              "field": "zoning_status",
+              "operator": "eq",
+              "value": "establishing_or_updating"
+            }
+          }
+        ]
+      }
+    ],
+    "set_asides": [],
+    "adjustments": {
+      "tradeoff_layer": {
+        "enabled": true,
+        "urgency_sort": false,
+        "financial_impact_sort": false,
+        "discretion_override_allowed": true
+      }
+    },
+    "governance": {
+      "decision_authority": "Wyoming Aeronautics Commission",
+      "decision_cadence": "annual",
+      "statute_required": true,
+      "statute_citation": "Wyoming Statute 10-3-402",
+      "model_review_cycle_years": 3,
+      "scoring_authority": "WYDOT Aeronautics Division",
+      "approval_process": "Sponsors submit pre-applications. Division checks eligibility, then scores each project against the seven categories. Ranked WACIP is presented to the Wyoming Aeronautics Commission, which retains discretion to override the model when collective system needs warrant."
+    },
+    "disclaimer": "This model encoding is derived from the Wyoming Priority Rating Model for Project Evaluation \u2013 2021. For official adoption use, refer to the source document published by the Wyoming Aeronautics Commission."
+  }
+};
+
+  // Sample projects (25 synthetic projects for live preview):
+  window.PM_SAMPLE_PROJECTS = [
+  {
+    "project_id": "P001",
+    "airport_id": "JAC",
+    "airport_name": "Jackson Hole Airport",
+    "airport_classification": "commercial_service",
+    "project_type": "primary_rwy_rsa",
+    "purpose": "safety",
+    "project_component": "airside_primary",
+    "based_aircraft": 200,
+    "annual_operations": 90000,
+    "total_cost": 4500000,
+    "federal_share_pct": 90,
+    "federal_funding_type": "discretionary",
+    "project_year": 2026,
+    "urgency": "urgent",
+    "pci_score": 72,
+    "part77_obstructions": "clear",
+    "clear_zone_status": "full_protection",
+    "zoning_status": "adequate",
+    "licensing_status": "compliant",
+    "wysasp_state_goal_met": true,
+    "wysasp_local_goal_met": true,
+    "commission_priority_met": true,
+    "master_plan_status": "updated_and_included",
+    "minimum_standards_on_file": true,
+    "height_zoning_on_file": true,
+    "cip_status": "cip_phased_with_priority",
+    "pavement_management_program": true,
+    "system_plan_supported": true,
+    "nprs_score": 75,
+    "description": "Primary runway RSA expansion to meet design standards"
+  },
+  {
+    "project_id": "P002",
+    "airport_id": "LAR",
+    "airport_name": "Laramie Regional",
+    "airport_classification": "business",
+    "project_type": "primary_rwy_rehab",
+    "purpose": "maintenance",
+    "project_component": "airside_primary",
+    "based_aircraft": 85,
+    "annual_operations": 38000,
+    "total_cost": 2200000,
+    "federal_share_pct": 90,
+    "federal_funding_type": "entitlement",
+    "project_year": 2026,
+    "urgency": "time_sensitive",
+    "pci_score": 55,
+    "part77_obstructions": "one_clearing_project",
+    "clear_zone_status": "active_acquisition_or_czap",
+    "zoning_status": "establishing_or_updating",
+    "licensing_status": "compliant",
+    "wysasp_state_goal_met": true,
+    "wysasp_local_goal_met": true,
+    "commission_priority_met": false,
+    "master_plan_status": "programmed_or_in_process",
+    "minimum_standards_on_file": true,
+    "height_zoning_on_file": true,
+    "cip_status": "cip_in_current",
+    "pavement_management_program": true,
+    "system_plan_supported": true,
+    "nprs_score": 52,
+    "description": "Primary runway rehabilitation - PCI-driven preservation"
+  },
+  {
+    "project_id": "P003",
+    "airport_id": "RKS",
+    "airport_name": "Rock Springs Sweetwater County",
+    "airport_classification": "intermediate_ga",
+    "project_type": "twy_rehab_primary",
+    "purpose": "maintenance",
+    "project_component": "airside_primary",
+    "based_aircraft": 42,
+    "annual_operations": 12500,
+    "total_cost": 1100000,
+    "federal_share_pct": 90,
+    "federal_funding_type": "entitlement",
+    "project_year": 2026,
+    "urgency": "medium_urgency",
+    "pci_score": 48,
+    "part77_obstructions": "clear",
+    "clear_zone_status": "full_protection",
+    "zoning_status": "adequate",
+    "licensing_status": "compliant",
+    "wysasp_state_goal_met": true,
+    "wysasp_local_goal_met": false,
+    "commission_priority_met": false,
+    "master_plan_status": "updated_and_included",
+    "minimum_standards_on_file": true,
+    "height_zoning_on_file": true,
+    "cip_status": "cip_in_current",
+    "pavement_management_program": true,
+    "system_plan_supported": true,
+    "nprs_score": 42,
+    "description": "Primary taxiway rehabilitation"
+  },
+  {
+    "project_id": "P004",
+    "airport_id": "CYS",
+    "airport_name": "Cheyenne Regional",
+    "airport_classification": "business",
+    "project_type": "primary_rwy_obstruction_removal",
+    "purpose": "safety",
+    "project_component": "airside_primary",
+    "based_aircraft": 60,
+    "annual_operations": 22000,
+    "total_cost": 800000,
+    "federal_share_pct": 90,
+    "federal_funding_type": "discretionary",
+    "project_year": 2026,
+    "urgency": "urgent",
+    "pci_score": 82,
+    "part77_obstructions": "obstructions_no_fix",
+    "clear_zone_status": "full_protection",
+    "zoning_status": "adequate",
+    "licensing_status": "compliant",
+    "wysasp_state_goal_met": true,
+    "wysasp_local_goal_met": true,
+    "commission_priority_met": true,
+    "master_plan_status": "updated_and_included",
+    "minimum_standards_on_file": true,
+    "height_zoning_on_file": true,
+    "cip_status": "cip_phased_with_priority",
+    "pavement_management_program": true,
+    "system_plan_supported": true,
+    "nprs_score": 68,
+    "description": "Primary runway approach obstruction removal"
+  },
+  {
+    "project_id": "P005",
+    "airport_id": "COD",
+    "airport_name": "Yellowstone Regional",
+    "airport_classification": "business",
+    "project_type": "apron_rehab",
+    "purpose": "maintenance",
+    "project_component": "airside_apron_struct_equip",
+    "based_aircraft": 55,
+    "annual_operations": 21000,
+    "total_cost": 1800000,
+    "federal_share_pct": 90,
+    "federal_funding_type": "entitlement",
+    "project_year": 2027,
+    "urgency": "medium_urgency",
+    "pci_score": 60,
+    "part77_obstructions": "clear",
+    "clear_zone_status": "full_protection",
+    "zoning_status": "adequate",
+    "licensing_status": "compliant",
+    "wysasp_state_goal_met": true,
+    "wysasp_local_goal_met": false,
+    "commission_priority_met": false,
+    "master_plan_status": "programmed_or_in_process",
+    "minimum_standards_on_file": true,
+    "height_zoning_on_file": true,
+    "cip_status": "cip_in_current",
+    "pavement_management_program": true,
+    "system_plan_supported": true,
+    "nprs_score": 38,
+    "description": "Terminal apron rehabilitation"
+  },
+  {
+    "project_id": "P006",
+    "airport_id": "GCC",
+    "airport_name": "Gillette Campbell County",
+    "airport_classification": "business",
+    "project_type": "infra_arff",
+    "purpose": "safety",
+    "project_component": "airside_primary",
+    "based_aircraft": 45,
+    "annual_operations": 15000,
+    "total_cost": 650000,
+    "federal_share_pct": 90,
+    "federal_funding_type": "discretionary",
+    "project_year": 2026,
+    "urgency": "urgent",
+    "pci_score": 80,
+    "part77_obstructions": "clear",
+    "clear_zone_status": "full_protection",
+    "zoning_status": "adequate",
+    "licensing_status": "compliant",
+    "wysasp_state_goal_met": true,
+    "wysasp_local_goal_met": true,
+    "commission_priority_met": false,
+    "master_plan_status": "updated_and_included",
+    "minimum_standards_on_file": true,
+    "height_zoning_on_file": true,
+    "cip_status": "cip_phased_with_priority",
+    "pavement_management_program": true,
+    "system_plan_supported": true,
+    "nprs_score": 65,
+    "description": "ARFF vehicle replacement"
+  },
+  {
+    "project_id": "P007",
+    "airport_id": "SHR",
+    "airport_name": "Sheridan County",
+    "airport_classification": "intermediate_ga",
+    "project_type": "primary_rwy_extension",
+    "purpose": "airport_enhancement",
+    "project_component": "airside_primary",
+    "based_aircraft": 38,
+    "annual_operations": 10000,
+    "total_cost": 3500000,
+    "federal_share_pct": 90,
+    "federal_funding_type": "state_apportionment",
+    "project_year": 2027,
+    "urgency": "low_urgency",
+    "pci_score": 75,
+    "part77_obstructions": "clear",
+    "clear_zone_status": "full_protection",
+    "zoning_status": "adequate",
+    "licensing_status": "compliant",
+    "wysasp_state_goal_met": true,
+    "wysasp_local_goal_met": true,
+    "commission_priority_met": true,
+    "master_plan_status": "updated_and_included",
+    "minimum_standards_on_file": true,
+    "height_zoning_on_file": true,
+    "cip_status": "cip_phased_with_priority",
+    "pavement_management_program": true,
+    "system_plan_supported": true,
+    "nprs_score": 45,
+    "description": "Primary runway extension for larger critical aircraft"
+  },
+  {
+    "project_id": "P008",
+    "airport_id": "WRL",
+    "airport_name": "Worland Municipal",
+    "airport_classification": "local_ga",
+    "project_type": "primary_rwy_maintenance",
+    "purpose": "maintenance",
+    "project_component": "airside_primary",
+    "based_aircraft": 18,
+    "annual_operations": 5500,
+    "total_cost": 420000,
+    "federal_share_pct": 90,
+    "federal_funding_type": "entitlement",
+    "project_year": 2026,
+    "urgency": "time_sensitive",
+    "pci_score": 52,
+    "part77_obstructions": "clear",
+    "clear_zone_status": "active_acquisition_or_czap",
+    "zoning_status": "establishing_or_updating",
+    "licensing_status": "compliant",
+    "wysasp_state_goal_met": true,
+    "wysasp_local_goal_met": false,
+    "commission_priority_met": false,
+    "master_plan_status": "programmed_or_in_process",
+    "minimum_standards_on_file": true,
+    "height_zoning_on_file": false,
+    "cip_status": "cip_in_current",
+    "pavement_management_program": true,
+    "system_plan_supported": true,
+    "nprs_score": 32,
+    "description": "Crack seal and seal coat - primary runway"
+  },
+  {
+    "project_id": "P009",
+    "airport_id": "RIW",
+    "airport_name": "Riverton Regional",
+    "airport_classification": "intermediate_ga",
+    "project_type": "infra_drainage",
+    "purpose": "maintenance",
+    "project_component": "airside_apron_struct_equip",
+    "based_aircraft": 28,
+    "annual_operations": 8200,
+    "total_cost": 950000,
+    "federal_share_pct": 90,
+    "federal_funding_type": "entitlement",
+    "project_year": 2027,
+    "urgency": "medium_urgency",
+    "pci_score": 58,
+    "part77_obstructions": "clear",
+    "clear_zone_status": "full_protection",
+    "zoning_status": "adequate",
+    "licensing_status": "compliant",
+    "wysasp_state_goal_met": false,
+    "wysasp_local_goal_met": true,
+    "commission_priority_met": false,
+    "master_plan_status": "updated_and_included",
+    "minimum_standards_on_file": true,
+    "height_zoning_on_file": true,
+    "cip_status": "cip_in_current",
+    "pavement_management_program": true,
+    "system_plan_supported": true,
+    "nprs_score": 35,
+    "description": "Airfield drainage improvements"
+  },
+  {
+    "project_id": "P010",
+    "airport_id": "LND",
+    "airport_name": "Hunt Field",
+    "airport_classification": "local_ga",
+    "project_type": "landside_security_fencing",
+    "purpose": "security",
+    "project_component": "airside_taxilane_landside_other",
+    "based_aircraft": 12,
+    "annual_operations": 3500,
+    "total_cost": 180000,
+    "federal_share_pct": 90,
+    "federal_funding_type": "state_apportionment",
+    "project_year": 2026,
+    "urgency": "medium_urgency",
+    "pci_score": 68,
+    "part77_obstructions": "clear",
+    "clear_zone_status": "full_protection",
+    "zoning_status": "adequate",
+    "licensing_status": "compliant",
+    "wysasp_state_goal_met": true,
+    "wysasp_local_goal_met": false,
+    "commission_priority_met": false,
+    "master_plan_status": "inadequate_no_update",
+    "minimum_standards_on_file": false,
+    "height_zoning_on_file": false,
+    "cip_status": "cip_in_current",
+    "pavement_management_program": false,
+    "system_plan_supported": true,
+    "nprs_score": 28,
+    "description": "Perimeter security fencing"
+  },
+  {
+    "project_id": "P011",
+    "airport_id": "EVW",
+    "airport_name": "Evanston Burns Field",
+    "airport_classification": "local_ga",
+    "project_type": "twy_partial_parallel",
+    "purpose": "airport_enhancement",
+    "project_component": "airside_primary",
+    "based_aircraft": 15,
+    "annual_operations": 4200,
+    "total_cost": 1600000,
+    "federal_share_pct": 90,
+    "federal_funding_type": "state_apportionment",
+    "project_year": 2027,
+    "urgency": "low_urgency",
+    "pci_score": 72,
+    "part77_obstructions": "clear",
+    "clear_zone_status": "active_acquisition_or_czap",
+    "zoning_status": "establishing_or_updating",
+    "licensing_status": "compliant",
+    "wysasp_state_goal_met": false,
+    "wysasp_local_goal_met": true,
+    "commission_priority_met": false,
+    "master_plan_status": "programmed_or_in_process",
+    "minimum_standards_on_file": true,
+    "height_zoning_on_file": false,
+    "cip_status": "cip_in_current",
+    "pavement_management_program": true,
+    "system_plan_supported": true,
+    "nprs_score": 22,
+    "description": "Partial parallel taxiway construction"
+  },
+  {
+    "project_id": "P012",
+    "airport_id": "P60",
+    "airport_name": "Yellowstone Regional - Cody",
+    "airport_classification": "intermediate_ga",
+    "project_type": "navaid_papi",
+    "purpose": "safety",
+    "project_component": "airside_primary",
+    "based_aircraft": 32,
+    "annual_operations": 9500,
+    "total_cost": 310000,
+    "federal_share_pct": 90,
+    "federal_funding_type": "discretionary",
+    "project_year": 2026,
+    "urgency": "urgent",
+    "pci_score": 76,
+    "part77_obstructions": "clear",
+    "clear_zone_status": "full_protection",
+    "zoning_status": "adequate",
+    "licensing_status": "compliant",
+    "wysasp_state_goal_met": true,
+    "wysasp_local_goal_met": true,
+    "commission_priority_met": true,
+    "master_plan_status": "updated_and_included",
+    "minimum_standards_on_file": true,
+    "height_zoning_on_file": true,
+    "cip_status": "cip_phased_with_priority",
+    "pavement_management_program": true,
+    "system_plan_supported": true,
+    "nprs_score": 58,
+    "description": "PAPI installation primary runway"
+  },
+  {
+    "project_id": "P013",
+    "airport_id": "DGW",
+    "airport_name": "Douglas Converse County",
+    "airport_classification": "local_ga",
+    "project_type": "primary_rwy_rehab",
+    "purpose": "maintenance",
+    "project_component": "airside_primary",
+    "based_aircraft": 22,
+    "annual_operations": 6800,
+    "total_cost": 1900000,
+    "federal_share_pct": 90,
+    "federal_funding_type": "entitlement",
+    "project_year": 2027,
+    "urgency": "time_sensitive",
+    "pci_score": 42,
+    "part77_obstructions": "one_clearing_project",
+    "clear_zone_status": "active_acquisition_or_czap",
+    "zoning_status": "adequate",
+    "licensing_status": "compliant",
+    "wysasp_state_goal_met": true,
+    "wysasp_local_goal_met": false,
+    "commission_priority_met": false,
+    "master_plan_status": "programmed_or_in_process",
+    "minimum_standards_on_file": true,
+    "height_zoning_on_file": true,
+    "cip_status": "cip_in_current",
+    "pavement_management_program": true,
+    "system_plan_supported": true,
+    "nprs_score": 40,
+    "description": "Primary runway rehabilitation"
+  },
+  {
+    "project_id": "P014",
+    "airport_id": "TOR",
+    "airport_name": "Torrington Municipal",
+    "airport_classification": "local_ga",
+    "project_type": "master_plan_update",
+    "purpose": "planning",
+    "project_component": "airside_taxilane_landside_other",
+    "based_aircraft": 19,
+    "annual_operations": 5100,
+    "total_cost": 225000,
+    "federal_share_pct": 90,
+    "federal_funding_type": "state_apportionment",
+    "project_year": 2027,
+    "urgency": "medium_urgency",
+    "pci_score": 65,
+    "part77_obstructions": "clear",
+    "clear_zone_status": "full_protection",
+    "zoning_status": "adequate",
+    "licensing_status": "compliant",
+    "wysasp_state_goal_met": false,
+    "wysasp_local_goal_met": false,
+    "commission_priority_met": false,
+    "master_plan_status": "inadequate_no_update",
+    "minimum_standards_on_file": true,
+    "height_zoning_on_file": false,
+    "cip_status": "cip_in_current",
+    "pavement_management_program": false,
+    "system_plan_supported": true,
+    "nprs_score": 18,
+    "description": "Master plan update"
+  },
+  {
+    "project_id": "P015",
+    "airport_id": "BPI",
+    "airport_name": "Big Piney-Marbleton",
+    "airport_classification": "local_ga",
+    "project_type": "land_obstruction_removal",
+    "purpose": "safety",
+    "project_component": "airside_primary",
+    "based_aircraft": 8,
+    "annual_operations": 1900,
+    "total_cost": 750000,
+    "federal_share_pct": 90,
+    "federal_funding_type": "discretionary",
+    "project_year": 2026,
+    "urgency": "urgent",
+    "pci_score": "N/A",
+    "part77_obstructions": "obstructions_no_fix",
+    "clear_zone_status": "partial_no_czap",
+    "zoning_status": "no_adequate_zoning",
+    "licensing_status": "partial_compliance",
+    "wysasp_state_goal_met": true,
+    "wysasp_local_goal_met": true,
+    "commission_priority_met": false,
+    "master_plan_status": "programmed_or_in_process",
+    "minimum_standards_on_file": false,
+    "height_zoning_on_file": false,
+    "cip_status": "cip_in_current",
+    "pavement_management_program": false,
+    "system_plan_supported": true,
+    "nprs_score": 30,
+    "description": "Land acquisition for approach obstruction removal"
+  },
+  {
+    "project_id": "P016",
+    "airport_id": "CPR",
+    "airport_name": "Casper-Natrona County",
+    "airport_classification": "business",
+    "project_type": "terminal_renovation",
+    "purpose": "airport_enhancement",
+    "project_component": "airside_taxilane_landside_other",
+    "based_aircraft": 72,
+    "annual_operations": 28000,
+    "total_cost": 5200000,
+    "federal_share_pct": 75,
+    "federal_funding_type": "no_federal",
+    "project_year": 2027,
+    "urgency": "low_urgency",
+    "pci_score": "N/A",
+    "part77_obstructions": "clear",
+    "clear_zone_status": "full_protection",
+    "zoning_status": "adequate",
+    "licensing_status": "compliant",
+    "wysasp_state_goal_met": false,
+    "wysasp_local_goal_met": true,
+    "commission_priority_met": false,
+    "master_plan_status": "updated_and_included",
+    "minimum_standards_on_file": true,
+    "height_zoning_on_file": true,
+    "cip_status": "cip_in_current",
+    "pavement_management_program": true,
+    "system_plan_supported": true,
+    "nprs_score": 15,
+    "description": "Terminal renovation - revenue-producing"
+  },
+  {
+    "project_id": "P017",
+    "airport_id": "SAA",
+    "airport_name": "Shively Field Saratoga",
+    "airport_classification": "local_ga",
+    "project_type": "infra_new_fuel",
+    "purpose": "airport_enhancement",
+    "project_component": "airside_taxilane_landside_other",
+    "based_aircraft": 9,
+    "annual_operations": 2200,
+    "total_cost": 380000,
+    "federal_share_pct": 0,
+    "federal_funding_type": "no_federal",
+    "project_year": 2026,
+    "urgency": "medium_urgency",
+    "pci_score": "N/A",
+    "part77_obstructions": "clear",
+    "clear_zone_status": "active_acquisition_or_czap",
+    "zoning_status": "establishing_or_updating",
+    "licensing_status": "compliant",
+    "wysasp_state_goal_met": false,
+    "wysasp_local_goal_met": false,
+    "commission_priority_met": false,
+    "master_plan_status": "inadequate_no_update",
+    "minimum_standards_on_file": false,
+    "height_zoning_on_file": false,
+    "cip_status": "cip_in_current",
+    "pavement_management_program": false,
+    "system_plan_supported": true,
+    "nprs_score": 8,
+    "description": "New fuel facility - revenue-producing"
+  },
+  {
+    "project_id": "P018",
+    "airport_id": "GEY",
+    "airport_name": "South Big Horn County",
+    "airport_classification": "local_ga",
+    "project_type": "landside_perimeter_fencing",
+    "purpose": "security",
+    "project_component": "airside_taxilane_landside_other",
+    "based_aircraft": 11,
+    "annual_operations": 3100,
+    "total_cost": 140000,
+    "federal_share_pct": 90,
+    "federal_funding_type": "state_apportionment",
+    "project_year": 2027,
+    "urgency": "low_urgency",
+    "pci_score": "N/A",
+    "part77_obstructions": "clear",
+    "clear_zone_status": "full_protection",
+    "zoning_status": "adequate",
+    "licensing_status": "compliant",
+    "wysasp_state_goal_met": true,
+    "wysasp_local_goal_met": false,
+    "commission_priority_met": false,
+    "master_plan_status": "programmed_or_in_process",
+    "minimum_standards_on_file": true,
+    "height_zoning_on_file": false,
+    "cip_status": "cip_in_current",
+    "pavement_management_program": false,
+    "system_plan_supported": true,
+    "nprs_score": 25,
+    "description": "Wildlife perimeter fencing"
+  },
+  {
+    "project_id": "P019",
+    "airport_id": "PNA",
+    "airport_name": "Pinedale Wenz Field",
+    "airport_classification": "local_ga",
+    "project_type": "primary_rwy_strengthen",
+    "purpose": "airport_enhancement",
+    "project_component": "airside_primary",
+    "based_aircraft": 16,
+    "annual_operations": 4500,
+    "total_cost": 2100000,
+    "federal_share_pct": 90,
+    "federal_funding_type": "state_apportionment",
+    "project_year": 2028,
+    "urgency": "low_urgency",
+    "pci_score": 68,
+    "part77_obstructions": "clear",
+    "clear_zone_status": "full_protection",
+    "zoning_status": "adequate",
+    "licensing_status": "compliant",
+    "wysasp_state_goal_met": false,
+    "wysasp_local_goal_met": true,
+    "commission_priority_met": false,
+    "master_plan_status": "updated_and_included",
+    "minimum_standards_on_file": true,
+    "height_zoning_on_file": true,
+    "cip_status": "cip_in_current",
+    "pavement_management_program": true,
+    "system_plan_supported": true,
+    "nprs_score": 28,
+    "description": "Runway strengthening for larger critical aircraft"
+  },
+  {
+    "project_id": "P020",
+    "airport_id": "KMC",
+    "airport_name": "Mountain View Lyman",
+    "airport_classification": "local_ga",
+    "project_type": "environmental_assessment",
+    "purpose": "planning",
+    "project_component": "airside_taxilane_landside_other",
+    "based_aircraft": 7,
+    "annual_operations": 1800,
+    "total_cost": 165000,
+    "federal_share_pct": 90,
+    "federal_funding_type": "entitlement",
+    "project_year": 2026,
+    "urgency": "medium_urgency",
+    "pci_score": "N/A",
+    "part77_obstructions": "clear",
+    "clear_zone_status": "full_protection",
+    "zoning_status": "adequate",
+    "licensing_status": "compliant",
+    "wysasp_state_goal_met": false,
+    "wysasp_local_goal_met": false,
+    "commission_priority_met": false,
+    "master_plan_status": "programmed_or_in_process",
+    "minimum_standards_on_file": false,
+    "height_zoning_on_file": false,
+    "cip_status": "cip_in_current",
+    "pavement_management_program": false,
+    "system_plan_supported": true,
+    "nprs_score": 12,
+    "description": "NEPA environmental assessment for future expansion"
+  },
+  {
+    "project_id": "P021",
+    "airport_id": "IFP",
+    "airport_name": "South Eastern Texas",
+    "airport_classification": "non_npias",
+    "project_type": "land_industrial_commercial",
+    "purpose": "airport_enhancement",
+    "project_component": "airside_taxilane_landside_other",
+    "based_aircraft": 5,
+    "annual_operations": 1200,
+    "total_cost": 520000,
+    "federal_share_pct": 0,
+    "federal_funding_type": "no_federal",
+    "project_year": 2027,
+    "urgency": "low_urgency",
+    "pci_score": "N/A",
+    "part77_obstructions": "clear",
+    "clear_zone_status": "partial_no_czap",
+    "zoning_status": "establishing_or_updating",
+    "licensing_status": "partial_compliance",
+    "wysasp_state_goal_met": false,
+    "wysasp_local_goal_met": false,
+    "commission_priority_met": false,
+    "master_plan_status": "inadequate_no_update",
+    "minimum_standards_on_file": false,
+    "height_zoning_on_file": false,
+    "cip_status": "cip_in_current",
+    "pavement_management_program": false,
+    "system_plan_supported": false,
+    "nprs_score": 0,
+    "description": "Industrial/commercial land acquisition - non-NPIAS"
+  },
+  {
+    "project_id": "P022",
+    "airport_id": "HEY",
+    "airport_name": "Hereford Municipal",
+    "airport_classification": "local_ga",
+    "project_type": "twy_connector",
+    "purpose": "airport_enhancement",
+    "project_component": "airside_primary",
+    "based_aircraft": 14,
+    "annual_operations": 3900,
+    "total_cost": 1400000,
+    "federal_share_pct": 90,
+    "federal_funding_type": "state_apportionment",
+    "project_year": 2027,
+    "urgency": "medium_urgency",
+    "pci_score": 71,
+    "part77_obstructions": "clear",
+    "clear_zone_status": "active_acquisition_or_czap",
+    "zoning_status": "adequate",
+    "licensing_status": "compliant",
+    "wysasp_state_goal_met": false,
+    "wysasp_local_goal_met": true,
+    "commission_priority_met": false,
+    "master_plan_status": "updated_and_included",
+    "minimum_standards_on_file": true,
+    "height_zoning_on_file": true,
+    "cip_status": "cip_in_current",
+    "pavement_management_program": true,
+    "system_plan_supported": true,
+    "nprs_score": 32,
+    "description": "Connector taxiway construction"
+  },
+  {
+    "project_id": "P023",
+    "airport_id": "APD",
+    "airport_name": "Anniston Regional",
+    "airport_classification": "intermediate_ga",
+    "project_type": "infra_env_mitigation",
+    "purpose": "maintenance",
+    "project_component": "airside_apron_struct_equip",
+    "based_aircraft": 41,
+    "annual_operations": 11800,
+    "total_cost": 890000,
+    "federal_share_pct": 90,
+    "federal_funding_type": "discretionary",
+    "project_year": 2026,
+    "urgency": "time_sensitive",
+    "pci_score": "N/A",
+    "part77_obstructions": "clear",
+    "clear_zone_status": "full_protection",
+    "zoning_status": "adequate",
+    "licensing_status": "compliant",
+    "wysasp_state_goal_met": true,
+    "wysasp_local_goal_met": true,
+    "commission_priority_met": false,
+    "master_plan_status": "updated_and_included",
+    "minimum_standards_on_file": true,
+    "height_zoning_on_file": true,
+    "cip_status": "cip_phased_with_priority",
+    "pavement_management_program": true,
+    "system_plan_supported": true,
+    "nprs_score": 48,
+    "description": "Wetland mitigation per environmental finding"
+  },
+  {
+    "project_id": "P024",
+    "airport_id": "SUO",
+    "airport_name": "Springer Municipal",
+    "airport_classification": "local_ga",
+    "project_type": "navaid_awos",
+    "purpose": "safety",
+    "project_component": "airside_primary",
+    "based_aircraft": 10,
+    "annual_operations": 2800,
+    "total_cost": 295000,
+    "federal_share_pct": 90,
+    "federal_funding_type": "discretionary",
+    "project_year": 2026,
+    "urgency": "urgent",
+    "pci_score": "N/A",
+    "part77_obstructions": "clear",
+    "clear_zone_status": "full_protection",
+    "zoning_status": "adequate",
+    "licensing_status": "compliant",
+    "wysasp_state_goal_met": true,
+    "wysasp_local_goal_met": false,
+    "commission_priority_met": true,
+    "master_plan_status": "programmed_or_in_process",
+    "minimum_standards_on_file": true,
+    "height_zoning_on_file": false,
+    "cip_status": "cip_in_current",
+    "pavement_management_program": false,
+    "system_plan_supported": true,
+    "nprs_score": 42,
+    "description": "AWOS installation"
+  },
+  {
+    "project_id": "P025",
+    "airport_id": "HVR",
+    "airport_name": "Havre City-County",
+    "airport_classification": "intermediate_ga",
+    "project_type": "apron_expand_capacity",
+    "purpose": "airport_enhancement",
+    "project_component": "airside_apron_struct_equip",
+    "based_aircraft": 35,
+    "annual_operations": 9800,
+    "total_cost": 2800000,
+    "federal_share_pct": 90,
+    "federal_funding_type": "entitlement",
+    "project_year": 2028,
+    "urgency": "low_urgency",
+    "pci_score": 72,
+    "part77_obstructions": "clear",
+    "clear_zone_status": "full_protection",
+    "zoning_status": "adequate",
+    "licensing_status": "compliant",
+    "wysasp_state_goal_met": false,
+    "wysasp_local_goal_met": false,
+    "commission_priority_met": false,
+    "master_plan_status": "programmed_or_in_process",
+    "minimum_standards_on_file": true,
+    "height_zoning_on_file": true,
+    "cip_status": "cip_in_current",
+    "pavement_management_program": true,
+    "system_plan_supported": true,
+    "nprs_score": 22,
+    "description": "Apron expansion for capacity"
+  }
+];
+  // END_EMBEDDED_DATA
+</script>
+
+<!-- Engine, ACRP taxonomy, wizard -->
+<script src="priority_engine.js"></script>
+<script src="acrp_taxonomy.js"></script>
+<!-- Optional libraries for Modify-Existing path (loaded lazily on demand) -->
+<script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js" defer></script>
+<script src="wizard.js" defer></script>
+<script src="generators.js" defer></script>
+
+<!-- App logic -->
+<script>
+(function () {
+  "use strict";
+
+  const Engine = window.PriorityEngine;
+  if (!Engine) { console.error("priority_engine.js not loaded"); return; }
+
+  const STORAGE_KEY = "aph_priority_models";
+  const ACTIVE_KEY  = "aph_priority_active";
+
+  // ── State ────────────────────────────────────────────────────────
+  let profiles = {};       // {name: config}
+  let activeName = null;   // string
+  let activeConfig = null; // dict
+  let originalSnapshot = null; // JSON string for dirty-check
+
+  // ── Persistence ──────────────────────────────────────────────────
+  function loadProfiles() {
+    try {
+      profiles = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+    } catch (e) { profiles = {}; }
+    activeName = localStorage.getItem(ACTIVE_KEY);
+  }
+
+  function persist() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(profiles));
+    localStorage.setItem(ACTIVE_KEY, activeName || "");
+  }
+
+  // ── Bootstrapping ────────────────────────────────────────────────
+  function bootstrap() {
+    loadProfiles();
+    // Seed with reference configs on first load
+    if (Object.keys(profiles).length === 0) {
+      Object.entries(window.PM_REFERENCE_CONFIGS).forEach(([k, c]) => {
+        profiles["[Reference] " + k] = JSON.parse(JSON.stringify(c));
+      });
+      activeName = "[Reference] wyoming";
+      persist();
+    }
+    if (!activeName || !profiles[activeName]) {
+      activeName = Object.keys(profiles)[0];
+    }
+    activeConfig = JSON.parse(JSON.stringify(profiles[activeName]));
+    originalSnapshot = JSON.stringify(profiles[activeName]);
+
+    populateProfileSelect();
+    bindTabs();
+    renderAll();
+  }
+
+  function populateProfileSelect() {
+    const sel = document.getElementById("profileSelect");
+    sel.innerHTML = "";
+    Object.keys(profiles).sort().forEach(name => {
+      const opt = document.createElement("option");
+      opt.value = name; opt.textContent = name;
+      if (name === activeName) opt.selected = true;
+      sel.appendChild(opt);
+    });
+    sel.onchange = (e) => {
+      if (isModified() && !confirm("You have unsaved changes. Switch profiles anyway?")) {
+        sel.value = activeName; return;
+      }
+      activeName = e.target.value;
+      activeConfig = JSON.parse(JSON.stringify(profiles[activeName]));
+      originalSnapshot = JSON.stringify(profiles[activeName]);
+      persist(); renderAll();
+    };
+  }
+
+  // ── Tab handling ─────────────────────────────────────────────────
+  function bindTabs() {
+    document.querySelectorAll(".tab-btn").forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+        document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+        btn.classList.add("active");
+        document.getElementById("tab-" + btn.dataset.tab).classList.add("active");
+      };
+    });
+  }
+
+  // ── Dirty tracking ───────────────────────────────────────────────
+  function isModified() {
+    return JSON.stringify(activeConfig) !== originalSnapshot;
+  }
+  function updateModifiedIndicator() {
+    const el = document.getElementById("modifiedIndicator");
+    if (isModified()) {
+      el.textContent = "● Modified"; el.className = "profile-modified";
+    } else {
+      el.textContent = "✓ Saved"; el.className = "profile-clean";
+    }
+  }
+
+  // ── Render: master ───────────────────────────────────────────────
+  function renderAll() {
+    if (!activeConfig) return;
+    renderMetadata();
+    renderCriteria();
+    renderWeighting();
+    renderSetAsides();
+    renderEligibility();
+    renderAdjustments();
+    renderGovernance();
+    renderRawJSON();
+    runPreview();
+    updateModifiedIndicator();
+  }
+
+  // ── Render: Metadata ─────────────────────────────────────────────
+  function renderMetadata() {
+    const m = activeConfig.metadata || {};
+    document.getElementById("m_name").value = m.name || "";
+    document.getElementById("m_state").value = m.state || "";
+    document.getElementById("m_agency").value = m.agency || "";
+    document.getElementById("m_model_version").value = m.model_version || "";
+    document.getElementById("m_last_updated").value = m.last_updated || "";
+    document.getElementById("m_source_citation").value = m.source_citation || "";
+    document.getElementById("m_disclaimer").value = activeConfig.disclaimer || "";
+    renderDecisionsLog();
+  }
+
+  function renderDecisionsLog() {
+    const wrap = document.getElementById("decisionsLog");
+    const log = (activeConfig.metadata && activeConfig.metadata.decisions_log) || [];
+    if (!log.length) {
+      wrap.innerHTML = '<div class="empty">No decisions logged yet. Add the first one when you change a weight or criterion.</div>';
+      return;
+    }
+    wrap.innerHTML = log.map((d, i) => `
+      <div class="criterion-card" style="margin-bottom:8px">
+        <div style="font-size:.78rem; color:var(--gray-600)">${d.date || ""} — ${d.author || ""}</div>
+        <div style="font-weight:600; margin: 4px 0">${escapeHtml(d.decision || "")}</div>
+        <div style="font-size:.78rem">${escapeHtml(d.rationale || "")}</div>
+        ${d.source ? `<div style="font-size:.72rem; color:var(--gray-600); margin-top:4px">Source: ${escapeHtml(d.source)}</div>` : ""}
+        <div style="text-align:right; margin-top: 4px">
+          <button class="btn btn-danger btn-sm" onclick="window.removeDecision(${i})">Remove</button>
+        </div>
+      </div>
+    `).join("");
+  }
+
+  // ── Render: Criteria ─────────────────────────────────────────────
+  function renderCriteria() {
+    const wrap = document.getElementById("criteriaList");
+    const crits = activeConfig.criteria || [];
+    if (!crits.length) {
+      wrap.innerHTML = '<div class="empty">No criteria yet. Add one or load a template.</div>';
+      return;
+    }
+    wrap.innerHTML = crits.map((c, i) => renderCriterionCard(c, i)).join("");
+  }
+
+  function renderCriterionCard(c, idx) {
+    const subs = c.subcategories || [];
+    const acrp = c.acrp_category ? `<span class="pill pill-acrp">${c.acrp_category}</span>` : "";
+    const bucket = c.bucket ? `<span class="pill pill-bucket">${c.bucket}</span>` : "";
+    const style = `<span class="pill pill-style">${c.scoring_style}</span>`;
+    return `
+      <div class="criterion-card expanded">
+        <div class="criterion-header">
+          <div>
+            <div class="criterion-title">${escapeHtml(c.label || c.id)}</div>
+            <div class="criterion-detail">${acrp} ${bucket} ${style}
+              ${c.weight !== undefined ? `<span class="pill pill-style">w=${c.weight}</span>` : ""}
+              ${c.max_points !== undefined ? `<span class="pill pill-style">max=${c.max_points}</span>` : ""}
+            </div>
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="window.editCriterionMeta(${idx})">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="window.removeCriterion(${idx})">Remove</button>
+        </div>
+        <div class="criterion-body">
+          <div style="font-size:.78rem; color:var(--gray-600); margin-bottom: 8px">
+            ${escapeHtml(c.description || "")}
+          </div>
+          <table>
+            <thead><tr><th>Subcategory</th><th class="num">Score</th><th></th></tr></thead>
+            <tbody>
+              ${subs.map((s, j) => `
+                <tr>
+                  <td>${escapeHtml(s.label || s.id)}
+                    <div style="font-size:.72rem; color:var(--gray-600)">${escapeHtml(s.condition || "")}</div>
+                  </td>
+                  <td class="num">
+                    <input type="number" step="0.5" value="${s.score}" style="width: 70px"
+                           oninput="window.updateSubcategoryScore(${idx}, ${j}, this.value)">
+                  </td>
+                  <td><button class="btn btn-danger btn-sm" onclick="window.removeSubcategory(${idx}, ${j})">×</button></td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+          <button class="btn btn-secondary btn-sm" style="margin-top:8px" onclick="window.addSubcategory(${idx})">+ Subcategory</button>
+        </div>
+      </div>
+    `;
+  }
+
+  // ── Render: Weighting ────────────────────────────────────────────
+  function renderWeighting() {
+    document.getElementById("weightingModel").value = activeConfig.weighting_model || "multiplicative";
+    document.getElementById("globalFormulaWrap").style.display =
+      activeConfig.weighting_model === "formula" ? "" : "none";
+    document.getElementById("globalFormula").value = activeConfig.global_formula || "";
+
+    const body = document.getElementById("weightingBody");
+    const crits = activeConfig.criteria || [];
+    const wm = activeConfig.weighting_model;
+    body.innerHTML = crits.map((c, i) => `
+      <tr>
+        <td><strong>${escapeHtml(c.label || c.id)}</strong></td>
+        <td>${c.acrp_category ? `<span class="pill pill-acrp">${c.acrp_category}</span>` : ""}</td>
+        <td>${c.bucket ? `<span class="pill pill-bucket">${c.bucket}</span>` : ""}</td>
+        <td class="num">
+          ${wm === "multiplicative" ?
+            `<input type="number" step="0.5" value="${c.weight ?? 1}" style="width: 80px" oninput="window.updateCriterionWeight(${i}, this.value)">` :
+            wm === "additive_100pt" ?
+            `<input type="number" step="1" value="${c.max_points ?? 0}" style="width: 80px" oninput="window.updateCriterionMax(${i}, this.value)">` :
+            "—"}
+        </td>
+      </tr>
+    `).join("");
+  }
+
+  // ── Render: Set-asides ───────────────────────────────────────────
+  function renderSetAsides() {
+    const wrap = document.getElementById("setAsidesList");
+    const list = activeConfig.set_asides || [];
+    if (!list.length) {
+      wrap.innerHTML = '<div class="empty">No set-asides defined.</div>';
+      return;
+    }
+    wrap.innerHTML = list.map((s, i) => `
+      <div class="criterion-card" style="margin-bottom:8px">
+        <div style="display:flex; gap:10px; align-items:center">
+          <div style="flex:1">
+            <input type="text" value="${escapeAttr(s.label || "")}" placeholder="Label"
+                   oninput="window.updateSetAside(${i}, 'label', this.value)" style="width:100%">
+          </div>
+          <div style="width: 100px">
+            <input type="number" step="0.1" value="${s.allocation_pct ?? 0}" placeholder="%"
+                   oninput="window.updateSetAside(${i}, 'allocation_pct', parseFloat(this.value))" style="width:100%">
+          </div>
+          <button class="btn btn-danger btn-sm" onclick="window.removeSetAside(${i})">×</button>
+        </div>
+        <div style="margin-top: 6px">
+          <input type="text" value="${escapeAttr(s.eligibility_filter || "")}"
+                 placeholder="Eligibility filter (plain language)"
+                 oninput="window.updateSetAside(${i}, 'eligibility_filter', this.value)" style="width:100%">
+        </div>
+      </div>
+    `).join("");
+  }
+
+  function renderEligibility() {
+    const gate = activeConfig.eligibility_gate || { enabled: false, filters: [] };
+    document.getElementById("gateEnabled").checked = !!gate.enabled;
+    const wrap = document.getElementById("eligibilityFilters");
+    const filters = gate.filters || [];
+    if (!filters.length) {
+      wrap.innerHTML = '<div class="empty" style="padding:14px">No filters yet.</div>';
+      return;
+    }
+    wrap.innerHTML = filters.map((f, i) => `
+      <div class="criterion-card" style="margin-bottom:8px">
+        <div style="display:flex; gap:10px; align-items:center">
+          <div style="flex:1">
+            <input type="text" value="${escapeAttr(f.label || "")}" placeholder="Label"
+                   oninput="window.updateFilter(${i}, 'label', this.value)" style="width:100%">
+          </div>
+          <button class="btn btn-danger btn-sm" onclick="window.removeFilter(${i})">×</button>
+        </div>
+        <div style="margin-top: 6px">
+          <input type="text" value="${escapeAttr(f.rule || "")}" placeholder="Rule (plain language)"
+                 oninput="window.updateFilter(${i}, 'rule', this.value)" style="width:100%">
+        </div>
+      </div>
+    `).join("");
+  }
+
+  // ── Render: Adjustments ──────────────────────────────────────────
+  function renderAdjustments() {
+    const a = activeConfig.adjustments || {};
+    const rev = a.revenue_producing_bump || {};
+    document.getElementById("adj_rev_enabled").checked = !!rev.enabled;
+    document.getElementById("adj_rev_amount").value = rev.bonus_amount ?? "";
+    document.getElementById("adj_rev_tags").value = (rev.applies_to_project_types || []).join(", ");
+
+    const lfp = a.low_federal_priority_bonus || {};
+    document.getElementById("adj_lfp_enabled").checked = !!lfp.enabled;
+    document.getElementById("adj_lfp_threshold").value = lfp.nprs_threshold ?? "";
+    document.getElementById("adj_lfp_amount").value = lfp.bonus_amount ?? "";
+
+    const tl = a.tradeoff_layer || {};
+    document.getElementById("adj_tl_enabled").checked = !!tl.enabled;
+    document.getElementById("adj_tl_urgency").checked = !!tl.urgency_sort;
+    document.getElementById("adj_tl_finance").checked = !!tl.financial_impact_sort;
+    document.getElementById("adj_tl_override").checked = !!tl.discretion_override_allowed;
+  }
+
+  // ── Render: Governance ───────────────────────────────────────────
+  function renderGovernance() {
+    const g = activeConfig.governance || {};
+    document.getElementById("g_decision_authority").value = g.decision_authority || "";
+    document.getElementById("g_decision_cadence").value = g.decision_cadence || "annual";
+    document.getElementById("g_statute_required").value = String(!!g.statute_required);
+    document.getElementById("g_statute_citation").value = g.statute_citation || "";
+    document.getElementById("g_model_review_cycle").value = g.model_review_cycle_years ?? "";
+    document.getElementById("g_scoring_authority").value = g.scoring_authority || "";
+    document.getElementById("g_approval_process").value = g.approval_process || "";
+  }
+
+  // ── Render: Raw JSON ────────────────────────────────────────────
+  function renderRawJSON() {
+    document.getElementById("rawJSON").value = JSON.stringify(activeConfig, null, 2);
+  }
+
+  // ── Live preview ─────────────────────────────────────────────────
+  function runPreview() {
+    let result;
+    try {
+      const m = new Engine.PriorityModel(activeConfig);
+      result = m.rank(window.PM_SAMPLE_PROJECTS || []);
+    } catch (e) {
+      console.error("Preview engine error:", e);
+      document.getElementById("rankingBody").innerHTML =
+        `<tr><td colspan="3" style="color:var(--danger)">Engine error: ${escapeHtml(e.message)}</td></tr>`;
+      ["stat-scored","stat-excluded","stat-top","stat-bottom"].forEach(id =>
+        document.getElementById(id).textContent = "—");
+      return;
+    }
+    const ranked = result.ranked();
+    document.getElementById("stat-scored").textContent = result.scored.length;
+    document.getElementById("stat-excluded").textContent = result.excluded.length;
+    document.getElementById("stat-top").textContent =
+      ranked.length ? Number(ranked[0].final_score).toFixed(1) : "—";
+    document.getElementById("stat-bottom").textContent =
+      ranked.length ? Number(ranked[ranked.length-1].final_score).toFixed(1) : "—";
+
+    const rows = ranked.map((p, i) => `
+      <tr class="ranking-row">
+        <td class="center">${i + 1}</td>
+        <td class="num score ${scoreClass(p.final_score)}">${Number(p.final_score).toFixed(1)}</td>
+        <td><span class="id">${escapeHtml(p.project_id)}</span> ${escapeHtml(p.project_label.slice(0, 50))}</td>
+      </tr>
+    `).join("");
+    const excludedRows = result.excluded.map(p => `
+      <tr class="ranking-row excluded">
+        <td class="center">—</td>
+        <td class="num score">EXCL</td>
+        <td>${escapeHtml(p.project_id)} ${escapeHtml(p.project_label.slice(0, 50))}</td>
+      </tr>
+    `).join("");
+    document.getElementById("rankingBody").innerHTML = rows + excludedRows;
+  }
+
+  function scoreClass(v) {
+    const n = Number(v);
+    if (n > 0) return "score-positive";
+    if (n < 0) return "score-negative";
+    return "score-zero";
+  }
+
+  // ── Mutations ────────────────────────────────────────────────────
+  function touch() { updateModifiedIndicator(); runPreview(); }
+
+  window.onMetaInput = function () {
+    activeConfig.metadata = activeConfig.metadata || {};
+    activeConfig.metadata.name = val("m_name");
+    activeConfig.metadata.state = val("m_state");
+    activeConfig.metadata.agency = val("m_agency");
+    activeConfig.metadata.model_version = val("m_model_version");
+    activeConfig.metadata.last_updated = val("m_last_updated");
+    activeConfig.metadata.source_citation = val("m_source_citation");
+    activeConfig.disclaimer = val("m_disclaimer");
+    touch();
+  };
+
+  window.onGovInput = function () {
+    activeConfig.governance = activeConfig.governance || {};
+    activeConfig.governance.decision_authority = val("g_decision_authority");
+    activeConfig.governance.decision_cadence = val("g_decision_cadence");
+    activeConfig.governance.statute_required = val("g_statute_required") === "true";
+    activeConfig.governance.statute_citation = val("g_statute_citation");
+    const mrc = val("g_model_review_cycle");
+    activeConfig.governance.model_review_cycle_years = mrc === "" ? undefined : Number(mrc);
+    activeConfig.governance.scoring_authority = val("g_scoring_authority");
+    activeConfig.governance.approval_process = val("g_approval_process");
+    touch();
+  };
+
+  window.onAdjChange = function () {
+    activeConfig.adjustments = activeConfig.adjustments || {};
+    activeConfig.adjustments.revenue_producing_bump = {
+      enabled: document.getElementById("adj_rev_enabled").checked,
+      bonus_amount: Number(val("adj_rev_amount")) || 0,
+      applies_to_project_types: val("adj_rev_tags").split(",").map(s => s.trim()).filter(Boolean)
+    };
+    activeConfig.adjustments.low_federal_priority_bonus = {
+      enabled: document.getElementById("adj_lfp_enabled").checked,
+      nprs_threshold: Number(val("adj_lfp_threshold")) || 0,
+      bonus_amount: Number(val("adj_lfp_amount")) || 0
+    };
+    activeConfig.adjustments.tradeoff_layer = {
+      enabled: document.getElementById("adj_tl_enabled").checked,
+      urgency_sort: document.getElementById("adj_tl_urgency").checked,
+      financial_impact_sort: document.getElementById("adj_tl_finance").checked,
+      discretion_override_allowed: document.getElementById("adj_tl_override").checked
+    };
+    touch();
+  };
+
+  window.onWeightingChange = function () {
+    activeConfig.weighting_model = val("weightingModel");
+    document.getElementById("globalFormulaWrap").style.display =
+      activeConfig.weighting_model === "formula" ? "" : "none";
+    renderWeighting();
+    touch();
+  };
+
+  window.onGlobalFormulaInput = function () {
+    activeConfig.global_formula = val("globalFormula");
+    touch();
+  };
+
+  window.onGateToggle = function () {
+    activeConfig.eligibility_gate = activeConfig.eligibility_gate || { filters: [] };
+    activeConfig.eligibility_gate.enabled = document.getElementById("gateEnabled").checked;
+    touch();
+  };
+
+  // Criterion / subcategory mutations
+  window.updateCriterionWeight = function (i, v) {
+    activeConfig.criteria[i].weight = Number(v);
+    renderCriteria(); touch();
+  };
+  window.updateCriterionMax = function (i, v) {
+    activeConfig.criteria[i].max_points = Number(v);
+    renderCriteria(); touch();
+  };
+  window.updateSubcategoryScore = function (ci, si, v) {
+    activeConfig.criteria[ci].subcategories[si].score = Number(v);
+    touch();
+  };
+  window.removeCriterion = function (i) {
+    if (!confirm("Remove this criterion?")) return;
+    activeConfig.criteria.splice(i, 1);
+    renderAll();
+  };
+  window.removeSubcategory = function (ci, si) {
+    activeConfig.criteria[ci].subcategories.splice(si, 1);
+    renderCriteria(); touch();
+  };
+  window.editCriterionMeta = function (i) {
+    const c = activeConfig.criteria[i];
+    const newLabel = prompt("Criterion label", c.label || "");
+    if (newLabel !== null) c.label = newLabel;
+    const newAcrp = prompt("ACRP category (e.g., safety_security, asset_preservation)", c.acrp_category || "");
+    if (newAcrp !== null) c.acrp_category = newAcrp || undefined;
+    const newField = prompt("Project field (CSV column the engine consults)", c.project_field || c.id);
+    if (newField !== null) c.project_field = newField;
+    renderAll();
+  };
+  window.addCriterion = function () {
+    const id = prompt("New criterion id (snake_case)", "new_criterion");
+    if (!id) return;
+    activeConfig.criteria.push({
+      id, label: id.replace(/_/g, " "),
+      scoring_style: "select_one",
+      weight: 1, max_points: 10,
+      subcategories: []
+    });
+    renderAll();
+  };
+  window.addSubcategory = function (ci) {
+    const c = activeConfig.criteria[ci];
+    const id = prompt("Subcategory id", "new_sub");
+    if (!id) return;
+    c.subcategories = c.subcategories || [];
+    c.subcategories.push({ id, label: id.replace(/_/g, " "), score: 0 });
+    renderCriteria(); touch();
+  };
+
+  // Set-asides
+  window.updateSetAside = function (i, key, v) {
+    activeConfig.set_asides[i][key] = v; touch();
+  };
+  window.removeSetAside = function (i) {
+    activeConfig.set_asides.splice(i, 1); renderSetAsides(); touch();
+  };
+  window.addSetAside = function () {
+    activeConfig.set_asides = activeConfig.set_asides || [];
+    activeConfig.set_asides.push({ id: "new_set_aside", label: "New Set-aside",
+                                    allocation_pct: 0, eligibility_filter: "" });
+    renderSetAsides(); touch();
+  };
+
+  // Eligibility filters
+  window.updateFilter = function (i, key, v) {
+    activeConfig.eligibility_gate.filters[i][key] = v; touch();
+  };
+  window.removeFilter = function (i) {
+    activeConfig.eligibility_gate.filters.splice(i, 1);
+    renderEligibility(); touch();
+  };
+  window.addEligibilityFilter = function () {
+    activeConfig.eligibility_gate = activeConfig.eligibility_gate || { enabled: true, filters: [] };
+    activeConfig.eligibility_gate.filters = activeConfig.eligibility_gate.filters || [];
+    activeConfig.eligibility_gate.filters.push({
+      id: "new_filter", label: "New filter", rule: "", on_fail: "exclude"
+    });
+    renderEligibility(); touch();
+  };
+
+  // Decisions log
+  window.removeDecision = function (i) {
+    activeConfig.metadata.decisions_log.splice(i, 1);
+    renderDecisionsLog(); touch();
+  };
+  window.addDecision = function () {
+    activeConfig.metadata = activeConfig.metadata || {};
+    activeConfig.metadata.decisions_log = activeConfig.metadata.decisions_log || [];
+    const today = new Date().toISOString().slice(0, 10);
+    const decision = prompt("Decision (one-line summary)", "");
+    if (!decision) return;
+    activeConfig.metadata.decisions_log.push({
+      date: today, author: "configurator", decision,
+      rationale: prompt("Rationale (why)", "") || "",
+      source: prompt("Source (citation)", "") || ""
+    });
+    renderDecisionsLog(); touch();
+  };
+
+  // ── Profile actions ──────────────────────────────────────────────
+  window.saveActive = function () {
+    profiles[activeName] = JSON.parse(JSON.stringify(activeConfig));
+    originalSnapshot = JSON.stringify(profiles[activeName]);
+    persist(); updateModifiedIndicator();
+  };
+
+  window.renameActive = function () {
+    const newName = prompt("Rename to", activeName);
+    if (!newName || newName === activeName) return;
+    if (profiles[newName] && !confirm("Overwrite existing profile?")) return;
+    profiles[newName] = JSON.parse(JSON.stringify(activeConfig));
+    delete profiles[activeName];
+    activeName = newName;
+    persist(); populateProfileSelect();
+  };
+
+  window.cloneActive = function () {
+    const newName = prompt("Clone as", activeName + " (copy)");
+    if (!newName) return;
+    if (profiles[newName] && !confirm("Overwrite existing profile?")) return;
+    profiles[newName] = JSON.parse(JSON.stringify(activeConfig));
+    activeName = newName;
+    activeConfig = JSON.parse(JSON.stringify(profiles[newName]));
+    originalSnapshot = JSON.stringify(profiles[newName]);
+    persist(); populateProfileSelect(); renderAll();
+  };
+
+  window.deleteActive = function () {
+    if (Object.keys(profiles).length <= 1) { alert("Cannot delete the only profile."); return; }
+    if (!confirm("Delete profile '" + activeName + "'?")) return;
+    delete profiles[activeName];
+    activeName = Object.keys(profiles)[0];
+    activeConfig = JSON.parse(JSON.stringify(profiles[activeName]));
+    originalSnapshot = JSON.stringify(profiles[activeName]);
+    persist(); populateProfileSelect(); renderAll();
+  };
+
+  window.newFromTemplate = function (key) {
+    if (isModified() && !confirm("Discard unsaved changes?")) return;
+    const tpl = window.PM_REFERENCE_CONFIGS[key];
+    if (!tpl) { alert("Template not found: " + key); return; }
+    const newName = prompt("Name your new model", "My Model from " + key);
+    if (!newName) return;
+    profiles[newName] = JSON.parse(JSON.stringify(tpl));
+    profiles[newName].metadata.state = "";
+    profiles[newName].metadata.name = newName;
+    activeName = newName;
+    activeConfig = JSON.parse(JSON.stringify(profiles[newName]));
+    originalSnapshot = JSON.stringify(profiles[newName]);
+    persist(); populateProfileSelect(); renderAll();
+  };
+
+  window.newBlankModel = function () {
+    if (isModified() && !confirm("Discard unsaved changes?")) return;
+    const newName = prompt("Name your new model", "Blank Model");
+    if (!newName) return;
+    const blank = {
+      schema_version: "1.0.0",
+      metadata: {
+        name: newName, state: "", agency: "", model_version: "draft",
+        last_updated: new Date().toISOString().slice(0, 10),
+        decisions_log: []
+      },
+      weighting_model: "additive_100pt",
+      criteria: [],
+      governance: { decision_authority: "", decision_cadence: "annual" }
+    };
+    profiles[newName] = blank;
+    activeName = newName;
+    activeConfig = JSON.parse(JSON.stringify(blank));
+    originalSnapshot = JSON.stringify(blank);
+    persist(); populateProfileSelect(); renderAll();
+  };
+
+  // ── Import / Export ──────────────────────────────────────────────
+  window.exportActive = function () {
+    const blob = new Blob([JSON.stringify(activeConfig, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = (activeConfig.metadata?.name || "priority_model").replace(/\s+/g, "_") + ".json";
+    a.click(); URL.revokeObjectURL(url);
+  };
+
+  window.importJSON = function (input) {
+    const f = input.files[0];
+    if (!f) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const cfg = JSON.parse(e.target.result);
+        const name = cfg.metadata?.name || "Imported model";
+        profiles[name] = cfg;
+        activeName = name;
+        activeConfig = JSON.parse(JSON.stringify(cfg));
+        originalSnapshot = JSON.stringify(cfg);
+        persist(); populateProfileSelect(); renderAll();
+      } catch (e) { alert("Import failed: " + e.message); }
+    };
+    reader.readAsText(f);
+    input.value = "";
+  };
+
+  window.applyRawJSON = function () {
+    try {
+      const cfg = JSON.parse(val("rawJSON"));
+      activeConfig = cfg; renderAll();
+    } catch (e) { alert("JSON parse error: " + e.message); }
+  };
+
+  // ── Generators (sprint 5) ────────────────────────────────────────
+  window.exportExcel = function () {
+    if (!window.PM_Generators) { alert("Generators not loaded yet."); return; }
+    window.PM_Generators.generateExcel(activeConfig, window.PM_SAMPLE_PROJECTS || []);
+  };
+  window.exportPolicyWyoming = function () {
+    if (!window.PM_Generators) { alert("Generators not loaded yet."); return; }
+    window.PM_Generators.generateWyomingPolicyManual(activeConfig);
+  };
+  window.exportPolicyLouisiana = function () {
+    if (!window.PM_Generators) { alert("Generators not loaded yet."); return; }
+    window.PM_Generators.generateLouisianaPolicyManual(activeConfig);
+  };
+
+  // ── Helpers ──────────────────────────────────────────────────────
+  function val(id) { return document.getElementById(id).value; }
+  function escapeHtml(s) {
+    return String(s ?? "").replace(/[&<>"']/g, c => (
+      { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]
+    ));
+  }
+  function escapeAttr(s) { return escapeHtml(s); }
+
+  // ── Wizard hook ──────────────────────────────────────────────────
+  // Called by wizard.js when the user finishes the build- or modify-existing flow.
+  // Saves the wizard's draft as a new named profile, makes it active, and re-renders.
+  window.installWizardDraft = function (cfg) {
+    if (!cfg) return;
+    let baseName = cfg.metadata?.name || "Wizard draft";
+    let name = baseName;
+    let i = 2;
+    while (profiles[name]) { name = baseName + " (" + i++ + ")"; }
+    profiles[name] = JSON.parse(JSON.stringify(cfg));
+    activeName = name;
+    activeConfig = JSON.parse(JSON.stringify(cfg));
+    originalSnapshot = JSON.stringify(cfg);
+    persist();
+    populateProfileSelect();
+    renderAll();
+  };
+
+  // ── Boot ─────────────────────────────────────────────────────────
+  document.addEventListener("DOMContentLoaded", bootstrap);
+})();
+</script>
+
+</body>
+</html>

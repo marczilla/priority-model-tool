@@ -1,0 +1,149 @@
+{
+  "schema_version": "1.0.0",
+  "metadata": {
+    "name": "Louisiana Airport Construction and Development Priority Program",
+    "state": "Louisiana",
+    "agency": "Louisiana Department of Transportation and Development, Aviation Division",
+    "model_version": "FY2024-2025",
+    "last_updated": "2024-07-01",
+    "source_citation": "Louisiana Aviation Program Policy Manual, Effective July 1, 2024, Version 1.2. Reference: LA Adm Code Title 70, Part IX. Encoded from source PDF at Priority_Model/Example Prioritization Models/Louisiana-aviation-program-policy-manual-july-1-2024.pdf.",
+    "decisions_log": [
+      {
+        "date": "2026-05-06",
+        "author": "APH m49 reference encoder",
+        "decision": "Encoded Louisiana model with eligibility_gate enabled (two-step process)",
+        "rationale": "Louisiana's process is explicitly two-step per the source: 'Step One – determine project eligibility / Step Two – confirm all required information is available'. The eligibility_gate captures step one before scoring runs.",
+        "source": "Louisiana Aviation Policy Manual; NASP Symposium - LADOTD deck"
+      },
+      {
+        "date": "2026-05-06",
+        "author": "APH m49 reference encoder",
+        "decision": "Used additive_100pt with four categories per the LADOTD deck",
+        "rationale": "LADOTD's NASP presentation explicitly identifies four categories: Project Type, Facility Usage, Sponsor Compliance, Special Considerations. Specific point allocations within each category live in LA Adm Code Title 70 Part IX Ch 3 and require the user to populate from their adopted statute.",
+        "source": "NASP Symposium - LADOTD Prioritization deck"
+      },
+      {
+        "date": "2026-05-06",
+        "author": "APH m49 reference encoder",
+        "decision": "Set air carrier set-aside via ACE program percentage",
+        "rationale": "Louisiana's Air Carrier Enhancement (ACE) Program reserves 21.622% of total air carrier allocation amount through the prioritized program for FY2025-2026.",
+        "source": "Louisiana Aviation Policy Manual Ch 1.2"
+      }
+    ]
+  },
+  "eligibility_gate": {
+    "enabled": true,
+    "filters": [
+      {
+        "id": "airport_sponsor_eligible",
+        "label": "Eligible Airport Sponsor",
+        "rule": "Sponsor must be a state agency, city, town, parish, airport authority, airport commission, airport district, or other political subdivision that owns/operates/leases/controls a public-use airport or landing area.",
+        "on_fail": "exclude"
+      },
+      {
+        "id": "public_use_airport",
+        "label": "Public-Use Airport",
+        "rule": "Project must be at a publicly owned, public-use airport in the Louisiana Airport System (excludes non-NPIAS rural strips by default).",
+        "field_check": { "field": "airport_classification", "operator": "ne", "value": "non_npias" },
+        "on_fail": "exclude"
+      },
+      {
+        "id": "non_prioritized_excluded",
+        "label": "Non-Prioritized Project Categories",
+        "rule": "Projects falling under Manual Table 1.2 (Non-Prioritized Projects) are excluded from the priority program.",
+        "on_fail": "exclude"
+      },
+      {
+        "id": "minimum_application_criteria",
+        "label": "Minimum Pre-Application Criteria",
+        "rule": "Project must meet the minimum criteria outlined in Manual Table 2.8 (Airport Project Pre-Application Minimum Criteria).",
+        "on_fail": "flag_for_review"
+      }
+    ]
+  },
+  "weighting_model": "additive_100pt",
+  "criteria": [
+    {
+      "id": "project_type",
+      "label": "Project Type",
+      "description": "Category I — what the project is. Specific point values live in LA Adm Code Title 70 Part IX Ch 3 and Manual Table 3.3 Project Components. Defaults below are placeholder tiers using regex matches against project_type; states adopting this model should replace with statute-specific values.",
+      "max_points": 35,
+      "acrp_category": "asset_preservation",
+      "scoring_style": "tiered_score",
+      "subcategories": [
+        { "id": "safety_critical", "label": "Safety-critical airside (RSA, OFA, RPZ, obstruction removal, ARFF)", "score": 35, "field_match": { "field": "project_type", "operator": "matches", "value": "(rsa|obstruction|rpz|emas|arff|navaid_papi|navaid_awos)" } },
+        { "id": "preservation", "label": "Preservation (rehab, maintenance, drainage, mitigation)", "score": 28, "field_match": { "field": "project_type", "operator": "matches", "value": "(rehab|maintenance|drainage|mitigation|seal)" } },
+        { "id": "expansion", "label": "Expansion / new (extension, strengthen, expand, new)", "score": 18, "field_match": { "field": "project_type", "operator": "matches", "value": "(extension|strengthen|expand|new_runway|partial_parallel|connector)" } },
+        { "id": "planning", "label": "Planning and environmental", "score": 12, "field_match": { "field": "project_type", "operator": "matches", "value": "(master_plan|environmental|nepa)" } },
+        { "id": "landside_other", "label": "Landside / other infrastructure", "score": 5, "field_match": { "field": "project_type", "operator": "matches", "value": "(landside|fencing|fuel|terminal|hangar)" } }
+      ]
+    },
+    {
+      "id": "facility_usage",
+      "label": "Facility Usage",
+      "description": "Category II — based on Louisiana Aviation System Plan (LASP) classification, based aircraft, and operations levels.",
+      "max_points": 25,
+      "acrp_category": "demand_accommodation",
+      "scoring_style": "select_one",
+      "project_field": "airport_classification",
+      "subcategories": [
+        { "id": "commercial_service", "label": "Air Carrier / Commercial Service (Part 139)", "score": 25 },
+        { "id": "business", "label": "Business Airport", "score": 18 },
+        { "id": "intermediate_ga", "label": "GA Intermediate / Regional", "score": 12 },
+        { "id": "local_ga", "label": "GA Local", "score": 8 },
+        { "id": "non_npias", "label": "Non-NPIAS / Rural (typically excluded by gate)", "score": 3 }
+      ]
+    },
+    {
+      "id": "sponsor_compliance",
+      "label": "Sponsor Compliance",
+      "description": "Category III — sponsor's compliance posture: inspection score, certification status, grant performance history.",
+      "max_points": 25,
+      "acrp_category": "regulatory_mandate",
+      "scoring_style": "select_many",
+      "negative_scores_allowed": true,
+      "subcategories": [
+        { "id": "inspection_pass", "label": "Most recent public-use airport inspection passed", "score": 10 },
+        { "id": "self_inspection_program", "label": "Active airport self-inspection program", "score": 5 },
+        { "id": "based_aircraft_documented", "label": "Based aircraft scoring documented per Manual 5.8", "score": 2 },
+        { "id": "operations_documented", "label": "Operations scoring documented per Manual 5.9", "score": 3 },
+        { "id": "grant_performance_good", "label": "No outstanding grant performance discrepancies", "score": 5 },
+        { "id": "grant_performance_issues", "label": "Active grant performance discrepancies (per Manual Table 8.5)", "score": -10 }
+      ]
+    },
+    {
+      "id": "special_considerations",
+      "label": "Special Considerations",
+      "description": "Category IV — local funding contribution, leveraging factors, and other special considerations per Manual Section 3.2.2.",
+      "max_points": 15,
+      "acrp_category": "revenue_cost",
+      "scoring_style": "select_many",
+      "subcategories": [
+        { "id": "local_match_above_required", "label": "Sponsor local funding contribution exceeds required match", "score": 10 },
+        { "id": "leverages_federal", "label": "Project leverages federal funds", "score": 5 },
+        { "id": "emergency_storm_damage", "label": "Storm damage / emergency project (Manual Ch 9)", "score": 5 },
+        { "id": "multi_modal_benefit", "label": "Multimodal commerce benefit", "score": 3 }
+      ]
+    }
+  ],
+  "set_asides": [
+    {
+      "id": "ace_program",
+      "label": "Air Carrier Enhancement (ACE) Program",
+      "allocation_pct": 21.622,
+      "eligibility_filter": "Air carrier airports under the prioritized airport construction and development priority program. Statute-defined allocation percentages per Manual Appendix A.",
+      "field_filter": { "field": "airport_classification", "operator": "eq", "value": "air_carrier" }
+    }
+  ],
+  "adjustments": {},
+  "governance": {
+    "decision_authority": "Louisiana DOTD Aviation Division (with legislative approval per LA Adm Code Title 70 Part IX)",
+    "decision_cadence": "annual",
+    "statute_required": true,
+    "statute_citation": "LA Adm Code Title 70, Part IX, Subpart A, Chapter 3 (Airport Construction and Development Priority Program). LA Revised Statutes Title 2, Aeronautics.",
+    "model_review_cycle_years": 1,
+    "scoring_authority": "DOTD Aviation Division Development line of business",
+    "approval_process": "Two-step process: (1) eligibility determination, (2) confirmation of required information. Programmed projects shall be included within the Airport Construction and Development Priority Program. Funding flows through total approved calculated amounts for each airport and category. Subject to legislative approval; airport sponsors review draft program before legislative submission."
+  },
+  "disclaimer": "This model encoding is derived from the Louisiana Aviation Program Policy Manual (July 2024) and references LA Adm Code Title 70 Part IX. Specific point allocations within each category are placeholder tiers; states adopting this model should replace with their statute's exact values. The ACE Program 21.622% allocation reflects FY2025-2026 percentages and changes annually."
+}
