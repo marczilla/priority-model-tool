@@ -1,0 +1,115 @@
+{
+  "schema_version": "1.0.0",
+  "metadata": {
+    "name": "Tennessee State Priority Rating (SPR) Model",
+    "state": "Tennessee",
+    "agency": "Tennessee Department of Transportation (TDOT), Aeronautics Division",
+    "model_version": "TAC Policy 170-02 (effective 2023-10-01)",
+    "last_updated": "2023-10-01",
+    "source_citation": "Tennessee Aeronautics Commission Policy 170-02 (effective October 1, 2023) — 'Direction of the Tennessee Aeronautics Commission' and TASP 2040 Aviation System Plan documentation. State funding prioritization criteria: safety, security, preservation/maintenance, and/or compliance with Federal and State standards. Source: tn.gov/tdot/aeronautics.",
+    "decisions_log": [
+      {
+        "date": "2026-05-26",
+        "author": "APH m49 Sprint 7 reference encoder",
+        "decision": "Encoded Tennessee SPR as additive_100pt model with 5 buckets totaling 100 points.",
+        "rationale": "Documented TDOT priority order: 1. Safety, 2. Security, 3. Preservation/Maintenance, 4. Federal/State Standards Compliance, 5. Economic Development/Capacity/Modernization (case-by-case). Used 35/15/25/15/10 point allocation to reflect TDOT's stated priorities.",
+        "source": "TAC Policy 170-02; TDOT Aeronautics public guidance"
+      },
+      {
+        "date": "2026-05-26",
+        "author": "APH m49 Sprint 7 reference encoder",
+        "decision": "Specific point values within each bucket are inferred — TDOT publishes priority order but not numerical scoring matrix.",
+        "rationale": "TDOT documents the conceptual framework of the SPR model but the detailed point allocation table is internal. Encoded with reasonable values that preserve the documented priority ordering.",
+        "source": "Limitations of public documentation"
+      }
+    ]
+  },
+  "weighting_model": "additive_100pt",
+  "criteria": [
+    {
+      "id": "safety",
+      "label": "Safety",
+      "description": "Highest priority per TDOT. Projects that directly address aircraft, operations, or airfield safety.",
+      "bucket": "State Priorities",
+      "max_points": 35,
+      "acrp_category": "safety_security",
+      "scoring_style": "select_one",
+      "project_field": "purpose",
+      "subcategories": [
+        { "id": "primary_safety", "label": "Primary safety purpose (RSA, obstruction, approach)", "score": 35, "field_match": { "field": "purpose", "operator": "eq", "value": "safety" } },
+        { "id": "secondary_safety", "label": "Secondary safety benefit", "score": 18, "field_match": { "field": "purpose", "operator": "eq", "value": "rehabilitation" } },
+        { "id": "no_safety", "label": "Not safety-related", "score": 0 }
+      ]
+    },
+    {
+      "id": "security",
+      "label": "Security",
+      "description": "Physical security and access control. Tier 2 priority per TDOT.",
+      "bucket": "State Priorities",
+      "max_points": 15,
+      "acrp_category": "safety_security",
+      "scoring_style": "select_one",
+      "project_field": "purpose",
+      "subcategories": [
+        { "id": "primary_security", "label": "Primary security purpose", "score": 15, "field_match": { "field": "purpose", "operator": "eq", "value": "security" } },
+        { "id": "no_security", "label": "Not security-related", "score": 0 }
+      ]
+    },
+    {
+      "id": "preservation_maintenance",
+      "label": "Preservation / Maintenance",
+      "description": "Maintains existing infrastructure. Tier 3 priority per TDOT.",
+      "bucket": "State Priorities",
+      "max_points": 25,
+      "acrp_category": "asset_preservation",
+      "scoring_style": "select_one",
+      "project_field": "purpose",
+      "subcategories": [
+        { "id": "pavement_rehab", "label": "Pavement rehabilitation", "score": 25, "field_match": { "field": "purpose", "operator": "eq", "value": "rehabilitation" } },
+        { "id": "maintenance", "label": "General maintenance", "score": 18, "field_match": { "field": "purpose", "operator": "eq", "value": "maintenance" } },
+        { "id": "reconstruction", "label": "Reconstruction (failed assets)", "score": 12, "field_match": { "field": "purpose", "operator": "eq", "value": "reconstruction" } },
+        { "id": "no_preservation", "label": "Not preservation-related", "score": 0 }
+      ]
+    },
+    {
+      "id": "standards_compliance",
+      "label": "Federal/State Standards Compliance",
+      "description": "Project brings airport into compliance with Federal Aviation Regulations or Tennessee aviation standards.",
+      "bucket": "State Priorities",
+      "max_points": 15,
+      "acrp_category": "regulatory_mandate",
+      "scoring_style": "accumulating",
+      "subcategories": [
+        { "id": "faa_design_standards", "label": "Project meets/exceeds FAA design standards", "score": 8, "field_match": { "field": "system_plan_supported", "operator": "eq", "value": true } },
+        { "id": "tn_aviation_standards", "label": "Aligned with Tennessee Aviation System Plan (TASP)", "score": 4, "field_match": { "field": "system_plan_supported", "operator": "eq", "value": true } },
+        { "id": "tn_license_compliance", "label": "Maintains state airport license compliance", "score": 3, "field_match": { "field": "licensing_status", "operator": "eq", "value": "compliant" } }
+      ]
+    },
+    {
+      "id": "economic_capacity_modernization",
+      "label": "Economic Development / Capacity / Modernization",
+      "description": "Case-by-case consideration per TDOT. Lower base priority but considered when state priority needs are met.",
+      "bucket": "Secondary Considerations",
+      "max_points": 10,
+      "acrp_category": "economic_development",
+      "scoring_style": "select_one",
+      "project_field": "purpose",
+      "subcategories": [
+        { "id": "capacity_primary", "label": "Capacity expansion", "score": 10, "field_match": { "field": "purpose", "operator": "eq", "value": "capacity" } },
+        { "id": "modernization", "label": "Modernization / enhancement", "score": 6, "field_match": { "field": "purpose", "operator": "eq", "value": "airport_enhancement" } },
+        { "id": "planning_study", "label": "Planning / study", "score": 4, "field_match": { "field": "purpose", "operator": "eq", "value": "planning" } },
+        { "id": "no_econ", "label": "No economic/capacity component", "score": 0 }
+      ]
+    }
+  ],
+  "governance": {
+    "decision_authority": "Tennessee Aeronautics Commission (TAC)",
+    "decision_cadence": "annual",
+    "statute_required": true,
+    "statute_citation": "TAC Policy 170-02 (effective 2023-10-01)",
+    "scoring_authority": "TDOT Aeronautics Division",
+    "approval_process": "TDOT Aeronautics applies State Priority Rating (SPR) model in development of Airport Capital Improvement Plans (ACIP). TAC reviews and approves funding decisions. Economic development, capacity, and modernization projects considered on case-by-case basis.",
+    "model_review_cycle_years": 5
+  },
+  "disclaimer": "Encoded from publicly available TAC Policy 170-02 and TASP 2040 documentation. TDOT publishes the SPR conceptual priority order (safety > security > preservation > compliance > economic) but the specific numerical point allocations are internal to the Aeronautics Division. Point values shown here are inferred to preserve the documented priority ordering; Tennessee stakeholders should calibrate to TDOT's internal scoring matrix before adoption."
+}

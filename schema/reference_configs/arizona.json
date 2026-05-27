@@ -1,0 +1,178 @@
+{
+  "schema_version": "1.0.0",
+  "metadata": {
+    "name": "Arizona Airport Priority Rating System",
+    "state": "Arizona",
+    "agency": "ADOT Multimodal Planning Division, Aeronautics Group",
+    "model_version": "Airport Development Guidelines (2018)",
+    "last_updated": "2018-05-01",
+    "source_citation": "ADOT Airport Development Guidelines, Multimodal Planning Division, Aeronautics Group. Project Component Priority Values reproduced verbatim from Appendix D. Airport Measures point tables reproduced from Appendix D.7. Source PDF: https://azdot.gov/sites/default/files/2019/05/airport-development-guidelines.pdf",
+    "decisions_log": [
+      {
+        "date": "2026-05-26",
+        "author": "APH m49 Sprint 7 reference encoder",
+        "decision": "Encoded Arizona as formula model: final_score = project_component_value + based_aircraft_points + enplaned_passengers_points + ops_asv_points",
+        "rationale": "ADOT manual states 'overall priority of a project for the development of the ACIP will be the sum of the Project Component points plus any Airport Measure points.' Formula weighting_model is exact fit. Project Component is a flat_lookup against 47 documented components ranging 17-255 points; Airport Measures contribute additional 1-17 points based on airport activity.",
+        "source": "ADOT Airport Development Guidelines Chapter 3 Section A.2.a; Appendix D.6 (Project Component Priority Values), Appendix D.7 (Airport Measures)"
+      },
+      {
+        "date": "2026-05-26",
+        "author": "APH m49 Sprint 7 reference encoder",
+        "decision": "Encoded six implicit grant categories (Safety > Security > Capacity > Environmental > Planning > Preservation) as reference info only; not used as separate scoring tier",
+        "rationale": "ADOT states components are organized into 6 categories for framing, but the actual scoring uses raw Project Component priority values; categories are informational.",
+        "source": "ADOT Airport Development Guidelines Section A.2.b"
+      }
+    ]
+  },
+  "weighting_model": "formula",
+  "global_formula": "project_component + based_aircraft + enplaned_passengers + ops_asv",
+  "criteria": [
+    {
+      "id": "project_component",
+      "label": "Project Component",
+      "description": "Each ADOT-defined airport development project type is assigned a priority value. Safety/obstruction projects score highest (255); existing airport acquisition lowest (17). 47 components documented in Appendix D.6.",
+      "acrp_category": "regulatory_mandate",
+      "scoring_style": "flat_lookup",
+      "project_field": "project_type",
+      "subcategories": [
+        { "id": "obstructions_safety_areas", "label": "Obstructions, Light/Mark/Remove (Safety Areas)", "score": 255, "field_match": { "field": "project_type", "operator": "matches", "value": "obstruction" } },
+        { "id": "land_safety_areas", "label": "Land for Protection (Safety Areas), Acquire", "score": 245, "field_match": { "field": "project_type", "operator": "matches", "value": "land.*safety|safety.*land" } },
+        { "id": "runway_extend", "label": "Runway, Extend", "score": 238, "field_match": { "field": "project_type", "operator": "matches", "value": "primary_rwy_extension|rwy_extension|runway_extension" } },
+        { "id": "airport_drainage_improve", "label": "Airport Drainage, Improve", "score": 237, "field_match": { "field": "project_type", "operator": "matches", "value": "drainage" } },
+        { "id": "perimeter_fencing_barbed_wire", "label": "Perimeter Fencing - Barbed Wire (New)", "score": 235 },
+        { "id": "runway_rehab", "label": "Runway, Rehabilitate", "score": 230, "field_match": { "field": "project_type", "operator": "matches", "value": "rwy_rehab|runway_rehab|primary_rwy_rehab" } },
+        { "id": "runway_strengthen", "label": "Runway, Strengthen", "score": 228, "field_match": { "field": "project_type", "operator": "matches", "value": "rwy_strength|runway_strength" } },
+        { "id": "runway_mirl_hirl", "label": "Runway MIRL/HIRL, Install", "score": 218, "field_match": { "field": "project_type", "operator": "matches", "value": "mirl|hirl|runway_light" } },
+        { "id": "runway_construct", "label": "Runway, Construct", "score": 215, "field_match": { "field": "project_type", "operator": "matches", "value": "rwy_construct|new_runway" } },
+        { "id": "wildlife_deterrent_fencing", "label": "Wildlife Deterrent Fencing (New)", "score": 212, "field_match": { "field": "project_type", "operator": "matches", "value": "wildlife" } },
+        { "id": "rotating_beacon_rehab", "label": "Rotating Beacon, Rehabilitate", "score": 210 },
+        { "id": "heliport_rehab", "label": "Heliport, Rehabilitate", "score": 206 },
+        { "id": "heliport_strengthen", "label": "Heliport, Strengthen", "score": 205 },
+        { "id": "wind_cone", "label": "Wind Cone, Install/Upgrade", "score": 202 },
+        { "id": "guidance_signage_rehab", "label": "Guidance Signage, Rehabilitate", "score": 201 },
+        { "id": "heliport_construct", "label": "Heliport, Construct", "score": 200 },
+        { "id": "guidance_signage_new", "label": "Guidance Signage, Install (New)", "score": 195 },
+        { "id": "rotating_beacon_new", "label": "Rotating Beacon, Install (New)", "score": 192 },
+        { "id": "weather_reporting", "label": "Weather Reporting Equipment (AWOS) (New)", "score": 190, "field_match": { "field": "project_type", "operator": "matches", "value": "awos|weather" } },
+        { "id": "runway_vert_guidance", "label": "Runway Vertical/Visual Guidance (PAPI/VASI/REIL/ALS)", "score": 188, "field_match": { "field": "project_type", "operator": "matches", "value": "papi|vasi|reil|als|approach_aid" } },
+        { "id": "security_fencing", "label": "Security Fencing - Chain Link (New)", "score": 170, "field_match": { "field": "project_type", "operator": "matches", "value": "fencing|fence" } },
+        { "id": "taxiway_rehab", "label": "Taxiway, Rehabilitate", "score": 155, "field_match": { "field": "project_type", "operator": "matches", "value": "twy_rehab|taxiway_rehab|primary_twy_rehab" } },
+        { "id": "apron_rehab", "label": "Apron, Rehabilitate", "score": 150, "field_match": { "field": "project_type", "operator": "matches", "value": "apron_rehab|apron.*rehab" } },
+        { "id": "taxiway_strengthen", "label": "Taxiway, Strengthen", "score": 145 },
+        { "id": "apron_strengthen", "label": "Apron, Strengthen", "score": 140 },
+        { "id": "taxiway_lighting", "label": "Taxiway Lighting (New)", "score": 135 },
+        { "id": "apron_lighting", "label": "Apron Lighting (New)", "score": 130 },
+        { "id": "taxiway_construct", "label": "Taxiway, Construct (New)", "score": 125, "field_match": { "field": "project_type", "operator": "matches", "value": "twy_construct|taxiway_construct|new_taxiway|parallel" } },
+        { "id": "apron_construct", "label": "Apron, Construct (New)", "score": 120, "field_match": { "field": "project_type", "operator": "matches", "value": "apron_expan|apron_construct|new_apron" } },
+        { "id": "perimeter_road_rehab", "label": "Perimeter/Service Road, Rehabilitate", "score": 115 },
+        { "id": "perimeter_road_lighting", "label": "Perimeter/Service Road Lighting", "score": 110 },
+        { "id": "perimeter_road_construct", "label": "Perimeter/Service Road, Construct", "score": 105 },
+        { "id": "master_plans", "label": "Master Plans", "score": 100, "field_match": { "field": "project_type", "operator": "matches", "value": "master_plan" } },
+        { "id": "drainage_plan", "label": "Airport Drainage Plan", "score": 95 },
+        { "id": "access_road_rehab", "label": "Main Airport Access Road, Rehabilitate", "score": 60 },
+        { "id": "land_development_acquire", "label": "Land for Development, Acquire", "score": 55, "field_match": { "field": "project_type", "operator": "matches", "value": "land_acquisition" } },
+        { "id": "access_road_strengthen", "label": "Main Airport Access Road, Strengthen", "score": 48 },
+        { "id": "terminal_construct_expand", "label": "Terminal, Construct/Expand", "score": 44, "field_match": { "field": "project_type", "operator": "matches", "value": "terminal" } },
+        { "id": "access_road_lighting", "label": "Main Airport Access Road, Lighting", "score": 40 },
+        { "id": "access_road_construct", "label": "Main Airport Access Road, Construct", "score": 36 },
+        { "id": "new_airport_construct", "label": "New Airport, Construct", "score": 33 },
+        { "id": "auto_parking_rehab", "label": "Auto Parking, Rehabilitate", "score": 25 },
+        { "id": "auto_parking_construct", "label": "Auto Parking, Construct", "score": 22 },
+        { "id": "airport_buildings_construct", "label": "Airport Buildings, Construct", "score": 19, "field_match": { "field": "project_type", "operator": "matches", "value": "hangar|building|fuel|industrial" } },
+        { "id": "existing_airport_acquire", "label": "Existing Airport, Acquire", "score": 17 },
+        { "id": "environmental_studies", "label": "Environmental Studies (variable, inherits parent component points)", "score": 50, "field_match": { "field": "project_type", "operator": "matches", "value": "nepa|environmental|wetland|ea_for" } }
+      ]
+    },
+    {
+      "id": "based_aircraft",
+      "label": "Based Aircraft (Airport Measure)",
+      "description": "Multiplier based on number of registered aircraft at the airport (Appendix D.7.a).",
+      "acrp_category": "demand_accommodation",
+      "scoring_style": "tiered_score",
+      "project_field": "based_aircraft",
+      "subcategories": [
+        { "id": "ba_201_plus", "label": "Based aircraft 201+", "score": 6, "field_match": { "field": "based_aircraft", "operator": "gte", "value": 201 } },
+        { "id": "ba_101_200", "label": "Based aircraft 101-200", "score": 5, "field_match": { "field": "based_aircraft", "operator": "gte", "value": 101 } },
+        { "id": "ba_51_100", "label": "Based aircraft 51-100", "score": 4, "field_match": { "field": "based_aircraft", "operator": "gte", "value": 51 } },
+        { "id": "ba_26_50", "label": "Based aircraft 26-50", "score": 3, "field_match": { "field": "based_aircraft", "operator": "gte", "value": 26 } },
+        { "id": "ba_6_25", "label": "Based aircraft 6-25", "score": 2, "field_match": { "field": "based_aircraft", "operator": "gte", "value": 6 } },
+        { "id": "ba_0_5", "label": "Based aircraft 0-5", "score": 1, "field_match": { "field": "based_aircraft", "operator": "gte", "value": 0 } }
+      ]
+    },
+    {
+      "id": "enplaned_passengers",
+      "label": "Enplaned Passengers (Airport Measure)",
+      "description": "Multiplier based on FAA-reported scheduled air carrier enplaned passengers from the immediately preceding calendar year (Appendix D.7.b). Aligns with FAA Primary Hub Classification.",
+      "acrp_category": "demand_accommodation",
+      "scoring_style": "tiered_score",
+      "project_field": "annual_operations",
+      "subcategories": [
+        { "id": "ep_large_hub", "label": "Enplanements 3,000,001+ (Large Hub)", "score": 5, "field_match": { "field": "annual_operations", "operator": "gte", "value": 3000001 } },
+        { "id": "ep_medium_hub", "label": "Enplanements 300,001-3,000,000 (Medium Hub)", "score": 4, "field_match": { "field": "annual_operations", "operator": "gte", "value": 300001 } },
+        { "id": "ep_small_hub", "label": "Enplanements 10,001-300,000 (Small Hub)", "score": 3, "field_match": { "field": "annual_operations", "operator": "gte", "value": 10001 } },
+        { "id": "ep_nonhub_mid", "label": "Enplanements 5,001-10,000 (Non-Hub)", "score": 2, "field_match": { "field": "annual_operations", "operator": "gte", "value": 5001 } },
+        { "id": "ep_nonhub_low", "label": "Enplanements 2,501-5,000", "score": 1, "field_match": { "field": "annual_operations", "operator": "gte", "value": 2501 } },
+        { "id": "ep_none", "label": "Enplanements 0-2,500 (no enplanements)", "score": 0, "field_match": { "field": "annual_operations", "operator": "gte", "value": 0 } }
+      ]
+    },
+    {
+      "id": "ops_asv",
+      "label": "Operations vs. Airport Service Volume (Airport Measure)",
+      "description": "Multiplier based on percent of runway capacity used (annual ops / ASV per FAA AC 150/5060-5). Higher utilization = higher priority (Appendix D.7.c).",
+      "acrp_category": "demand_accommodation",
+      "scoring_style": "tiered_score",
+      "project_field": "annual_operations",
+      "subcategories": [
+        { "id": "ops_high_use", "label": "Ops/ASV 81-100%", "score": 6, "field_match": { "field": "annual_operations", "operator": "gte", "value": 50000 } },
+        { "id": "ops_mid_high", "label": "Ops/ASV 71-80%", "score": 4, "field_match": { "field": "annual_operations", "operator": "gte", "value": 25000 } },
+        { "id": "ops_mid", "label": "Ops/ASV 61-70%", "score": 2, "field_match": { "field": "annual_operations", "operator": "gte", "value": 12000 } },
+        { "id": "ops_low", "label": "Ops/ASV <= 60%", "score": 0, "field_match": { "field": "annual_operations", "operator": "gte", "value": 0 } }
+      ]
+    }
+  ],
+  "set_asides": [
+    {
+      "id": "commercial_service_share",
+      "label": "Commercial Service Airports",
+      "allocation_pct": 43,
+      "eligibility_filter": "Publicly owned airports enplaning >= 2,500 passengers annually with scheduled passenger air service.",
+      "field_filter": { "field": "airport_classification", "operator": "eq", "value": "commercial_service" }
+    },
+    {
+      "id": "reliever_share",
+      "label": "Reliever Airports",
+      "allocation_pct": 35,
+      "eligibility_filter": "FAA-designated airports that relieve congestion at a commercial service airport.",
+      "field_filter": { "field": "airport_classification", "operator": "eq", "value": "business" }
+    },
+    {
+      "id": "ga_community_share",
+      "label": "GA Community Airports",
+      "allocation_pct": 19,
+      "eligibility_filter": "Airports that serve regional economies, connecting state and national economies.",
+      "field_filter": { "field": "airport_classification", "operator": "eq", "value": "intermediate_ga" }
+    },
+    {
+      "id": "ga_rural_share",
+      "label": "GA Rural Airports",
+      "allocation_pct": 2,
+      "eligibility_filter": "Airports serving supplemental role in local economies. Floor: $500,000."
+    },
+    {
+      "id": "ga_basic_share",
+      "label": "GA Basic Airports",
+      "allocation_pct": 0.27,
+      "eligibility_filter": "Airports serving limited role, primarily recreational/personal flying. Floor: $100,000."
+    }
+  ],
+  "governance": {
+    "decision_authority": "Arizona State Transportation Board (STB)",
+    "decision_cadence": "annual",
+    "statute_required": true,
+    "statute_citation": "A.R.S. 28-8202, A.R.S. 28-305(1) and (5)",
+    "scoring_authority": "ADOT Multimodal Planning Division, Aeronautics Group",
+    "approval_process": "Aeronautics prepares Five-Year Airport Development Program using published Priority Rating System. STB approves annually. Sponsors must be publicly-owned, open to public, and owned by an Arizona political subdivision (per A.R.S. 28-8202). 55 of 83 SASP airports are state-grant-eligible.",
+    "model_review_cycle_years": 3
+  },
+  "disclaimer": "Encoded from the ADOT Airport Development Guidelines publicly available at azdot.gov. Project Component values (47 components) and Airport Measures (3 multipliers) reproduced verbatim from Appendix D. Project type matching patterns are best-effort regex matches against the sample CSV schema; states adopting this template should map ADOT components to their own project_type taxonomy. The current Loan Program (Chapter 5) is suspended per ADOT and is not encoded as a separate criterion."
+}

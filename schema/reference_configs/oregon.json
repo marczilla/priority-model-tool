@@ -1,0 +1,115 @@
+{
+  "schema_version": "1.0.0",
+  "metadata": {
+    "name": "Oregon FAM Grant Priority System",
+    "state": "Oregon",
+    "agency": "Oregon Department of Aviation, State Aviation Board",
+    "model_version": "OAR Chapter 738 (current)",
+    "last_updated": "2024-01-01",
+    "source_citation": "Oregon Administrative Rules (OAR) Chapter 738, Division 060 (Financial Aid to Municipalities / FAM Grant Program). Tier order documented at OAR 738-060: (1) AIP match, (2) safety/infrastructure, (3) economic. Eligibility criteria from OAR 738-060-0040. Critical Oregon Airport Relief (COAR) grant program operates under ASAP (HB2075/HB2434).",
+    "decisions_log": [
+      {
+        "date": "2026-05-26",
+        "author": "APH m49 Sprint 7 reference encoder",
+        "decision": "Encoded Oregon as multiplicative model with priority tier as primary criterion (weight=5) and 4 eligibility criteria as accumulating bonuses.",
+        "rationale": "Oregon's FAM rules state grant priority is (1) AIP match > (2) safety/infrastructure > (3) economic. This natural priority order is captured with weight=5 on the tier criterion. The 4 eligibility criteria are accumulating because OAR 738-060-0040 says a project must meet AT LEAST ONE.",
+        "source": "OAR 738-060-0040; ODA grant program description"
+      }
+    ]
+  },
+  "weighting_model": "multiplicative",
+  "criteria": [
+    {
+      "id": "priority_tier",
+      "label": "FAM Priority Tier",
+      "description": "OAR 738-060 priority order. Tier 1 (AIP match) > Tier 2 (safety/infrastructure) > Tier 3 (economic benefit). Only one tier selected.",
+      "weight": 5,
+      "acrp_category": "regulatory_mandate",
+      "scoring_style": "select_one",
+      "project_field": "federal_funding_type",
+      "subcategories": [
+        { "id": "tier1_aip_match", "label": "Tier 1 - Match for FAA AIP grant", "score": 10, "condition": "Applications to assist airports with match requirements for FAA Airport Improvement Program grants.", "field_match": { "field": "federal_funding_type", "operator": "in", "value": ["discretionary", "entitlement"] } },
+        { "id": "tier2_safety_infra", "label": "Tier 2 - Safety / infrastructure", "score": 6, "condition": "Applications filed with respect to safety and infrastructure development.", "field_match": { "field": "purpose", "operator": "in", "value": ["safety", "maintenance", "rehabilitation"] } },
+        { "id": "tier3_economic", "label": "Tier 3 - Aviation-related economic benefit", "score": 3, "condition": "Applications filed with respect to aviation-related economic benefits related to airports.", "field_match": { "field": "purpose", "operator": "in", "value": ["capacity", "airport_enhancement"] } }
+      ]
+    },
+    {
+      "id": "fam_eligibility",
+      "label": "FAM Eligibility (must meet at least one)",
+      "description": "OAR 738-060-0040: Project must meet at least one eligibility criterion to receive a FAM grant. All met criteria accumulate as bonus points.",
+      "weight": 2,
+      "acrp_category": "system_plan_alignment",
+      "scoring_style": "accumulating",
+      "subcategories": [
+        { "id": "prevent_future_deficiencies", "label": "(a) Prevent future deficiencies / preserve existing facilities", "score": 2, "field_match": { "field": "purpose", "operator": "in", "value": ["maintenance", "rehabilitation"] } },
+        { "id": "eliminate_existing_deficiencies", "label": "(b) Eliminate existing deficiencies per Oregon Aviation Plan", "score": 2, "field_match": { "field": "purpose", "operator": "in", "value": ["safety", "security"] } },
+        { "id": "modernize_exceed_standards", "label": "(c) Modernize by exceeding state/federal minimum standards", "score": 2, "field_match": { "field": "purpose", "operator": "eq", "value": "airport_enhancement" } },
+        { "id": "leverage_funds", "label": "(d) Leverage state and federal funds for planning/capital improvements", "score": 2, "field_match": { "field": "federal_funding_type", "operator": "ne", "value": "no_federal" } }
+      ]
+    },
+    {
+      "id": "sponsor_match_commitment",
+      "label": "Sponsor Match Commitment",
+      "description": "OAR requires applicant to demonstrate commitment to contribute at least 5% of project costs. Higher local contribution earns priority.",
+      "weight": 2,
+      "acrp_category": "revenue_cost",
+      "scoring_style": "tiered_score",
+      "project_field": "federal_share_pct",
+      "subcategories": [
+        { "id": "match_above_25", "label": "Local match > 25%", "score": 5, "field_match": { "field": "federal_share_pct", "operator": "lt", "value": 75 } },
+        { "id": "match_10_25", "label": "Local match 10-25%", "score": 3, "field_match": { "field": "federal_share_pct", "operator": "lt", "value": 90 } },
+        { "id": "match_5_10", "label": "Local match 5-10%", "score": 2, "field_match": { "field": "federal_share_pct", "operator": "lt", "value": 95 } },
+        { "id": "match_5_min", "label": "Local match = 5% (minimum)", "score": 1, "field_match": { "field": "federal_share_pct", "operator": "lte", "value": 95 } }
+      ]
+    },
+    {
+      "id": "oregon_aviation_plan_alignment",
+      "label": "Oregon Aviation Plan Alignment",
+      "description": "Project addresses a deficiency, opportunity, or goal in the current Oregon Aviation Plan.",
+      "weight": 2,
+      "acrp_category": "system_plan_alignment",
+      "scoring_style": "accumulating",
+      "subcategories": [
+        { "id": "system_plan_supported", "label": "Project supports Oregon Aviation Plan", "score": 3, "field_match": { "field": "system_plan_supported", "operator": "eq", "value": true } },
+        { "id": "master_plan_alignment", "label": "Project consistent with current Master Plan / ALP", "score": 2, "field_match": { "field": "master_plan_status", "operator": "in", "value": ["updated_and_included", "programmed_or_in_process"] } }
+      ]
+    },
+    {
+      "id": "project_urgency",
+      "label": "Project Urgency",
+      "description": "Time-sensitivity / risk if project not done.",
+      "weight": 2,
+      "acrp_category": "risk",
+      "scoring_style": "tiered_score",
+      "project_field": "urgency",
+      "subcategories": [
+        { "id": "urgent", "label": "Urgent (failure imminent)", "score": 4, "field_match": { "field": "urgency", "operator": "eq", "value": "urgent" } },
+        { "id": "time_sensitive", "label": "Time-sensitive (within 1-2 years)", "score": 3, "field_match": { "field": "urgency", "operator": "eq", "value": "time_sensitive" } },
+        { "id": "medium", "label": "Medium urgency", "score": 2, "field_match": { "field": "urgency", "operator": "eq", "value": "medium_urgency" } },
+        { "id": "low", "label": "Low urgency", "score": 1, "field_match": { "field": "urgency", "operator": "eq", "value": "low_urgency" } }
+      ]
+    }
+  ],
+  "eligibility_gate": {
+    "enabled": true,
+    "filters": [
+      {
+        "id": "public_use_airport",
+        "label": "Must be a public-use airport in Oregon",
+        "rule": "ODA FAM grants are restricted to public-use airports as defined in OAR 738-060.",
+        "field_check": { "field": "airport_classification", "operator": "ne", "value": "non_npias" },
+        "on_fail": "exclude"
+      }
+    ]
+  },
+  "governance": {
+    "decision_authority": "Oregon State Aviation Board",
+    "decision_cadence": "annual",
+    "statute_required": true,
+    "statute_citation": "ORS Chapter 835 and 836; OAR Chapter 738; HB 2075 (2015) established ASAP; HB 2434 (2021) made ASAP permanent.",
+    "scoring_authority": "Oregon Department of Aviation staff",
+    "approval_process": "ODA prioritizes applications by tier (AIP match > safety/infrastructure > economic). State Aviation Board approves grants. COAR grants capped at $150,000 per eligible project. ASAP funded by 2 cents/gallon aviation fuel tax.",
+    "model_review_cycle_years": 5
+  },
+  "disclaimer": "Encoded from publicly available Oregon Administrative Rules (OAR Chapter 738) and ODA grant program descriptions. The tier order and four eligibility criteria are directly documented; specific point values within each criterion are inferred and should be calibrated by ODA staff before adoption. ASAP (Aviation System Action Program) and COAR (Critical Oregon Airport Relief) program details vary by biennium budget cycle."
+}
