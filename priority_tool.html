@@ -285,6 +285,37 @@
   .wf-rec-row:hover { background: var(--gray-50); }
   .wf-rec-row input[type="checkbox"] { margin-top: 4px; }
 
+  /* State picker dropdown */
+  .state-picker {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(232, 133, 30, 0.08);
+    border: 1px solid var(--accent);
+    border-radius: 6px;
+    padding: 4px 10px;
+  }
+  .state-picker label {
+    font-size: .82rem;
+    color: var(--gray-700);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .state-loader-select {
+    background: #fff;
+    border: 1px solid var(--gray-300);
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: .85rem;
+    color: var(--gray-800);
+    cursor: pointer;
+    min-width: 280px;
+    max-width: 420px;
+  }
+  .state-loader-select:hover { border-color: var(--accent); }
+  .state-loader-select optgroup { font-style: italic; color: var(--primary); font-size: .78rem; }
+  .state-loader-select option { font-style: normal; color: var(--gray-800); font-size: .85rem; padding: 4px; }
+
   /* APH integration — back link, suite label, beta banner */
   .aph-backlink-bar {
     background: linear-gradient(135deg, #0f1b2d 0%, #1a365d 100%);
@@ -365,23 +396,35 @@
   <button class="btn btn-primary" onclick="openWizardBuild()">🪄 Build New (Wizard)</button>
   <button class="btn btn-primary" onclick="openWizardModify()">🔍 Modify Existing</button>
   <span style="border-left: 1px solid var(--gray-300); height: 22px; margin: 0 4px"></span>
-  <button class="btn btn-accent" onclick="newFromTemplate('wyoming')">🆕 Wyoming</button>
-  <button class="btn btn-accent" onclick="newFromTemplate('mndot')">🆕 MnDOT</button>
-  <button class="btn btn-accent" onclick="newFromTemplate('aldot')">🆕 ALDOT</button>
-  <button class="btn btn-accent" onclick="newFromTemplate('louisiana')">🆕 Louisiana</button>
-  <button class="btn btn-accent" onclick="newFromTemplate('idaho')">🆕 Idaho</button>
-  <button class="btn btn-accent" onclick="newFromTemplate('illinois')">🆕 Illinois</button>
-  <button class="btn btn-accent" onclick="newFromTemplate('virginia')">🆕 Virginia</button>
-  <button class="btn btn-accent" onclick="newFromTemplate('washington')">🆕 Washington</button>
-  <button class="btn btn-accent" onclick="newFromTemplate('north_dakota')">🆕 N. Dakota</button>
-  <button class="btn btn-accent" onclick="newFromTemplate('arizona')">🆕 Arizona</button>
-  <button class="btn btn-accent" onclick="newFromTemplate('oregon')">🆕 Oregon</button>
-  <button class="btn btn-accent" onclick="newFromTemplate('tennessee')">🆕 Tennessee</button>
-  <button class="btn btn-accent" onclick="newFromTemplate('california')">🆕 California</button>
-  <button class="btn btn-accent" onclick="newFromTemplate('texas')">🆕 Texas</button>
-  <button class="btn btn-accent" onclick="newFromTemplate('new_york')">🆕 New York</button>
-  <button class="btn btn-accent" onclick="newFromTemplate('colorado')">🆕 Colorado</button>
-  <button class="btn btn-accent" onclick="newFromTemplate('pennsylvania')">🆕 PennDOT</button>
+  <div class="state-picker">
+    <label for="stateLoader">🆕 Load reference state model:</label>
+    <select id="stateLoader" class="state-loader-select" onchange="loadStateFromDropdown(this)">
+      <option value="">— Choose a state to import / modify —</option>
+      <optgroup label="Primary-source (verbatim from agency PDF)">
+        <option value="wyoming">Wyoming · Priority Rating Model (2021)</option>
+        <option value="mndot">Minnesota · MnDOT Aeronautics (2024)</option>
+        <option value="aldot">Alabama · ALDOT Aeronautics</option>
+        <option value="louisiana">Louisiana · LaDOTD FY24-25 (with eligibility gate)</option>
+        <option value="arizona">Arizona · ADOT Airport Dev Guidelines (47 components)</option>
+      </optgroup>
+      <optgroup label="ACRP Synthesis 123 case examples (2023)">
+        <option value="idaho">Idaho · ITD Aeronautics</option>
+        <option value="illinois">Illinois · Rebuild IL ACIP (formula)</option>
+        <option value="virginia">Virginia · DOAV Project Priority System</option>
+        <option value="washington">Washington · WSDOT 11-factor</option>
+        <option value="north_dakota">North Dakota · NDAC dual objective+subjective</option>
+      </optgroup>
+      <optgroup label="Public-doc encodings (state DOT websites)">
+        <option value="oregon">Oregon · ODA FAM / COAR (OAR Chapter 738)</option>
+        <option value="tennessee">Tennessee · TDOT SPR Model</option>
+        <option value="california">California · Caltrans ACIP (June 2025)</option>
+        <option value="texas">Texas · TxDOT ACIP 2026-2028</option>
+        <option value="new_york">New York · NYSDOT AIR NY 2024</option>
+        <option value="colorado">Colorado · CDOT CDAG (template)</option>
+        <option value="pennsylvania">Pennsylvania · PennDOT BOA (template)</option>
+      </optgroup>
+    </select>
+  </div>
   <button class="btn btn-secondary" onclick="newBlankModel()">➕ Blank</button>
   <button class="btn btn-secondary" onclick="openBenchmarkLibrary()">📚 Benchmark Library</button>
   <button class="btn btn-secondary" onclick="openCompareModels()">⚖️ Compare Models</button>
@@ -8045,6 +8088,14 @@
     activeConfig = JSON.parse(JSON.stringify(profiles[activeName]));
     originalSnapshot = JSON.stringify(profiles[activeName]);
     persist(); populateProfileSelect(); renderAll();
+  };
+
+  window.loadStateFromDropdown = function (selectEl) {
+    const key = selectEl.value;
+    if (!key) return;
+    newFromTemplate(key);
+    // Reset dropdown so the user can pick again later without confusion
+    selectEl.value = "";
   };
 
   window.newFromTemplate = function (key) {
