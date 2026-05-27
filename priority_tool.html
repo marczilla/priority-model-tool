@@ -8168,10 +8168,12 @@
     const rankings = {};
     _compareSelected.forEach(k => {
       try {
-        const result = window.PriorityEngine.rank(configs[k], projects);
-        rankings[k] = result.scored.reduce((m, row, i) => {
-          m[row.project_id] = { rank: i + 1, score: row.final_score, label: row.project_label };
-          return m;
+        const m = new window.PriorityEngine.PriorityModel(configs[k]);
+        const result = m.rank(projects);
+        const ranked = result.ranked();
+        rankings[k] = ranked.reduce((acc, row, i) => {
+          acc[row.project_id] = { rank: i + 1, score: row.final_score, label: row.project_label };
+          return acc;
         }, {});
       } catch (e) {
         rankings[k] = { error: e.message };
