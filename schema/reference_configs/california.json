@@ -1,0 +1,87 @@
+{
+  "schema_version": "1.0.0",
+  "metadata": {
+    "name": "California Aeronautics A&D Grant Priority",
+    "state": "California",
+    "agency": "Caltrans Division of Aeronautics; California Transportation Commission (CTC)",
+    "model_version": "ACIP for Adoption June 2025",
+    "last_updated": "2025-06-01",
+    "source_citation": "Caltrans Aeronautics Capital Improvement Plan, June 2025 adoption. Source PDF: https://dot.ca.gov/-/media/dot-media/programs/aeronautics/documents/airport-cip/4-11-aeronautics-cip-for-adoption-june-2025-combined-a11y.pdf. Project category priority order: Safety > Capacity > Security, plus additional inputs from Caltrans Office of Airports and sponsor.",
+    "decisions_log": [
+      {
+        "date": "2026-05-26",
+        "author": "APH m49 Sprint 8 reference encoder",
+        "decision": "Encoded California as multiplicative model with 3 stated priority categories (safety/capacity/security) at the top of the criterion list and 2 supplementary criteria for inspection reports and sponsor input.",
+        "rationale": "Caltrans Aeronautics ACIP explicitly states: 'A&D grants are selected from the CIP using the Commission-approved Priority List in the order of safety, capacity, and security.' Multiplicative captures the strong priority ordering.",
+        "source": "Caltrans ACIP June 2025"
+      }
+    ]
+  },
+  "weighting_model": "multiplicative",
+  "criteria": [
+    {
+      "id": "project_category",
+      "label": "Project Category (CTC Priority List)",
+      "description": "California Transportation Commission-approved priority order. Safety highest, then Capacity, then Security. One category selected.",
+      "weight": 5,
+      "acrp_category": "regulatory_mandate",
+      "scoring_style": "select_one",
+      "project_field": "purpose",
+      "subcategories": [
+        { "id": "safety", "label": "Safety", "score": 10, "condition": "Highest CTC priority. Safety-of-operations projects.", "field_match": { "field": "purpose", "operator": "eq", "value": "safety" } },
+        { "id": "capacity", "label": "Capacity", "score": 6, "condition": "Second CTC priority. Capacity additions or improvements.", "field_match": { "field": "purpose", "operator": "eq", "value": "capacity" } },
+        { "id": "security", "label": "Security", "score": 4, "condition": "Third CTC priority. Physical/operational security.", "field_match": { "field": "purpose", "operator": "eq", "value": "security" } },
+        { "id": "preservation", "label": "Preservation (supplementary)", "score": 5, "condition": "Pavement and asset preservation (Caltrans Office of Airports input).", "field_match": { "field": "purpose", "operator": "in", "value": ["maintenance", "rehabilitation"] } },
+        { "id": "other", "label": "Other / case-by-case", "score": 2 }
+      ]
+    },
+    {
+      "id": "safety_inspection",
+      "label": "Safety Inspection Report Findings",
+      "description": "Caltrans Aeronautics safety inspection findings can elevate project priority within a category.",
+      "weight": 2,
+      "acrp_category": "safety_security",
+      "scoring_style": "accumulating",
+      "subcategories": [
+        { "id": "inspection_finding", "label": "Project addresses a recent inspection finding", "score": 3, "field_match": { "field": "urgency", "operator": "in", "value": ["urgent", "time_sensitive"] } },
+        { "id": "compliance", "label": "Project maintains state airport permit compliance", "score": 2, "field_match": { "field": "licensing_status", "operator": "eq", "value": "compliant" } }
+      ]
+    },
+    {
+      "id": "sponsor_input",
+      "label": "Sponsor Input / Local Support",
+      "description": "Caltrans Office of Airports also considers sponsor input as a selection factor.",
+      "weight": 2,
+      "acrp_category": "community_impact",
+      "scoring_style": "tiered_score",
+      "project_field": "federal_share_pct",
+      "subcategories": [
+        { "id": "high_local_match", "label": "Local match > 25%", "score": 4, "field_match": { "field": "federal_share_pct", "operator": "lt", "value": 75 } },
+        { "id": "med_local_match", "label": "Local match 10-25%", "score": 2, "field_match": { "field": "federal_share_pct", "operator": "lt", "value": 90 } },
+        { "id": "low_local_match", "label": "Local match 5-10%", "score": 1, "field_match": { "field": "federal_share_pct", "operator": "lt", "value": 95 } }
+      ]
+    },
+    {
+      "id": "system_alignment",
+      "label": "California Aviation System Plan Alignment",
+      "description": "Project advances California Aviation System Plan objectives.",
+      "weight": 2,
+      "acrp_category": "system_plan_alignment",
+      "scoring_style": "accumulating",
+      "subcategories": [
+        { "id": "casp_goal", "label": "Advances CASP goal", "score": 3, "field_match": { "field": "system_plan_supported", "operator": "eq", "value": true } },
+        { "id": "master_plan", "label": "Consistent with current Master Plan / ALP", "score": 2, "field_match": { "field": "master_plan_status", "operator": "in", "value": ["updated_and_included", "programmed_or_in_process"] } }
+      ]
+    }
+  ],
+  "governance": {
+    "decision_authority": "California Transportation Commission (CTC)",
+    "decision_cadence": "annual",
+    "statute_required": true,
+    "statute_citation": "Streets and Highways Code Section 21601 et seq.; Public Utilities Code Aeronautics Act",
+    "scoring_authority": "Caltrans Division of Aeronautics, Office of Airports",
+    "approval_process": "Caltrans Aeronautics prepares ACIP. CTC adopts annually. A&D (Acquisition and Development) grants drawn from CIP in stated priority order.",
+    "model_review_cycle_years": 1
+  },
+  "disclaimer": "Encoded from publicly available Caltrans ACIP June 2025 document. Caltrans documents only the conceptual priority order (Safety > Capacity > Security) plus reference to inspection reports and sponsor input; numerical scoring is internal. Point values shown are inferred to preserve the documented priority order. California stakeholders should calibrate to Caltrans internal scoring matrix before adoption."
+}

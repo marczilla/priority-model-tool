@@ -1,0 +1,103 @@
+{
+  "schema_version": "1.0.0",
+  "metadata": {
+    "name": "Colorado Discretionary Aviation Grant (CDAG)",
+    "state": "Colorado",
+    "agency": "Colorado Department of Transportation (CDOT) Division of Aeronautics; Colorado Aeronautical Board",
+    "model_version": "2026 cycle (WIMS-managed)",
+    "last_updated": "2026-01-01",
+    "source_citation": "CDOT Aeronautics CDAG program. Managed via WIMS (Web-based Information Management System). Public information: https://www.codot.gov/programs/aeronautics/programs/AviationGrants. Colorado Aeronautical Board approved $9M FY2026 (up from $4.5M FY2025 federal-match grants).",
+    "decisions_log": [
+      {
+        "date": "2026-05-26",
+        "author": "APH m49 Sprint 8 reference encoder",
+        "decision": "Encoded Colorado as additive_100pt model with State/Local + Aviation Education buckets. Detailed scoring criteria are internal (WIMS-managed) and not publicly published.",
+        "rationale": "CDOT publishes CDAG grant cycles and award totals but not the scoring rubric. Encoded a sensible default framework with 5 buckets covering safety, preservation, federal leverage, capacity/modernization, and system plan alignment. Clear disclaimer that this is a template-style encoding.",
+        "source": "CDOT Aeronautics public website + general state aviation funding practice"
+      }
+    ]
+  },
+  "weighting_model": "additive_100pt",
+  "criteria": [
+    {
+      "id": "safety",
+      "label": "Safety",
+      "description": "Safety improvements (RSA, obstruction, approach, signage).",
+      "max_points": 30,
+      "acrp_category": "safety_security",
+      "scoring_style": "select_one",
+      "project_field": "purpose",
+      "subcategories": [
+        { "id": "safety_primary", "label": "Primary safety purpose", "score": 30, "field_match": { "field": "purpose", "operator": "eq", "value": "safety" } },
+        { "id": "safety_secondary", "label": "Secondary safety benefit", "score": 15 },
+        { "id": "no_safety", "label": "Not safety-related", "score": 0 }
+      ]
+    },
+    {
+      "id": "preservation",
+      "label": "Asset Preservation",
+      "description": "Pavement and infrastructure preservation - high priority in Colorado's mountain airport network.",
+      "max_points": 25,
+      "acrp_category": "asset_preservation",
+      "scoring_style": "select_one",
+      "project_field": "purpose",
+      "subcategories": [
+        { "id": "pavement_rehab", "label": "Pavement rehabilitation", "score": 25, "field_match": { "field": "purpose", "operator": "eq", "value": "rehabilitation" } },
+        { "id": "maintenance", "label": "General maintenance", "score": 18, "field_match": { "field": "purpose", "operator": "eq", "value": "maintenance" } },
+        { "id": "reconstruction", "label": "Reconstruction", "score": 12, "field_match": { "field": "purpose", "operator": "eq", "value": "reconstruction" } },
+        { "id": "no_preservation", "label": "Not preservation-related", "score": 0 }
+      ]
+    },
+    {
+      "id": "federal_match",
+      "label": "Federal Match Leverage",
+      "description": "Colorado prioritizes state matching of federal grants (per CAB's $4.5M FY25 federal-match grant approval).",
+      "max_points": 20,
+      "acrp_category": "revenue_cost",
+      "scoring_style": "select_one",
+      "project_field": "federal_funding_type",
+      "subcategories": [
+        { "id": "federal_discretionary", "label": "Federal discretionary / BIL", "score": 20, "field_match": { "field": "federal_funding_type", "operator": "eq", "value": "discretionary" } },
+        { "id": "federal_entitlement", "label": "Federal entitlement (NPIAS)", "score": 15, "field_match": { "field": "federal_funding_type", "operator": "eq", "value": "entitlement" } },
+        { "id": "state_apportionment", "label": "State apportionment", "score": 8, "field_match": { "field": "federal_funding_type", "operator": "eq", "value": "state_apportionment" } },
+        { "id": "no_federal", "label": "State/local only", "score": 4, "field_match": { "field": "federal_funding_type", "operator": "eq", "value": "no_federal" } }
+      ]
+    },
+    {
+      "id": "modernization_capacity",
+      "label": "Modernization / Capacity",
+      "description": "Capacity additions, modernization, and capability improvements.",
+      "max_points": 15,
+      "acrp_category": "level_of_service",
+      "scoring_style": "select_one",
+      "project_field": "purpose",
+      "subcategories": [
+        { "id": "capacity", "label": "Capacity addition", "score": 15, "field_match": { "field": "purpose", "operator": "eq", "value": "capacity" } },
+        { "id": "modernization", "label": "Modernization / enhancement", "score": 10, "field_match": { "field": "purpose", "operator": "eq", "value": "airport_enhancement" } },
+        { "id": "planning", "label": "Planning / study", "score": 6, "field_match": { "field": "purpose", "operator": "eq", "value": "planning" } },
+        { "id": "no_modernization", "label": "None", "score": 0 }
+      ]
+    },
+    {
+      "id": "system_plan_alignment",
+      "label": "Colorado Aviation System Plan Alignment",
+      "description": "Project advances Colorado Aviation System Plan goals.",
+      "max_points": 10,
+      "acrp_category": "system_plan_alignment",
+      "scoring_style": "accumulating",
+      "subcategories": [
+        { "id": "casp_goal", "label": "Advances CO Aviation System Plan goal", "score": 5, "field_match": { "field": "system_plan_supported", "operator": "eq", "value": true } },
+        { "id": "master_plan", "label": "Consistent with current Master Plan / ALP", "score": 5, "field_match": { "field": "master_plan_status", "operator": "in", "value": ["updated_and_included", "programmed_or_in_process"] } }
+      ]
+    }
+  ],
+  "governance": {
+    "decision_authority": "Colorado Aeronautical Board (CAB)",
+    "decision_cadence": "annual",
+    "statute_required": false,
+    "scoring_authority": "CDOT Division of Aeronautics (WIMS-managed)",
+    "approval_process": "CDOT Aeronautics solicits applications via WIMS. Aeronautical Board approves grant awards (~$9M FY2026, including federal-match and state/local grants).",
+    "model_review_cycle_years": 3
+  },
+  "disclaimer": "TEMPLATE-STYLE ENCODING. CDOT manages CDAG scoring internally via WIMS (Web-based Information Management System); the specific scoring rubric is not publicly published. The 5-criterion framework shown here is a reasonable default based on documented program priorities (safety, preservation, federal match) and Aeronautical Board reporting. Colorado stakeholders should obtain the actual WIMS scoring rubric from CDOT Aeronautics (303-512-5250) before adoption or significant decision-making."
+}

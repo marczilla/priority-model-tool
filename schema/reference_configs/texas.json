@@ -1,0 +1,95 @@
+{
+  "schema_version": "1.0.0",
+  "metadata": {
+    "name": "Texas Aviation Capital Improvement Program (ACIP)",
+    "state": "Texas",
+    "agency": "Texas Department of Transportation (TxDOT) Aviation Division; Texas Transportation Commission",
+    "model_version": "ACIP 2026-2028",
+    "last_updated": "2025-08-01",
+    "source_citation": "TxDOT Aviation Capital Improvement Program 2026-2028. Source PDF: https://www.txdot.gov/content/dam/docs/division/avn/acip-2026-2028-exec-summary.pdf. Objectives in priority order (per Texas Transportation Commission): (1) Enhance safety, (2) Preserve existing facilities, (3) Respond to present needs, (4) Provide for anticipated needs.",
+    "decisions_log": [
+      {
+        "date": "2026-05-26",
+        "author": "APH m49 Sprint 8 reference encoder",
+        "decision": "Encoded Texas as multiplicative model with the 5 documented project categories at the top, plus airport activity and federal leverage as secondary criteria.",
+        "rationale": "TxDOT explicitly lists 5 project categories in priority order (Safety > Preservation > Capacity > New Access > New Capacity). Multiplicative captures the strong ordering. Texas Transportation Commission objectives map directly to these categories.",
+        "source": "TxDOT ACIP 2026-2028 Executive Summary"
+      }
+    ]
+  },
+  "weighting_model": "multiplicative",
+  "criteria": [
+    {
+      "id": "project_category",
+      "label": "Project Category (Commission Priority Order)",
+      "description": "Texas Transportation Commission-set priority categories. Only one selected.",
+      "weight": 5,
+      "acrp_category": "regulatory_mandate",
+      "scoring_style": "select_one",
+      "project_field": "purpose",
+      "subcategories": [
+        { "id": "safety", "label": "Safety - Make facility safe for aircraft operations", "score": 10, "field_match": { "field": "purpose", "operator": "eq", "value": "safety" } },
+        { "id": "preservation", "label": "Preservation - Preserve functional/structural integrity", "score": 8, "field_match": { "field": "purpose", "operator": "in", "value": ["maintenance", "rehabilitation"] } },
+        { "id": "capacity", "label": "Capacity - Accommodate more aircraft / higher activity", "score": 6, "field_match": { "field": "purpose", "operator": "eq", "value": "capacity" } },
+        { "id": "new_access", "label": "New Access - Air access to previously unserved area", "score": 4 },
+        { "id": "new_capacity", "label": "New Capacity - New airport to relieve area congestion", "score": 3 },
+        { "id": "other", "label": "Other / case-by-case", "score": 1 }
+      ]
+    },
+    {
+      "id": "federal_leverage",
+      "label": "Federal Funding Leverage",
+      "description": "Texas leverages FAA AIP funding heavily. Projects with federal funding committed get priority.",
+      "weight": 2,
+      "acrp_category": "revenue_cost",
+      "scoring_style": "select_one",
+      "project_field": "federal_funding_type",
+      "subcategories": [
+        { "id": "federal_discretionary", "label": "Federal discretionary / BIL", "score": 4, "field_match": { "field": "federal_funding_type", "operator": "eq", "value": "discretionary" } },
+        { "id": "federal_entitlement", "label": "Federal entitlement (NPIAS)", "score": 3, "field_match": { "field": "federal_funding_type", "operator": "eq", "value": "entitlement" } },
+        { "id": "state_apportionment", "label": "State apportionment", "score": 2, "field_match": { "field": "federal_funding_type", "operator": "eq", "value": "state_apportionment" } },
+        { "id": "no_federal", "label": "State/local only", "score": 1, "field_match": { "field": "federal_funding_type", "operator": "eq", "value": "no_federal" } }
+      ]
+    },
+    {
+      "id": "airport_classification",
+      "label": "Airport Classification (TASP)",
+      "description": "Texas Airport System Plan role.",
+      "weight": 2,
+      "acrp_category": "system_plan_alignment",
+      "scoring_style": "select_one",
+      "project_field": "airport_classification",
+      "subcategories": [
+        { "id": "commercial", "label": "Commercial Service", "score": 4, "field_match": { "field": "airport_classification", "operator": "eq", "value": "commercial_service" } },
+        { "id": "reliever_business", "label": "Reliever / Business", "score": 3, "field_match": { "field": "airport_classification", "operator": "eq", "value": "business" } },
+        { "id": "ga_community", "label": "GA Community", "score": 2, "field_match": { "field": "airport_classification", "operator": "eq", "value": "intermediate_ga" } },
+        { "id": "ga_basic", "label": "GA Basic", "score": 1, "field_match": { "field": "airport_classification", "operator": "eq", "value": "local_ga" } }
+      ]
+    },
+    {
+      "id": "urgency",
+      "label": "Project Urgency",
+      "description": "Risk if project not done in current programming cycle.",
+      "weight": 2,
+      "acrp_category": "risk",
+      "scoring_style": "tiered_score",
+      "project_field": "urgency",
+      "subcategories": [
+        { "id": "urgent", "label": "Urgent", "score": 4, "field_match": { "field": "urgency", "operator": "eq", "value": "urgent" } },
+        { "id": "time_sensitive", "label": "Time-sensitive", "score": 3, "field_match": { "field": "urgency", "operator": "eq", "value": "time_sensitive" } },
+        { "id": "medium", "label": "Medium urgency", "score": 2, "field_match": { "field": "urgency", "operator": "eq", "value": "medium_urgency" } },
+        { "id": "low", "label": "Low urgency", "score": 1, "field_match": { "field": "urgency", "operator": "eq", "value": "low_urgency" } }
+      ]
+    }
+  ],
+  "governance": {
+    "decision_authority": "Texas Transportation Commission",
+    "decision_cadence": "annual",
+    "statute_required": true,
+    "statute_citation": "Texas Transportation Code Chapter 21 - Aviation",
+    "scoring_authority": "TxDOT Aviation Division",
+    "approval_process": "TxDOT Aviation prepares 3-year ACIP. Texas Transportation Commission approves annually. ACIP updated continually. Combines federal AIP and state projects.",
+    "model_review_cycle_years": 1
+  },
+  "disclaimer": "Encoded from TxDOT ACIP 2026-2028 Executive Summary. The 5 project categories and their priority order are documented; specific numerical scoring is internal to the Aviation Division. Point values are inferred to preserve the documented priority ordering. Texas stakeholders should calibrate to TxDOT internal scoring before adoption."
+}

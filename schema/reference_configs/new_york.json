@@ -1,0 +1,97 @@
+{
+  "schema_version": "1.0.0",
+  "metadata": {
+    "name": "New York AIR NY Aviation Capital Grant",
+    "state": "New York",
+    "agency": "New York State Department of Transportation (NYSDOT), Aviation Bureau",
+    "model_version": "AIR NY 2024 NOFA",
+    "last_updated": "2024-01-01",
+    "source_citation": "NYSDOT Aviation 2024 Notice of Funding Availability/Grant Program Guidelines (AIR NY: Airport Investment and Revitalization for New York). Source: https://www.dot.ny.gov/divisions/operating/opdm/aviation/repository/2024%20NOFA-Guidelines%20Final.pdf",
+    "decisions_log": [
+      {
+        "date": "2026-05-26",
+        "author": "APH m49 Sprint 8 reference encoder",
+        "decision": "Encoded New York with eligibility_gate (pass/fail screening) + two-tier scoring (project specific + airport specific) + secondary selection criteria.",
+        "rationale": "NYSDOT NOFA explicitly describes pass/fail eligibility screening, then two-category scoring (project-specific + airport-specific), plus a secondary criteria layer covering project type, eligible funding source, significance, cost-effectiveness, geographic balance, and GHG/Environmental Justice benefits.",
+        "source": "NYSDOT 2024 NOFA Guidelines"
+      }
+    ]
+  },
+  "weighting_model": "additive_100pt",
+  "criteria": [
+    {
+      "id": "project_specific",
+      "label": "Project-Specific Scoring",
+      "description": "First major scoring category. Covers safety, economic impact, operational efficiency, and project type alignment.",
+      "bucket": "Primary Scoring",
+      "max_points": 50,
+      "acrp_category": "regulatory_mandate",
+      "scoring_style": "select_one",
+      "project_field": "purpose",
+      "subcategories": [
+        { "id": "safety_primary", "label": "Safety / RSA / obstruction", "score": 50, "field_match": { "field": "purpose", "operator": "eq", "value": "safety" } },
+        { "id": "preservation", "label": "Preservation / rehabilitation", "score": 35, "field_match": { "field": "purpose", "operator": "in", "value": ["maintenance", "rehabilitation"] } },
+        { "id": "economic", "label": "Economic impact / capacity", "score": 30, "field_match": { "field": "purpose", "operator": "eq", "value": "capacity" } },
+        { "id": "operations", "label": "Operational efficiency", "score": 25, "field_match": { "field": "purpose", "operator": "eq", "value": "airport_enhancement" } },
+        { "id": "security", "label": "Security", "score": 25, "field_match": { "field": "purpose", "operator": "eq", "value": "security" } },
+        { "id": "planning", "label": "Planning / study", "score": 15, "field_match": { "field": "purpose", "operator": "eq", "value": "planning" } }
+      ]
+    },
+    {
+      "id": "airport_specific",
+      "label": "Airport-Specific Scoring",
+      "description": "Second major category. Airport role, activity, compliance, and prior investment.",
+      "bucket": "Primary Scoring",
+      "max_points": 30,
+      "acrp_category": "system_plan_alignment",
+      "scoring_style": "accumulating",
+      "subcategories": [
+        { "id": "commercial_service_role", "label": "Commercial service role", "score": 8, "field_match": { "field": "airport_classification", "operator": "eq", "value": "commercial_service" } },
+        { "id": "reliever_role", "label": "Reliever / business airport role", "score": 6, "field_match": { "field": "airport_classification", "operator": "eq", "value": "business" } },
+        { "id": "based_aircraft_high", "label": "Based aircraft >= 50", "score": 5, "field_match": { "field": "based_aircraft", "operator": "gte", "value": 50 } },
+        { "id": "operations_high", "label": "Annual operations >= 20,000", "score": 5, "field_match": { "field": "annual_operations", "operator": "gte", "value": 20000 } },
+        { "id": "master_plan_current", "label": "Current Master Plan / ALP", "score": 4, "field_match": { "field": "master_plan_status", "operator": "in", "value": ["updated_and_included", "programmed_or_in_process"] } },
+        { "id": "license_compliance", "label": "State airport license compliance", "score": 4, "field_match": { "field": "licensing_status", "operator": "eq", "value": "compliant" } },
+        { "id": "pavement_mgmt", "label": "Active pavement management program", "score": 3, "field_match": { "field": "pavement_management_program", "operator": "eq", "value": true } }
+      ]
+    },
+    {
+      "id": "secondary_criteria",
+      "label": "Secondary Selection Criteria",
+      "description": "Additional criteria incorporated in final selection: project type, eligible funding source, significance, cost-effectiveness, geographic balance, GHG mitigation in Environmental Justice Communities.",
+      "bucket": "Secondary Scoring",
+      "max_points": 20,
+      "acrp_category": "community_impact",
+      "scoring_style": "accumulating",
+      "subcategories": [
+        { "id": "federal_leverage", "label": "Eligible federal funding source", "score": 5, "field_match": { "field": "federal_funding_type", "operator": "in", "value": ["discretionary", "entitlement", "state_apportionment"] } },
+        { "id": "cost_effective", "label": "High cost-effectiveness (overmatch)", "score": 4, "field_match": { "field": "federal_share_pct", "operator": "lt", "value": 90 } },
+        { "id": "system_plan_aligned", "label": "Significance to NYS Aviation System Plan", "score": 4, "field_match": { "field": "system_plan_supported", "operator": "eq", "value": true } },
+        { "id": "geographic_balance", "label": "Geographic balance consideration", "score": 4 },
+        { "id": "ghg_ej", "label": "GHG mitigation in Environmental Justice community", "score": 3 }
+      ]
+    }
+  ],
+  "eligibility_gate": {
+    "enabled": true,
+    "filters": [
+      {
+        "id": "eligible_applicant_project",
+        "label": "Pass/fail screen — eligible applicant + project",
+        "rule": "Applications must meet AIR NY Eligible Applicant and Eligible Project criteria per the NOFA. Only those passing the initial screening are scored.",
+        "field_check": { "field": "airport_classification", "operator": "ne", "value": "non_npias" },
+        "on_fail": "exclude"
+      }
+    ]
+  },
+  "governance": {
+    "decision_authority": "NYSDOT Commissioner; Aviation Bureau",
+    "decision_cadence": "annual",
+    "statute_required": true,
+    "statute_citation": "AIR NY (Airport Investment and Revitalization for New York) program established under 5-year NYS Transportation Capital Program",
+    "scoring_authority": "NYSDOT Aviation Bureau",
+    "approval_process": "Pass/fail eligibility screening, then scoring by project-specific + airport-specific criteria. Secondary criteria considered in final selection. Up to $25M annually under AIR NY.",
+    "model_review_cycle_years": 5
+  },
+  "disclaimer": "Encoded from NYSDOT 2024 NOFA Guidelines (publicly published). The two-category structure (project-specific + airport-specific) and the 5-component secondary criteria list are documented. Specific numerical scoring weights are inferred to match the published structure. NY stakeholders should calibrate to NYSDOT internal scoring matrix before adoption."
+}

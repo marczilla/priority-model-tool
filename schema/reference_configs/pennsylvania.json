@@ -1,0 +1,145 @@
+{
+  "schema_version": "1.0.0",
+  "metadata": {
+    "name": "Pennsylvania Aviation Development Program (ADP)",
+    "state": "Pennsylvania",
+    "agency": "PennDOT Bureau of Aviation (BOA)",
+    "model_version": "2024 Program Updates",
+    "last_updated": "2024-01-01",
+    "source_citation": "PennDOT BOA Program Updates 2024 (https://www.pa.gov/content/dam/copapwp-pagov/en/penndot/documents/programs-and-doing-business/aviation/2024_pa_bureauofaviation_programupdates.pdf). BOA administers 4 grant programs (~$35M/year): Block Grant Program, Aviation Development Program (ADP), Capital Budget/Transportation Assistance Program, Real Estate Tax Reimbursement Program. JACIP role removed in 2024 update.",
+    "decisions_log": [
+      {
+        "date": "2026-05-26",
+        "author": "APH m49 Sprint 8 reference encoder",
+        "decision": "Encoded Pennsylvania as additive_100pt model with bucket structure reflecting BOA's 4 programs. Used Aviation Development Program (ADP) as the primary discretionary path since it has the broadest scoring criteria.",
+        "rationale": "BOA's published instructions describe 4 separate grant programs with distinct eligibility but a common scoring philosophy: safety > preservation > standards compliance > efficiency. JACIP was the historical evaluation system but has been simplified out of the process per the 2024 update.",
+        "source": "BOA ADP Applicant Instructions and BOA 2024 Program Updates"
+      }
+    ]
+  },
+  "weighting_model": "additive_100pt",
+  "criteria": [
+    {
+      "id": "safety",
+      "label": "Safety",
+      "description": "BOA's top priority. Safety improvements at airfield, approach surfaces, RSA.",
+      "max_points": 30,
+      "acrp_category": "safety_security",
+      "scoring_style": "select_one",
+      "project_field": "purpose",
+      "subcategories": [
+        { "id": "safety_primary", "label": "Primary safety purpose", "score": 30, "field_match": { "field": "purpose", "operator": "eq", "value": "safety" } },
+        { "id": "safety_secondary", "label": "Secondary safety benefit", "score": 15 },
+        { "id": "no_safety", "label": "Not safety-related", "score": 0 }
+      ]
+    },
+    {
+      "id": "preservation",
+      "label": "Asset Preservation",
+      "description": "Pavement, lighting, NAVAIDs preservation.",
+      "max_points": 25,
+      "acrp_category": "asset_preservation",
+      "scoring_style": "select_one",
+      "project_field": "purpose",
+      "subcategories": [
+        { "id": "pavement_rehab", "label": "Pavement rehabilitation", "score": 25, "field_match": { "field": "purpose", "operator": "eq", "value": "rehabilitation" } },
+        { "id": "maintenance", "label": "General maintenance", "score": 18, "field_match": { "field": "purpose", "operator": "eq", "value": "maintenance" } },
+        { "id": "reconstruction", "label": "Reconstruction", "score": 12, "field_match": { "field": "purpose", "operator": "eq", "value": "reconstruction" } },
+        { "id": "no_preservation", "label": "Not preservation-related", "score": 0 }
+      ]
+    },
+    {
+      "id": "standards_compliance",
+      "label": "Federal/State Standards Compliance",
+      "description": "Project brings airport into FAA/Commonwealth compliance.",
+      "max_points": 15,
+      "acrp_category": "regulatory_mandate",
+      "scoring_style": "accumulating",
+      "subcategories": [
+        { "id": "faa_design", "label": "Meets/exceeds FAA design standards", "score": 6, "field_match": { "field": "system_plan_supported", "operator": "eq", "value": true } },
+        { "id": "pa_license", "label": "Maintains PA airport license compliance", "score": 5, "field_match": { "field": "licensing_status", "operator": "eq", "value": "compliant" } },
+        { "id": "zoning_compliance", "label": "Height-zoning compliance", "score": 4, "field_match": { "field": "height_zoning_on_file", "operator": "eq", "value": true } }
+      ]
+    },
+    {
+      "id": "federal_leverage",
+      "label": "Federal Funding Match",
+      "description": "Block Grant program leverages federal AIP heavily; ADP supplements where AIP doesn't reach.",
+      "max_points": 15,
+      "acrp_category": "revenue_cost",
+      "scoring_style": "select_one",
+      "project_field": "federal_funding_type",
+      "subcategories": [
+        { "id": "federal_discretionary", "label": "Federal discretionary / BIL", "score": 15, "field_match": { "field": "federal_funding_type", "operator": "eq", "value": "discretionary" } },
+        { "id": "federal_entitlement", "label": "Federal entitlement (NPIAS)", "score": 12, "field_match": { "field": "federal_funding_type", "operator": "eq", "value": "entitlement" } },
+        { "id": "state_apportionment", "label": "State apportionment", "score": 8, "field_match": { "field": "federal_funding_type", "operator": "eq", "value": "state_apportionment" } },
+        { "id": "no_federal", "label": "State/local only (ADP target)", "score": 5, "field_match": { "field": "federal_funding_type", "operator": "eq", "value": "no_federal" } }
+      ]
+    },
+    {
+      "id": "airport_role",
+      "label": "Pennsylvania Aviation System Role",
+      "description": "Airport role in the PA Airport System Plan.",
+      "max_points": 10,
+      "acrp_category": "system_plan_alignment",
+      "scoring_style": "select_one",
+      "project_field": "airport_classification",
+      "subcategories": [
+        { "id": "commercial", "label": "Commercial Service", "score": 10, "field_match": { "field": "airport_classification", "operator": "eq", "value": "commercial_service" } },
+        { "id": "reliever_business", "label": "Reliever / Business Service", "score": 8, "field_match": { "field": "airport_classification", "operator": "eq", "value": "business" } },
+        { "id": "ga_community", "label": "Local Service GA", "score": 5, "field_match": { "field": "airport_classification", "operator": "eq", "value": "intermediate_ga" } },
+        { "id": "ga_basic", "label": "Local GA / heliport", "score": 3, "field_match": { "field": "airport_classification", "operator": "eq", "value": "local_ga" } }
+      ]
+    },
+    {
+      "id": "modernization_capacity",
+      "label": "Modernization / Capacity",
+      "description": "Lower-priority but considered.",
+      "max_points": 5,
+      "acrp_category": "level_of_service",
+      "scoring_style": "select_one",
+      "project_field": "purpose",
+      "subcategories": [
+        { "id": "capacity", "label": "Capacity expansion", "score": 5, "field_match": { "field": "purpose", "operator": "eq", "value": "capacity" } },
+        { "id": "modernization", "label": "Modernization", "score": 3, "field_match": { "field": "purpose", "operator": "eq", "value": "airport_enhancement" } },
+        { "id": "no_modernization", "label": "None", "score": 0 }
+      ]
+    }
+  ],
+  "set_asides": [
+    {
+      "id": "block_grant",
+      "label": "Block Grant Program (federal AIP block)",
+      "allocation_pct": 50,
+      "eligibility_filter": "FAA Block Grant eligible airports - non-primary commercial service, reliever, and GA airports."
+    },
+    {
+      "id": "adp",
+      "label": "Aviation Development Program (state discretionary)",
+      "allocation_pct": 30,
+      "eligibility_filter": "State-funded development projects, often filling federal gaps."
+    },
+    {
+      "id": "capital_budget",
+      "label": "Capital Budget / Transportation Assistance Program",
+      "allocation_pct": 15,
+      "eligibility_filter": "Large capital projects."
+    },
+    {
+      "id": "real_estate_tax",
+      "label": "Real Estate Tax Reimbursement",
+      "allocation_pct": 5,
+      "eligibility_filter": "Eligible airport sponsors with property tax obligations."
+    }
+  ],
+  "governance": {
+    "decision_authority": "PennDOT Bureau of Aviation; Pennsylvania Transportation Commission",
+    "decision_cadence": "annual",
+    "statute_required": true,
+    "statute_citation": "PA Aviation Code (74 Pa.C.S.A.); Pub. 405 (PennDOT)",
+    "scoring_authority": "PennDOT Bureau of Aviation",
+    "approval_process": "BOA reviews applications across 4 grant programs (~$35M/year combined). 2024 update removed JACIP from the process to streamline ready-to-start projects.",
+    "model_review_cycle_years": 4
+  },
+  "disclaimer": "TEMPLATE-STYLE ENCODING. PennDOT BOA documents the 4 grant programs and conceptual priorities but the specific scoring rubric is not publicly published. The 6-criterion framework and 100-point allocation are inferred from documented program priorities. PA stakeholders should obtain BOA's actual scoring methodology before adoption."
+}
