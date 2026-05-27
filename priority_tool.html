@@ -496,7 +496,7 @@
     <div class="wizard-body">
       <div style="margin-bottom: 14px">
         <strong>Select models to compare (2-3 recommended):</strong>
-        <div id="compareModelPicker" style="margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px"></div>
+        <div id="compareModelPicker" style="margin-top: 10px; display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px"></div>
         <div style="margin-top: 12px; display: flex; gap: 12px; align-items: center">
           <button onclick="runCompare()" class="btn btn-primary">Run comparison →</button>
           <span id="compareStatus" style="font-size: .85rem; color: var(--gray-700)"></span>
@@ -8150,7 +8150,14 @@
       pennsylvania: "PennDOT BOA (template)"
     };
 
-    let rows = order.filter(k => configs[k]).map(k => {
+    // Group keys by source-quality cohort to keep parity with the action-bar dropdown
+    const groups = [
+      { title: "Primary-source (verbatim from agency PDF)", keys: ["wyoming","mndot","aldot","louisiana","arizona"] },
+      { title: "ACRP Synthesis 123 case examples (2023)", keys: ["idaho","illinois","virginia","washington","north_dakota"] },
+      { title: "Public-doc encodings (state DOT websites)", keys: ["oregon","tennessee","california","texas","new_york","colorado","pennsylvania"] },
+    ];
+
+    function buildRow(k) {
       const c = configs[k];
       const nCrit = (c.criteria || []).length;
       const nSub = (c.criteria || []).reduce((s, x) => s + ((x.subcategories || []).length), 0);
@@ -8171,6 +8178,18 @@
           <td style="font-size:.78rem">${escapeHtml(sourceLabel[k] || "")}</td>
           <td><button class="btn btn-accent btn-sm" onclick="loadBenchmark('${k}')">Load</button></td>
         </tr>`;
+    }
+
+    let rows = groups.map(g => {
+      const groupKeys = g.keys.filter(k => configs[k]);
+      if (!groupKeys.length) return "";
+      const headerRow = `
+        <tr style="background:rgba(232,133,30,0.08)">
+          <td colspan="9" style="padding:8px 10px;font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--accent)">
+            ${escapeHtml(g.title)} <span style="font-weight:500;color:var(--gray-700);text-transform:none;letter-spacing:0">(${groupKeys.length} ${groupKeys.length === 1 ? "model" : "models"})</span>
+          </td>
+        </tr>`;
+      return headerRow + groupKeys.map(buildRow).join("");
     }).join("");
 
     const html2 = `
@@ -8215,12 +8234,17 @@
 
   function renderComparePicker() {
     const configs = window.PM_REFERENCE_CONFIGS || {};
-    const order = ["wyoming","mndot","aldot","louisiana","idaho","illinois","virginia","washington","north_dakota","arizona","oregon","tennessee","california","texas","new_york","colorado","pennsylvania"];
     const wmLabel = {
       multiplicative: "mult", additive_100pt: "add",
       formula: "formula", dual_objective_subjective: "dual"
     };
-    let buttons = order.filter(k => configs[k]).map(k => {
+    const groups = [
+      { title: "Primary-source (verbatim)", keys: ["wyoming","mndot","aldot","louisiana","arizona"] },
+      { title: "ACRP Syn 123 case examples", keys: ["idaho","illinois","virginia","washington","north_dakota"] },
+      { title: "Public-doc encodings", keys: ["oregon","tennessee","california","texas","new_york","colorado","pennsylvania"] },
+    ];
+
+    function buildBtn(k) {
       const c = configs[k];
       const stateName = c.metadata.state || k;
       const selected = _compareSelected.includes(k);
@@ -8229,8 +8253,17 @@
         <strong>${escapeHtml(stateName)}</strong>
         <span style="font-size:.7rem;opacity:.8">${wmLabel[c.weighting_model]||c.weighting_model}</span>
       </button>`;
+    }
+
+    const sections = groups.map(g => {
+      const groupKeys = g.keys.filter(k => configs[k]);
+      if (!groupKeys.length) return "";
+      const header = `<div style="grid-column:1/-1;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);padding-top:8px;border-top:1px solid rgba(232,133,30,0.2);margin-top:4px">${escapeHtml(g.title)}</div>`;
+      const btns = groupKeys.map(buildBtn).join("");
+      return header + btns;
     }).join("");
-    document.getElementById("compareModelPicker").innerHTML = buttons;
+
+    document.getElementById("compareModelPicker").innerHTML = sections;
   }
 
   window.toggleCompareModel = function (key) {
