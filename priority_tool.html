@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>State Funding Priority Model Builder — APH m49</title>
-<meta name="author" content="John Marcus Cocanougher">
-<meta name="copyright" content="© 2026 John Marcus Cocanougher. All rights reserved.">
+<meta name="author" content="Aviation Planning Hub">
+<meta name="copyright" content="© 2026 Aviation Planning Hub. All rights reserved.">
 <style>
   :root {
     --primary: #1B3A5C;
@@ -284,12 +284,54 @@
                  border: 1px solid var(--gray-200); border-radius: 6px; margin-bottom: 6px; cursor: pointer; }
   .wf-rec-row:hover { background: var(--gray-50); }
   .wf-rec-row input[type="checkbox"] { margin-top: 4px; }
+
+  /* APH integration — back link, suite label, beta banner */
+  .aph-backlink-bar {
+    background: linear-gradient(135deg, #0f1b2d 0%, #1a365d 100%);
+    padding: 6px 20px 0;
+  }
+  .aph-backlink-bar a {
+    color: #fff;
+    opacity: .7;
+    font-size: .85rem;
+    text-decoration: none;
+  }
+  .aph-backlink-bar a:hover { opacity: 1; }
+  header .suite-label {
+    font-size: .7rem;
+    text-transform: uppercase;
+    letter-spacing: .18em;
+    color: #4CAF7A;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .beta-banner {
+    background: #fefce8;
+    border-bottom: 2px solid #fde68a;
+    padding: 8px 20px;
+    font-size: .78rem;
+    color: #92400e;
+    text-align: center;
+  }
+  .beta-banner strong { color: #78350f; }
 </style>
 </head>
 <body>
 
+<!-- APH back-link bar (visible only when running inside APH tree) -->
+<div class="aph-backlink-bar" id="aphBackLinkBar" style="display:none">
+  <a href="../../index.html">&larr; Back to Aviation Planning Hub</a>
+</div>
+<script>
+  // Show back link only when running inside APH (mounted under /tools/priority_model_tool/)
+  if (location.pathname.includes('/tools/priority_model_tool/')) {
+    document.getElementById('aphBackLinkBar').style.display = '';
+  }
+</script>
+
 <header>
   <div>
+    <div class="suite-label">Aviation Planning Hub</div>
     <h1>
       State Funding Priority Model Builder
       <span class="module-tag">m49</span>
@@ -299,8 +341,13 @@
       Grounded in ACRP Synthesis 123.
     </div>
   </div>
-  <div style="font-size: .78rem; opacity: .85;">© 2026 J. Marcus Cocanougher</div>
+  <div style="font-size: .78rem; opacity: .85;">© 2026 Aviation Planning Hub</div>
 </header>
+
+<!-- Beta / Demo banner -->
+<div class="beta-banner" role="status">
+  <strong>Beta / Demo Tool</strong> — Reference state encodings include both primary-source (verbatim) and inferred values; verify with the issuing agency before any official adoption. All data saved locally in your browser via localStorage — export regularly for backup.
+</div>
 
 <!-- Profile bar -->
 <div class="profile-bar">
