@@ -484,6 +484,130 @@ ${bodyHtml}
   }
 
   // ═════════════════════════════════════════════════════════════
+  //  ADOPTION PACKAGE — all-in-one bundle for agency rollout
+  // ═════════════════════════════════════════════════════════════
+
+  function generateAdoptionPackage(config, sampleProjects, engine) {
+    const m = config.metadata || {};
+    const g = config.governance || {};
+    const state = m.state || "State";
+    const dateStr = new Date().toISOString().slice(0, 10);
+
+    // Run the engine to get a sample ranking
+    let topRows = "";
+    let methodNote = "";
+    try {
+      if (engine && sampleProjects && sampleProjects.length) {
+        const model = new engine.PriorityModel(config);
+        const result = model.rank(sampleProjects);
+        const ranked = result.ranked();
+        topRows = ranked.slice(0, 10).map((r, i) => `
+          <tr>
+            <td>${i + 1}</td>
+            <td>${escapeXml(r.project_id || "")}</td>
+            <td>${escapeXml(r.project_label || "")}</td>
+            <td style="text-align:right">${Number(r.final_score || 0).toFixed(1)}</td>
+          </tr>`).join("");
+        methodNote = `Sample ranking uses ${sampleProjects.length} synthetic projects shipped with the tool. Replace with your agency&apos;s actual project list to see your real-world rankings.`;
+      } else {
+        topRows = `<tr><td colspan="4" style="text-align:center;color:#888">Engine not available — load the tool with priority_engine.js to generate sample rankings.</td></tr>`;
+      }
+    } catch (e) {
+      topRows = `<tr><td colspan="4" style="text-align:center;color:#888">Sample ranking unavailable: ${escapeXml(e.message || "error")}</td></tr>`;
+    }
+
+    const html = wrapDocx(`
+      ${docHeader(`${state} Funding Priority Model — Adoption Package`, state, dateStr)}
+
+      <h1 style="color: #1B3A5C">${escapeXml(m.name || "Priority Model")} — Adoption Package</h1>
+      <h3 style="color:#666">Prepared ${escapeXml(dateStr)} via Aviation Planning Hub m49</h3>
+      <hr/>
+
+      <h2>1 · Executive Summary</h2>
+      <p>This document bundles everything ${escapeXml(state)} needs to <strong>review, socialize, and adopt</strong> the encoded
+        funding-prioritization model. It is intended as a starting point for an internal agency review meeting and
+        an external stakeholder briefing.</p>
+      <table style="border-collapse:collapse">
+        <tr><td style="padding:4px 12px;color:#555">Model name</td><td style="padding:4px 12px"><strong>${escapeXml(m.name || "—")}</strong></td></tr>
+        <tr><td style="padding:4px 12px;color:#555">Agency</td><td style="padding:4px 12px">${escapeXml(m.agency || "—")}</td></tr>
+        <tr><td style="padding:4px 12px;color:#555">Version</td><td style="padding:4px 12px">${escapeXml(m.model_version || "—")}</td></tr>
+        <tr><td style="padding:4px 12px;color:#555">Last updated</td><td style="padding:4px 12px">${escapeXml(m.last_updated || "—")}</td></tr>
+        <tr><td style="padding:4px 12px;color:#555">Weighting model</td><td style="padding:4px 12px">${escapeXml(config.weighting_model || "—")}</td></tr>
+        <tr><td style="padding:4px 12px;color:#555">Criteria count</td><td style="padding:4px 12px">${(config.criteria || []).length}</td></tr>
+        <tr><td style="padding:4px 12px;color:#555">Source citation</td><td style="padding:4px 12px;font-size:9pt">${escapeXml(m.source_citation || "—")}</td></tr>
+      </table>
+
+      <h2>2 · Why This Methodology</h2>
+      <p>The encoded ${escapeXml(state)} model uses a <strong>${escapeXml(config.weighting_model || "—")}</strong> weighting model
+        because:</p>
+      <ul>
+        ${config.weighting_model === "multiplicative" ?
+          "<li>Criteria are <strong>multiplied</strong> by category weights, so a single high-weight category (e.g., safety) can move a project up dramatically even if other criteria are weak.</li><li>This rewards focused projects — projects that score very well in one important dimension.</li>" :
+          config.weighting_model === "additive_100pt" ?
+          "<li>Criteria sum to a fixed total (typically 100), with each criterion capped at a maximum.</li><li>This rewards <strong>well-rounded projects</strong> — projects that score acceptably across many dimensions outscore one-dimensional projects.</li>" :
+          config.weighting_model === "formula" ?
+          "<li>A custom expression combines criteria, allowing non-linear blending and weighted divisions.</li><li>This is appropriate when an agency has historically used a specific algebraic formula that doesn&apos;t fit simple add/multiply patterns.</li>" :
+          "<li>The model has two layers: an objective merit ranking plus a subjective override for special cases.</li><li>This allows transparent merit-based ranking while preserving director discretion for edge cases (e.g., large economic-development opportunities).</li>"}
+      </ul>
+
+      <h2>3 · Full Criteria Breakdown</h2>
+      ${renderCriteriaSections(config, config.weighting_model)}
+
+      <h2>4 · Set-asides &amp; Eligibility</h2>
+      ${renderEligibilitySection(config)}
+      ${renderSetAsidesSection(config)}
+      ${renderAdjustmentsSection(config)}
+
+      <h2>5 · Sample Ranking — Top 10 Projects</h2>
+      <p style="font-size:9pt;color:#666">${methodNote}</p>
+      <table style="border-collapse:collapse;width:100%;font-size:10pt">
+        <thead><tr style="background:#1B3A5C;color:#fff"><th style="padding:6px 10px;text-align:left">Rank</th><th style="padding:6px 10px;text-align:left">Project ID</th><th style="padding:6px 10px;text-align:left">Description</th><th style="padding:6px 10px;text-align:right">Final Score</th></tr></thead>
+        <tbody>${topRows}</tbody>
+      </table>
+
+      <h2>6 · Governance</h2>
+      <table style="border-collapse:collapse">
+        <tr><td style="padding:4px 12px;color:#555">Decision authority</td><td style="padding:4px 12px">${escapeXml(g.decision_authority || "—")}</td></tr>
+        <tr><td style="padding:4px 12px;color:#555">Decision cadence</td><td style="padding:4px 12px">${escapeXml(g.decision_cadence || "—")}</td></tr>
+        <tr><td style="padding:4px 12px;color:#555">Scoring authority</td><td style="padding:4px 12px">${escapeXml(g.scoring_authority || "—")}</td></tr>
+        <tr><td style="padding:4px 12px;color:#555">Statute required</td><td style="padding:4px 12px">${g.statute_required ? "Yes" : "No"}</td></tr>
+        ${g.statute_citation ? `<tr><td style="padding:4px 12px;color:#555">Statute citation</td><td style="padding:4px 12px">${escapeXml(g.statute_citation)}</td></tr>` : ""}
+        <tr><td style="padding:4px 12px;color:#555">Model review cycle</td><td style="padding:4px 12px">${g.model_review_cycle_years || "—"} years</td></tr>
+        <tr><td style="padding:4px 12px;color:#555">Approval process</td><td style="padding:4px 12px">${escapeXml(g.approval_process || "—")}</td></tr>
+      </table>
+
+      <h2>7 · Verification Questions for Agency Review</h2>
+      <p>Before adopting this model, the responsible agency should review and confirm:</p>
+      <ol>
+        <li><strong>Weighting model</strong> — Does the chosen weighting (multiplicative, additive, formula, or dual) match how your team intuitively thinks about ranking?</li>
+        <li><strong>Criteria coverage</strong> — Are the criteria above the actual factors your team uses? Are any missing? Any that should be removed?</li>
+        <li><strong>Priority ordering</strong> — Does the relative ordering (which criteria carry more weight) match your agency&apos;s policy priorities?</li>
+        <li><strong>Subcategory point values</strong> — Within each criterion, do the numerical values broadly match what your agency would use?</li>
+        <li><strong>Set-asides &amp; eligibility gates</strong> — Have the right pre-scoring filters been captured (e.g., NPIAS-only, $X minimums, public-use-only)?</li>
+        <li><strong>Governance</strong> — Is the decision authority, cadence, and approval process accurate?</li>
+        <li><strong>Source citation</strong> — Is the source citation correct, and is there a more current authoritative source we should use instead?</li>
+      </ol>
+
+      <h2>8 · How to Socialize This Internally</h2>
+      <ol>
+        <li><strong>Open with a "what-if" demo.</strong> Open the live tool, load your state, then change one weight and show the live re-ranking. The instant-feedback loop disarms much of the abstract debate about methodology.</li>
+        <li><strong>Run a 3-state comparison.</strong> Use the Compare Models view to show your state alongside two peers (e.g., a primary-source state and an ACRP case example). Where your rankings diverge is where methodology matters.</li>
+        <li><strong>Bring this document to a working session.</strong> Section 7&apos;s verification questions are designed to drive a 60-90 minute review meeting with your scoring committee or aeronautics board working group.</li>
+        <li><strong>Document the audit trail.</strong> Every change you make in the tool can be exported as JSON; commit those JSON files to whatever you use for institutional memory (SharePoint, Git, file share). The Decisions Log inside the model itself is also append-only.</li>
+        <li><strong>Pilot before mandate.</strong> Score the upcoming CIP cycle in parallel — run your existing process alongside this model for one cycle and compare outputs. Don&apos;t mandate adoption until the working group is comfortable.</li>
+      </ol>
+
+      ${renderDecisionsLog(config)}
+
+      <hr/>
+      <p style="font-size: 9pt; color: #555"><em>${escapeXml(config.disclaimer || "Planning-level analysis only; verify with the issuing agency before any official adoption.")}</em></p>
+      <p style="font-size: 9pt; color: #888">Generated ${escapeXml(dateStr)} by Aviation Planning Hub m49 State Funding Priority Model Tool.</p>
+    `);
+    download(html, `${(m.name || "priority_model").replace(/\s+/g, "_")}_Adoption_Package.doc`,
+             "application/msword");
+  }
+
+  // ═════════════════════════════════════════════════════════════
   //  Public API
   // ═════════════════════════════════════════════════════════════
 
@@ -491,6 +615,7 @@ ${bodyHtml}
     generateExcel,
     generateWyomingPolicyManual,
     generateLouisianaPolicyManual,
+    generateAdoptionPackage,
   };
 
   if (typeof module !== "undefined" && module.exports) {

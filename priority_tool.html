@@ -285,6 +285,31 @@
   .wf-rec-row:hover { background: var(--gray-50); }
   .wf-rec-row input[type="checkbox"] { margin-top: 4px; }
 
+  /* Quickstart step layout */
+  .quickstart-step {
+    display: grid;
+    grid-template-columns: 40px 1fr;
+    gap: 14px;
+    align-items: start;
+    padding: 12px 14px;
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: 8px;
+  }
+  .quickstart-num {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700;
+    font-size: 1rem;
+  }
+  .quickstart-body h3 { margin: 0 0 6px; color: var(--primary); font-size: .95rem; font-weight: 600; }
+  .quickstart-body p { margin: 0 0 6px; font-size: .88rem; color: var(--gray-700); line-height: 1.5; }
+  .quickstart-body p:last-child { margin-bottom: 0; }
+  .quickstart-body code { background: var(--gray-200); padding: 1px 5px; border-radius: 3px; font-size: .82rem; }
+
   /* State picker dropdown */
   .state-picker {
     display: inline-flex;
@@ -423,17 +448,28 @@
         <option value="colorado">Colorado · CDOT CDAG (template)</option>
         <option value="pennsylvania">Pennsylvania · PennDOT BOA (template)</option>
       </optgroup>
+      <optgroup label="Template encodings (program structure only)">
+        <option value="iowa">Iowa · DOT Aviation Bureau (template)</option>
+        <option value="kansas">Kansas · KAIP (3-category template)</option>
+        <option value="ohio">Ohio · ODOT OASIP (template)</option>
+        <option value="michigan">Michigan · MDOT Aeronautics (template)</option>
+        <option value="utah">Utah · UDOT Aeronautics (template)</option>
+        <option value="florida">Florida · FDOT Aviation + hurricane criterion</option>
+        <option value="georgia">Georgia · GDOT Aviation (template)</option>
+      </optgroup>
     </select>
   </div>
   <button class="btn btn-secondary" onclick="newBlankModel()">➕ Blank</button>
   <button class="btn btn-secondary" onclick="openBenchmarkLibrary()">📚 Benchmark Library</button>
   <button class="btn btn-secondary" onclick="openCompareModels()">⚖️ Compare Models</button>
+  <button class="btn btn-secondary" onclick="openQuickstart()" style="background:#dbeafe;color:#1e40af;border-color:#93c5fd">❓ Quickstart</button>
   <span class="spacer"></span>
   <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">📥 Import JSON</button>
   <button class="btn btn-secondary" onclick="exportActive()">📤 Export JSON</button>
   <button class="btn btn-secondary" onclick="exportExcel()">📊 Excel</button>
   <button class="btn btn-secondary" onclick="exportPolicyWyoming()">📄 Policy (PRM)</button>
   <button class="btn btn-secondary" onclick="exportPolicyLouisiana()">📄 Policy (Admin)</button>
+  <button class="btn btn-secondary" onclick="exportAdoptionPackage()" style="background:#dcfce7;color:#15803d;border-color:#86efac">📦 Adoption Package</button>
   <input type="file" id="importFile" class="hidden-input" accept=".json" onchange="importJSON(this)">
 </div>
 
@@ -462,7 +498,7 @@
   <div class="wizard-modal" style="width: min(1100px, 100%)">
     <div class="wizard-header">
       <div>
-        <h2>📚 Benchmark Library — 17 State Models</h2>
+        <h2>📚 Benchmark Library — 24 State Models</h2>
         <div class="step-label">Compare and load reference models grounded in ACRP Synthesis 123.</div>
       </div>
       <button onclick="closeBenchmarkLibrary()" class="btn btn-secondary btn-sm">✕ Close</button>
@@ -511,6 +547,87 @@
       <span style="font-size:.8rem;color:var(--gray-700)">Same 25 sample projects, different scoring models</span>
       <div class="right">
         <button onclick="closeCompareModels()" class="btn btn-secondary">Done</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Quickstart overlay -->
+<div id="quickstartOverlay" class="wizard-overlay">
+  <div class="wizard-modal" style="width: min(800px, 100%)">
+    <div class="wizard-header" style="background: linear-gradient(135deg, #1e40af, #3b82f6)">
+      <div>
+        <h2>❓ Quickstart — 4 minutes to your first state model</h2>
+        <div class="step-label">A guided tour for first-time users.</div>
+      </div>
+      <button onclick="closeQuickstart()" class="btn btn-secondary btn-sm">✕ Close</button>
+    </div>
+    <div class="wizard-body">
+      <div style="margin-bottom: 20px; padding: 14px 18px; background: #eff6ff; border-left: 4px solid #3b82f6; border-radius: 0 6px 6px 0">
+        <strong style="color: #1e40af">Goal of this tour:</strong> Load a real state model, tweak one criterion, see the live ranking change, and export an Excel companion.
+      </div>
+
+      <div style="display: grid; gap: 14px">
+        <div class="quickstart-step">
+          <div class="quickstart-num">1</div>
+          <div class="quickstart-body">
+            <h3>Load a reference state</h3>
+            <p>In the action bar above, click the <strong>🆕 Load reference state model:</strong> dropdown and choose <strong>Wyoming · Priority Rating Model (2021)</strong>. The whole form populates instantly with Wyoming's 7-criterion multiplicative model.</p>
+            <p style="font-size:.82rem;color:var(--gray-600)">Wyoming is a good first pick because it's <em>primary-source verbatim</em> from the WYDOT PDF — the most faithful encoding in the library.</p>
+          </div>
+        </div>
+
+        <div class="quickstart-step">
+          <div class="quickstart-num">2</div>
+          <div class="quickstart-body">
+            <h3>Look at the live ranking</h3>
+            <p>On the right side, the <strong>Live Ranking Preview</strong> already ranks 25 synthetic projects under Wyoming's model. The top project is usually <code>P001 Primary runway RSA expansion</code> (a safety project on a primary runway).</p>
+          </div>
+        </div>
+
+        <div class="quickstart-step">
+          <div class="quickstart-num">3</div>
+          <div class="quickstart-body">
+            <h3>Tweak one criterion</h3>
+            <p>Click the <strong>Weighting</strong> tab. Find the <code>type_of_federal_funding</code> criterion (weight 5) and drop it to <strong>weight 1</strong>. Watch the ranking on the right re-shuffle in real time — federally-funded projects no longer dominate the top.</p>
+            <p style="font-size:.82rem;color:var(--gray-600)">This is the core "what-if" loop: every config change re-ranks instantly using the same JS engine that's tested against the Python reference.</p>
+          </div>
+        </div>
+
+        <div class="quickstart-step">
+          <div class="quickstart-num">4</div>
+          <div class="quickstart-body">
+            <h3>Save your tweaked model</h3>
+            <p>Type a name in <strong>Active model</strong> (top-left selector) — e.g. "Wyoming - no fed bonus" — then click <strong>💾 Save</strong>. Your model now persists in your browser via localStorage. The original Wyoming reference is untouched.</p>
+          </div>
+        </div>
+
+        <div class="quickstart-step">
+          <div class="quickstart-num">5</div>
+          <div class="quickstart-body">
+            <h3>Export an Excel companion</h3>
+            <p>Click <strong>📊 Excel</strong> in the action bar. You get a downloadable .xlsx file with three sheets: <em>Model</em> (criteria + subcategory points), <em>Ranking</em> (your project list pre-scored), and <em>Audit Trail</em> (every contribution traced).</p>
+          </div>
+        </div>
+
+        <div class="quickstart-step">
+          <div class="quickstart-num">6</div>
+          <div class="quickstart-body">
+            <h3>Compare what you built against another state</h3>
+            <p>Click <strong>⚖️ Compare Models</strong>. Pick your modified Wyoming and one other state (e.g. Illinois — a formula-based model). Hit <strong>Run comparison</strong>. The table shows where each project ranks under each model and flags the deltas (▲ climbed, ▼ dropped).</p>
+            <p style="font-size:.82rem;color:var(--gray-600)">If your top-5 shuffles substantially, the methodology choice meaningfully changes outcomes — useful evidence for a state considering a model overhaul.</p>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top: 20px; padding: 14px 18px; background: #fef3c7; border-left: 4px solid #f59e0b; border-radius: 0 6px 6px 0; font-size: .88rem">
+        <strong>For agency adoption:</strong> Use <strong>🪄 Build New (Wizard)</strong> for a guided 16-step co-design from problem statement to finished JSON, or <strong>🔍 Modify Existing</strong> to import an existing model and adjust it. The <strong>📚 Benchmark Library</strong> button shows all 24 state models side-by-side so your agency can pick a starting point that matches your context.
+      </div>
+    </div>
+    <div class="wizard-footer">
+      <span style="font-size:.8rem;color:var(--gray-700)">Tip: re-open this Quickstart anytime via the ❓ button in the action bar.</span>
+      <div class="right">
+        <button onclick="closeQuickstart()" class="btn btn-primary">Got it</button>
       </div>
     </div>
   </div>
@@ -811,7 +928,7 @@
 </footer>
 
 <!-- ─── Embedded reference data (auto-generated by build_embedded_data.py) ─── -->
-<script>        // BEGIN_EMBEDDED_DATA
+<script>          // BEGIN_EMBEDDED_DATA
   // Auto-generated by build_embedded_data.py — do not edit by hand.
   // Reference configs (4 reference state models):
   window.PM_REFERENCE_CONFIGS = {
@@ -2411,6 +2528,570 @@
     },
     "disclaimer": "TEMPLATE-STYLE ENCODING. CDOT manages CDAG scoring internally via WIMS (Web-based Information Management System); the specific scoring rubric is not publicly published. The 5-criterion framework shown here is a reasonable default based on documented program priorities (safety, preservation, federal match) and Aeronautical Board reporting. Colorado stakeholders should obtain the actual WIMS scoring rubric from CDOT Aeronautics (303-512-5250) before adoption or significant decision-making."
   },
+  "florida": {
+    "schema_version": "1.0.0",
+    "metadata": {
+      "name": "Florida Aviation Grant Program",
+      "state": "Florida",
+      "agency": "Florida Department of Transportation (FDOT), Aviation and Spaceports Office",
+      "model_version": "Current Work Program (5-year)",
+      "last_updated": "2025-07-01",
+      "source_citation": "FDOT Aviation and Spaceports Office (fdot.gov/aviation). Florida operates one of the largest state aviation programs (~$300M+ annual). Funded by Aviation Fuel Tax. Five-year Work Program approved annually by Florida Transportation Commission.",
+      "decisions_log": [
+        {
+          "date": "2026-05-30",
+          "author": "APH m49 Sprint 11 reference encoder",
+          "decision": "Encoded Florida with additive_100pt model. Florida's aviation program is unusually large (~$300M+) and funds capital, planning, economic development, and emergency response. Encoded as 7-criterion model with explicit hurricane/emergency response category given Florida-specific context.",
+          "rationale": "Template-style encoding using documented program structure and common state-aviation-funding scoring patterns.",
+          "source": "FDOT Aviation and Spaceports Office (fdot.gov/aviation). Florida operates one of the largest state aviation programs (~$300M+ annual). Funded by Aviation Fuel Tax. Five-year Work Program approved annually by Florida Transportation Commission."
+        }
+      ]
+    },
+    "weighting_model": "additive_100pt",
+    "criteria": [
+      {
+        "id": "safety",
+        "label": "Safety",
+        "description": "Highest-priority category. RSA, obstruction removal, approach surfaces, signage, lighting safety upgrades.",
+        "max_points": 25,
+        "acrp_category": "safety_security",
+        "scoring_style": "select_one",
+        "project_field": "purpose",
+        "subcategories": [
+          {
+            "id": "safety_primary",
+            "label": "Primary safety purpose",
+            "score": 25,
+            "field_match": {
+              "field": "purpose",
+              "operator": "eq",
+              "value": "safety"
+            }
+          },
+          {
+            "id": "safety_secondary",
+            "label": "Secondary safety benefit",
+            "score": 12
+          },
+          {
+            "id": "no_safety",
+            "label": "Not safety-related",
+            "score": 0
+          }
+        ]
+      },
+      {
+        "id": "preservation",
+        "label": "Asset Preservation",
+        "description": "Maintains existing infrastructure. Pavement rehab, lighting/NAVAID preservation, building maintenance.",
+        "max_points": 20,
+        "acrp_category": "asset_preservation",
+        "scoring_style": "select_one",
+        "project_field": "purpose",
+        "subcategories": [
+          {
+            "id": "pavement_rehab",
+            "label": "Pavement rehabilitation",
+            "score": 20,
+            "field_match": {
+              "field": "purpose",
+              "operator": "eq",
+              "value": "rehabilitation"
+            }
+          },
+          {
+            "id": "maintenance",
+            "label": "General maintenance",
+            "score": 14,
+            "field_match": {
+              "field": "purpose",
+              "operator": "eq",
+              "value": "maintenance"
+            }
+          },
+          {
+            "id": "reconstruction",
+            "label": "Reconstruction (failed assets)",
+            "score": 9,
+            "field_match": {
+              "field": "purpose",
+              "operator": "eq",
+              "value": "reconstruction"
+            }
+          },
+          {
+            "id": "no_preservation",
+            "label": "Not preservation-related",
+            "score": 0
+          }
+        ]
+      },
+      {
+        "id": "federal_leverage",
+        "label": "Federal Funding Leverage",
+        "description": "Match for FAA AIP/BIL discretionary or entitlement grants.",
+        "max_points": 15,
+        "acrp_category": "revenue_cost",
+        "scoring_style": "select_one",
+        "project_field": "federal_funding_type",
+        "subcategories": [
+          {
+            "id": "federal_discretionary",
+            "label": "Federal discretionary / BIL",
+            "score": 15,
+            "field_match": {
+              "field": "federal_funding_type",
+              "operator": "eq",
+              "value": "discretionary"
+            }
+          },
+          {
+            "id": "federal_entitlement",
+            "label": "Federal entitlement (NPIAS)",
+            "score": 12,
+            "field_match": {
+              "field": "federal_funding_type",
+              "operator": "eq",
+              "value": "entitlement"
+            }
+          },
+          {
+            "id": "state_apportionment",
+            "label": "State apportionment",
+            "score": 7,
+            "field_match": {
+              "field": "federal_funding_type",
+              "operator": "eq",
+              "value": "state_apportionment"
+            }
+          },
+          {
+            "id": "no_federal",
+            "label": "State/local only",
+            "score": 4,
+            "field_match": {
+              "field": "federal_funding_type",
+              "operator": "eq",
+              "value": "no_federal"
+            }
+          }
+        ]
+      },
+      {
+        "id": "hurricane_emergency",
+        "label": "Hurricane / Emergency Response Capability",
+        "description": "Florida-specific: airport's role in hurricane preparedness, evacuation, or post-disaster response.",
+        "max_points": 10,
+        "acrp_category": "risk",
+        "scoring_style": "select_one",
+        "subcategories": [
+          {
+            "id": "critical_emergency",
+            "label": "Critical emergency-response asset",
+            "score": 10
+          },
+          {
+            "id": "support_emergency",
+            "label": "Supports emergency operations",
+            "score": 5
+          },
+          {
+            "id": "no_emergency_role",
+            "label": "No emergency-response role",
+            "score": 0
+          }
+        ]
+      },
+      {
+        "id": "modernization",
+        "label": "Modernization / Capacity",
+        "description": "Capacity additions, modernization, sustainability upgrades.",
+        "max_points": 15,
+        "acrp_category": "level_of_service",
+        "scoring_style": "select_one",
+        "project_field": "purpose",
+        "subcategories": [
+          {
+            "id": "capacity",
+            "label": "Capacity addition",
+            "score": 15,
+            "field_match": {
+              "field": "purpose",
+              "operator": "eq",
+              "value": "capacity"
+            }
+          },
+          {
+            "id": "modernization",
+            "label": "Modernization / enhancement",
+            "score": 9,
+            "field_match": {
+              "field": "purpose",
+              "operator": "eq",
+              "value": "airport_enhancement"
+            }
+          },
+          {
+            "id": "planning",
+            "label": "Planning / study",
+            "score": 6,
+            "field_match": {
+              "field": "purpose",
+              "operator": "eq",
+              "value": "planning"
+            }
+          },
+          {
+            "id": "no_modernization",
+            "label": "None",
+            "score": 0
+          }
+        ]
+      },
+      {
+        "id": "system_plan_alignment",
+        "label": "Florida Aviation System Plan Alignment",
+        "description": "Advances state system plan goals.",
+        "max_points": 10,
+        "acrp_category": "system_plan_alignment",
+        "scoring_style": "accumulating",
+        "subcategories": [
+          {
+            "id": "sasp_goal",
+            "label": "Advances state system plan goal",
+            "score": 6,
+            "field_match": {
+              "field": "system_plan_supported",
+              "operator": "eq",
+              "value": true
+            }
+          },
+          {
+            "id": "master_plan",
+            "label": "Consistent with current Master Plan / ALP",
+            "score": 4,
+            "field_match": {
+              "field": "master_plan_status",
+              "operator": "in",
+              "value": [
+                "updated_and_included",
+                "programmed_or_in_process"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "id": "compliance",
+        "label": "Compliance",
+        "description": "Maintains state airport license + FAA design standards compliance.",
+        "max_points": 5,
+        "acrp_category": "regulatory_mandate",
+        "scoring_style": "accumulating",
+        "subcategories": [
+          {
+            "id": "state_license",
+            "label": "Maintains state airport license",
+            "score": 3,
+            "field_match": {
+              "field": "licensing_status",
+              "operator": "eq",
+              "value": "compliant"
+            }
+          },
+          {
+            "id": "pavement_mgmt",
+            "label": "Active pavement management program",
+            "score": 2,
+            "field_match": {
+              "field": "pavement_management_program",
+              "operator": "eq",
+              "value": true
+            }
+          }
+        ]
+      }
+    ],
+    "governance": {
+      "decision_authority": "Florida Department of Transportation (FDOT), Aviation and Spaceports Office",
+      "decision_cadence": "annual",
+      "statute_required": true,
+      "scoring_authority": "Florida Department of Transportation (FDOT), Aviation and Spaceports Office",
+      "approval_process": "State aviation agency staff scores applications against published program structure; transportation commission or aeronautics commission approves annual program.",
+      "model_review_cycle_years": 5,
+      "statute_citation": "Florida Statutes Chapter 332"
+    },
+    "disclaimer": "TEMPLATE-STYLE ENCODING. FDOT publishes program priorities and 5-year Work Program (one of largest state aviation programs nationally) but the actual project scoring matrix is internal. Florida stakeholders should consult FDOT Aviation and Spaceports Office for the scoring methodology used in their Work Program development."
+  },
+  "georgia": {
+    "schema_version": "1.0.0",
+    "metadata": {
+      "name": "Georgia State Aviation Program",
+      "state": "Georgia",
+      "agency": "Georgia Department of Transportation (GDOT), Intermodal Division \u2014 Aviation",
+      "model_version": "Current",
+      "last_updated": "2025-01-01",
+      "source_citation": "GDOT Intermodal Aviation public guidance (dot.ga.gov/PS/Intermodal/Aviation). Georgia operates state aviation programs from the State Aviation Trust Fund.",
+      "decisions_log": [
+        {
+          "date": "2026-05-30",
+          "author": "APH m49 Sprint 11 reference encoder",
+          "decision": "Encoded Georgia as 6-criterion additive_100pt model. Georgia's network includes Hartsfield-Jackson (largest US passenger airport) plus broad GA network; encoded as standard state-aviation pattern.",
+          "rationale": "Template-style encoding using documented program structure and common state-aviation-funding scoring patterns.",
+          "source": "GDOT Intermodal Aviation public guidance (dot.ga.gov/PS/Intermodal/Aviation). Georgia operates state aviation programs from the State Aviation Trust Fund."
+        }
+      ]
+    },
+    "weighting_model": "additive_100pt",
+    "criteria": [
+      {
+        "id": "safety",
+        "label": "Safety",
+        "description": "Highest-priority category. RSA, obstruction removal, approach surfaces, signage, lighting safety upgrades.",
+        "max_points": 30,
+        "acrp_category": "safety_security",
+        "scoring_style": "select_one",
+        "project_field": "purpose",
+        "subcategories": [
+          {
+            "id": "safety_primary",
+            "label": "Primary safety purpose",
+            "score": 30,
+            "field_match": {
+              "field": "purpose",
+              "operator": "eq",
+              "value": "safety"
+            }
+          },
+          {
+            "id": "safety_secondary",
+            "label": "Secondary safety benefit",
+            "score": 15
+          },
+          {
+            "id": "no_safety",
+            "label": "Not safety-related",
+            "score": 0
+          }
+        ]
+      },
+      {
+        "id": "preservation",
+        "label": "Asset Preservation",
+        "description": "Maintains existing infrastructure. Pavement rehab, lighting/NAVAID preservation, building maintenance.",
+        "max_points": 25,
+        "acrp_category": "asset_preservation",
+        "scoring_style": "select_one",
+        "project_field": "purpose",
+        "subcategories": [
+          {
+            "id": "pavement_rehab",
+            "label": "Pavement rehabilitation",
+            "score": 25,
+            "field_match": {
+              "field": "purpose",
+              "operator": "eq",
+              "value": "rehabilitation"
+            }
+          },
+          {
+            "id": "maintenance",
+            "label": "General maintenance",
+            "score": 17,
+            "field_match": {
+              "field": "purpose",
+              "operator": "eq",
+              "value": "maintenance"
+            }
+          },
+          {
+            "id": "reconstruction",
+            "label": "Reconstruction (failed assets)",
+            "score": 11,
+            "field_match": {
+              "field": "purpose",
+              "operator": "eq",
+              "value": "reconstruction"
+            }
+          },
+          {
+            "id": "no_preservation",
+            "label": "Not preservation-related",
+            "score": 0
+          }
+        ]
+      },
+      {
+        "id": "federal_leverage",
+        "label": "Federal Funding Leverage",
+        "description": "Match for FAA AIP/BIL discretionary or entitlement grants.",
+        "max_points": 15,
+        "acrp_category": "revenue_cost",
+        "scoring_style": "select_one",
+        "project_field": "federal_funding_type",
+        "subcategories": [
+          {
+            "id": "federal_discretionary",
+            "label": "Federal discretionary / BIL",
+            "score": 15,
+            "field_match": {
+              "field": "federal_funding_type",
+              "operator": "eq",
+              "value": "discretionary"
+            }
+          },
+          {
+            "id": "federal_entitlement",
+            "label": "Federal entitlement (NPIAS)",
+            "score": 12,
+            "field_match": {
+              "field": "federal_funding_type",
+              "operator": "eq",
+              "value": "entitlement"
+            }
+          },
+          {
+            "id": "state_apportionment",
+            "label": "State apportionment",
+            "score": 7,
+            "field_match": {
+              "field": "federal_funding_type",
+              "operator": "eq",
+              "value": "state_apportionment"
+            }
+          },
+          {
+            "id": "no_federal",
+            "label": "State/local only",
+            "score": 4,
+            "field_match": {
+              "field": "federal_funding_type",
+              "operator": "eq",
+              "value": "no_federal"
+            }
+          }
+        ]
+      },
+      {
+        "id": "modernization",
+        "label": "Modernization / Capacity",
+        "description": "Capacity additions, modernization, sustainability upgrades.",
+        "max_points": 15,
+        "acrp_category": "level_of_service",
+        "scoring_style": "select_one",
+        "project_field": "purpose",
+        "subcategories": [
+          {
+            "id": "capacity",
+            "label": "Capacity addition",
+            "score": 15,
+            "field_match": {
+              "field": "purpose",
+              "operator": "eq",
+              "value": "capacity"
+            }
+          },
+          {
+            "id": "modernization",
+            "label": "Modernization / enhancement",
+            "score": 9,
+            "field_match": {
+              "field": "purpose",
+              "operator": "eq",
+              "value": "airport_enhancement"
+            }
+          },
+          {
+            "id": "planning",
+            "label": "Planning / study",
+            "score": 6,
+            "field_match": {
+              "field": "purpose",
+              "operator": "eq",
+              "value": "planning"
+            }
+          },
+          {
+            "id": "no_modernization",
+            "label": "None",
+            "score": 0
+          }
+        ]
+      },
+      {
+        "id": "system_plan_alignment",
+        "label": "Georgia Aviation System Plan Alignment",
+        "description": "Advances state system plan goals.",
+        "max_points": 10,
+        "acrp_category": "system_plan_alignment",
+        "scoring_style": "accumulating",
+        "subcategories": [
+          {
+            "id": "sasp_goal",
+            "label": "Advances state system plan goal",
+            "score": 6,
+            "field_match": {
+              "field": "system_plan_supported",
+              "operator": "eq",
+              "value": true
+            }
+          },
+          {
+            "id": "master_plan",
+            "label": "Consistent with current Master Plan / ALP",
+            "score": 4,
+            "field_match": {
+              "field": "master_plan_status",
+              "operator": "in",
+              "value": [
+                "updated_and_included",
+                "programmed_or_in_process"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "id": "compliance",
+        "label": "Compliance",
+        "description": "Maintains state airport license + FAA design standards compliance.",
+        "max_points": 5,
+        "acrp_category": "regulatory_mandate",
+        "scoring_style": "accumulating",
+        "subcategories": [
+          {
+            "id": "state_license",
+            "label": "Maintains state airport license",
+            "score": 3,
+            "field_match": {
+              "field": "licensing_status",
+              "operator": "eq",
+              "value": "compliant"
+            }
+          },
+          {
+            "id": "pavement_mgmt",
+            "label": "Active pavement management program",
+            "score": 2,
+            "field_match": {
+              "field": "pavement_management_program",
+              "operator": "eq",
+              "value": true
+            }
+          }
+        ]
+      }
+    ],
+    "governance": {
+      "decision_authority": "Georgia Department of Transportation (GDOT), Intermodal Division \u2014 Aviation",
+      "decision_cadence": "annual",
+      "statute_required": false,
+      "scoring_authority": "Georgia Department of Transportation (GDOT), Intermodal Division \u2014 Aviation",
+      "approval_process": "State aviation agency staff scores applications against published program structure; transportation commission or aeronautics commission approves annual program.",
+      "model_review_cycle_years": 5
+    },
+    "disclaimer": "TEMPLATE-STYLE ENCODING. GDOT Aviation publishes program structure but not numerical scoring matrix. Georgia stakeholders should consult GDOT Aviation directly for actual project scoring methodology."
+  },
   "idaho": {
     "schema_version": "1.0.0",
     "metadata": {
@@ -3149,6 +3830,560 @@
     },
     "disclaimer": "Encoding reflects the Rebuild Illinois Capital Bill PR equation as documented in ACRP Synthesis 123 (2023). Illinois also uses the FAA National Priority Rating System for its base ACIP and State Block Grant projects; this encoding covers the Rebuild Illinois discretionary layer that targets projects low-federal-priority projects. Component, Purpose, and Type subcategory mid-points are inferred from ACRP-cited high/low endpoints \u2014 verify against IDOT's annual solicitation document before adoption."
   },
+  "iowa": {
+    "schema_version": "1.0.0",
+    "metadata": {
+      "name": "Iowa Aviation Capital Improvement Program",
+      "state": "Iowa",
+      "agency": "Iowa Department of Transportation, Aviation Bureau",
+      "model_version": "FY2026 (Transportation Commission approved August 2025)",
+      "last_updated": "2025-08-12",
+      "source_citation": "Iowa DOT Aviation Bureau program description; Iowa Aviation Funding Programs page (iowadot.gov/aviation). Airports stratified into 5 system-plan roles; Aviation Bureau administers AIP-style program funded through State Aviation Fund.",
+      "decisions_log": [
+        {
+          "date": "2026-05-30",
+          "author": "APH m49 Sprint 11 reference encoder",
+          "decision": "Encoded Iowa as additive_100pt with state-aviation pattern (safety > preservation > modernization > federal leverage). Service-level tiers (Levels 1/2/3 = commercial / non-commercial public-use / other public-owned) are encoded as system plan alignment.",
+          "rationale": "Template-style encoding using documented program structure and common state-aviation-funding scoring patterns.",
+          "source": "Iowa DOT Aviation Bureau program description; Iowa Aviation Funding Programs page (iowadot.gov/aviation). Airports stratified into 5 system-plan roles; Aviation Bureau administers AIP-style program funded through State Aviation Fund."
+        }
+      ]
+    },
+    "weighting_model": "additive_100pt",
+    "criteria": [
+      {
+        "id": "safety",
+        "label": "Safety",
+        "description": "Highest-priority category. RSA, obstruction removal, approach surfaces, signage, lighting safety upgrades.",
+        "max_points": 30,
+        "acrp_category": "safety_security",
+        "scoring_style": "select_one",
+        "project_field": "purpose",
+        "subcategories": [
+          {
+            "id": "safety_primary",
+            "label": "Primary safety purpose",
+            "score": 30,
+            "field_match": {
+              "field": "purpose",
+              "operator": "eq",
+              "value": "safety"
+            }
+          },
+          {
+            "id": "safety_secondary",
+            "label": "Secondary safety benefit",
+            "score": 15
+          },
+          {
+            "id": "no_safety",
+            "label": "Not safety-related",
+            "score": 0
+          }
+        ]
+      },
+      {
+        "id": "preservation",
+        "label": "Asset Preservation",
+        "description": "Maintains existing infrastructure. Pavement rehab, lighting/NAVAID preservation, building maintenance.",
+        "max_points": 25,
+        "acrp_category": "asset_preservation",
+        "scoring_style": "select_one",
+        "project_field": "purpose",
+        "subcategories": [
+          {
+            "id": "pavement_rehab",
+            "label": "Pavement rehabilitation",
+            "score": 25,
+            "field_match": {
+              "field": "purpose",
+              "operator": "eq",
+              "value": "rehabilitation"
+            }
+          },
+          {
+            "id": "maintenance",
+            "label": "General maintenance",
+            "score": 17,
+            "field_match": {
+              "field": "purpose",
+              "operator": "eq",
+              "value": "maintenance"
+            }
+          },
+          {
+            "id": "reconstruction",
+            "label": "Reconstruction (failed assets)",
+            "score": 11,
+            "field_match": {
+              "field": "purpose",
+              "operator": "eq",
+              "value": "reconstruction"
+            }
+          },
+          {
+            "id": "no_preservation",
+            "label": "Not preservation-related",
+            "score": 0
+          }
+        ]
+      },
+      {
+        "id": "federal_leverage",
+        "label": "Federal Funding Leverage",
+        "description": "Match for FAA AIP/BIL discretionary or entitlement grants.",
+        "max_points": 15,
+        "acrp_category": "revenue_cost",
+        "scoring_style": "select_one",
+        "project_field": "federal_funding_type",
+        "subcategories": [
+          {
+            "id": "federal_discretionary",
+            "label": "Federal discretionary / BIL",
+            "score": 15,
+            "field_match": {
+              "field": "federal_funding_type",
+              "operator": "eq",
+              "value": "discretionary"
+            }
+          },
+          {
+            "id": "federal_entitlement",
+            "label": "Federal entitlement (NPIAS)",
+            "score": 12,
+            "field_match": {
+              "field": "federal_funding_type",
+              "operator": "eq",
+              "value": "entitlement"
+            }
+          },
+          {
+            "id": "state_apportionment",
+            "label": "State apportionment",
+            "score": 7,
+            "field_match": {
+              "field": "federal_funding_type",
+              "operator": "eq",
+              "value": "state_apportionment"
+            }
+          },
+          {
+            "id": "no_federal",
+            "label": "State/local only",
+            "score": 4,
+            "field_match": {
+              "field": "federal_funding_type",
+              "operator": "eq",
+              "value": "no_federal"
+            }
+          }
+        ]
+      },
+      {
+        "id": "modernization",
+        "label": "Modernization / Capacity",
+        "description": "Capacity additions, modernization, sustainability upgrades.",
+        "max_points": 15,
+        "acrp_category": "level_of_service",
+        "scoring_style": "select_one",
+        "project_field": "purpose",
+        "subcategories": [
+          {
+            "id": "capacity",
+            "label": "Capacity addition",
+            "score": 15,
+            "field_match": {
+              "field": "purpose",
+              "operator": "eq",
+              "value": "capacity"
+            }
+          },
+          {
+            "id": "modernization",
+            "label": "Modernization / enhancement",
+            "score": 9,
+            "field_match": {
+              "field": "purpose",
+              "operator": "eq",
+              "value": "airport_enhancement"
+            }
+          },
+          {
+            "id": "planning",
+            "label": "Planning / study",
+            "score": 6,
+            "field_match": {
+              "field": "purpose",
+              "operator": "eq",
+              "value": "planning"
+            }
+          },
+          {
+            "id": "no_modernization",
+            "label": "None",
+            "score": 0
+          }
+        ]
+      },
+      {
+        "id": "system_plan_alignment",
+        "label": "Iowa Aviation System Plan Alignment",
+        "description": "Advances state system plan goals.",
+        "max_points": 10,
+        "acrp_category": "system_plan_alignment",
+        "scoring_style": "accumulating",
+        "subcategories": [
+          {
+            "id": "sasp_goal",
+            "label": "Advances state system plan goal",
+            "score": 6,
+            "field_match": {
+              "field": "system_plan_supported",
+              "operator": "eq",
+              "value": true
+            }
+          },
+          {
+            "id": "master_plan",
+            "label": "Consistent with current Master Plan / ALP",
+            "score": 4,
+            "field_match": {
+              "field": "master_plan_status",
+              "operator": "in",
+              "value": [
+                "updated_and_included",
+                "programmed_or_in_process"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "id": "compliance",
+        "label": "Compliance",
+        "description": "Maintains state airport license + FAA design standards compliance.",
+        "max_points": 5,
+        "acrp_category": "regulatory_mandate",
+        "scoring_style": "accumulating",
+        "subcategories": [
+          {
+            "id": "state_license",
+            "label": "Maintains state airport license",
+            "score": 3,
+            "field_match": {
+              "field": "licensing_status",
+              "operator": "eq",
+              "value": "compliant"
+            }
+          },
+          {
+            "id": "pavement_mgmt",
+            "label": "Active pavement management program",
+            "score": 2,
+            "field_match": {
+              "field": "pavement_management_program",
+              "operator": "eq",
+              "value": true
+            }
+          }
+        ]
+      }
+    ],
+    "governance": {
+      "decision_authority": "Iowa Department of Transportation, Aviation Bureau",
+      "decision_cadence": "annual",
+      "statute_required": true,
+      "scoring_authority": "Iowa Department of Transportation, Aviation Bureau",
+      "approval_process": "State aviation agency staff scores applications against published program structure; transportation commission or aeronautics commission approves annual program.",
+      "model_review_cycle_years": 5,
+      "statute_citation": "Iowa Code Chapter 328"
+    },
+    "disclaimer": "TEMPLATE-STYLE ENCODING. Iowa DOT publishes program structure but not numerical scoring rubric. The 6-criterion framework reflects documented Iowa Aviation Bureau priorities (safety, preservation, federal leverage). Iowa stakeholders should obtain the actual project-evaluation methodology from the Aviation Bureau before adoption."
+  },
+  "kansas": {
+    "schema_version": "1.0.0",
+    "metadata": {
+      "name": "Kansas Airport Improvement Program (KAIP)",
+      "state": "Kansas",
+      "agency": "Kansas Department of Transportation (KDOT); Kansas Aviation Division",
+      "model_version": "FY26 Guidelines (effective Jan 1, 2025)",
+      "last_updated": "2025-01-01",
+      "source_citation": "KAIP FY26 Guidelines (aviation.ks.gov/files/KAIP_FY26_Guidlines_EffJan1_2025.pdf). Three documented project categories: System Preservation, Modernization, Design/Planning. Local match 5-50% by category. ~$19M FY2026 ($53 projects).",
+      "decisions_log": [
+        {
+          "date": "2026-05-30",
+          "author": "APH m49 Sprint 11 reference encoder",
+          "decision": "Encoded Kansas with KAIP's 3 documented project categories as set-asides. Stated goal: 'maintain system runway condition rating of very good; minimize surface travel time to air ambulance pick-up; enhance airport/community economic development.'",
+          "rationale": "Template-style encoding using documented program structure and common state-aviation-funding scoring patterns.",
+          "source": "KAIP FY26 Guidelines (aviation.ks.gov/files/KAIP_FY26_Guidlines_EffJan1_2025.pdf). Three documented project categories: System Preservation, Modernization, Design/Planning. Local match 5-50% by category. ~$19M FY2026 ($53 projects)."
+        }
+      ]
+    },
+    "weighting_model": "additive_100pt",
+    "criteria": [
+      {
+        "id": "safety",
+        "label": "Safety",
+        "description": "Highest-priority category. RSA, obstruction removal, approach surfaces, signage, lighting safety upgrades.",
+        "max_points": 30,
+        "acrp_category": "safety_security",
+        "scoring_style": "select_one",
+        "project_field": "purpose",
+        "subcategories": [
+          {
+            "id": "safety_primary",
+            "label": "Primary safety purpose",
+            "score": 30,
+            "field_match": {
+              "field": "purpose",
+              "operator": "eq",
+              "value": "safety"
+            }
+          },
+          {
+            "id": "safety_secondary",
+            "label": "Secondary safety benefit",
+            "score": 15
+          },
+          {
+            "id": "no_safety",
+            "label": "Not safety-related",
+            "score": 0
+          }
+        ]
+      },
+      {
+        "id": "preservation",
+        "label": "System Preservation (KAIP category)",
+        "description": "Maintains existing infrastructure. Pavement rehab, lighting/NAVAID preservation, building maintenance.",
+        "max_points": 30,
+        "acrp_category": "asset_preservation",
+        "scoring_style": "select_one",
+        "project_field": "purpose",
+        "subcategories": [
+          {
+            "id": "pavement_rehab",
+            "label": "Pavement rehabilitation",
+            "score": 30,
+            "field_match": {
+              "field": "purpose",
+              "operator": "eq",
+              "value": "rehabilitation"
+            }
+          },
+          {
+            "id": "maintenance",
+            "label": "General maintenance",
+            "score": 21,
+            "field_match": {
+              "field": "purpose",
+              "operator": "eq",
+              "value": "maintenance"
+            }
+          },
+          {
+            "id": "reconstruction",
+            "label": "Reconstruction (failed assets)",
+            "score": 13,
+            "field_match": {
+              "field": "purpose",
+              "operator": "eq",
+              "value": "reconstruction"
+            }
+          },
+          {
+            "id": "no_preservation",
+            "label": "Not preservation-related",
+            "score": 0
+          }
+        ]
+      },
+      {
+        "id": "modernization",
+        "label": "Modernization / Capacity",
+        "description": "Capacity additions, modernization, sustainability upgrades.",
+        "max_points": 15,
+        "acrp_category": "level_of_service",
+        "scoring_style": "select_one",
+        "project_field": "purpose",
+        "subcategories": [
+          {
+            "id": "capacity",
+            "label": "Capacity addition",
+            "score": 15,
+            "field_match": {
+              "field": "purpose",
+              "operator": "eq",
+              "value": "capacity"
+            }
+          },
+          {
+            "id": "modernization",
+            "label": "Modernization / enhancement",
+            "score": 9,
+            "field_match": {
+              "field": "purpose",
+              "operator": "eq",
+              "value": "airport_enhancement"
+            }
+          },
+          {
+            "id": "planning",
+            "label": "Planning / study",
+            "score": 6,
+            "field_match": {
+              "field": "purpose",
+              "operator": "eq",
+              "value": "planning"
+            }
+          },
+          {
+            "id": "no_modernization",
+            "label": "None",
+            "score": 0
+          }
+        ]
+      },
+      {
+        "id": "federal_leverage",
+        "label": "Federal Funding Leverage",
+        "description": "Match for FAA AIP/BIL discretionary or entitlement grants.",
+        "max_points": 15,
+        "acrp_category": "revenue_cost",
+        "scoring_style": "select_one",
+        "project_field": "federal_funding_type",
+        "subcategories": [
+          {
+            "id": "federal_discretionary",
+            "label": "Federal discretionary / BIL",
+            "score": 15,
+            "field_match": {
+              "field": "federal_funding_type",
+              "operator": "eq",
+              "value": "discretionary"
+            }
+          },
+          {
+            "id": "federal_entitlement",
+            "label": "Federal entitlement (NPIAS)",
+            "score": 12,
+            "field_match": {
+              "field": "federal_funding_type",
+              "operator": "eq",
+              "value": "entitlement"
+            }
+          },
+          {
+            "id": "state_apportionment",
+            "label": "State apportionment",
+            "score": 7,
+            "field_match": {
+              "field": "federal_funding_type",
+              "operator": "eq",
+              "value": "state_apportionment"
+            }
+          },
+          {
+            "id": "no_federal",
+            "label": "State/local only",
+            "score": 4,
+            "field_match": {
+              "field": "federal_funding_type",
+              "operator": "eq",
+              "value": "no_federal"
+            }
+          }
+        ]
+      },
+      {
+        "id": "air_ambulance_access",
+        "label": "Air Ambulance Access Improvement",
+        "description": "KAIP stated goal: minimize surface travel time to air ambulance pick-up locations.",
+        "max_points": 5,
+        "acrp_category": "community_impact",
+        "scoring_style": "select_one",
+        "subcategories": [
+          {
+            "id": "ambulance_critical",
+            "label": "Critical to air ambulance access",
+            "score": 5
+          },
+          {
+            "id": "ambulance_secondary",
+            "label": "Secondary benefit",
+            "score": 2
+          },
+          {
+            "id": "no_ambulance",
+            "label": "No air ambulance benefit",
+            "score": 0
+          }
+        ]
+      },
+      {
+        "id": "system_plan_alignment",
+        "label": "Kansas Airport System Plan Alignment",
+        "description": "Advances state system plan goals.",
+        "max_points": 5,
+        "acrp_category": "system_plan_alignment",
+        "scoring_style": "accumulating",
+        "subcategories": [
+          {
+            "id": "sasp_goal",
+            "label": "Advances state system plan goal",
+            "score": 3,
+            "field_match": {
+              "field": "system_plan_supported",
+              "operator": "eq",
+              "value": true
+            }
+          },
+          {
+            "id": "master_plan",
+            "label": "Consistent with current Master Plan / ALP",
+            "score": 2,
+            "field_match": {
+              "field": "master_plan_status",
+              "operator": "in",
+              "value": [
+                "updated_and_included",
+                "programmed_or_in_process"
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "governance": {
+      "decision_authority": "Kansas Department of Transportation (KDOT); Kansas Aviation Division",
+      "decision_cadence": "annual",
+      "statute_required": false,
+      "scoring_authority": "Kansas Department of Transportation (KDOT); Kansas Aviation Division",
+      "approval_process": "State aviation agency staff scores applications against published program structure; transportation commission or aeronautics commission approves annual program.",
+      "model_review_cycle_years": 5
+    },
+    "disclaimer": "TEMPLATE-STYLE ENCODING per KAIP FY26 Guidelines. Kansas Aviation Division publishes program structure and 3 project categories (System Preservation, Modernization, Design/Planning) plus local-match ranges but does not publish a numerical scoring matrix. Kansas stakeholders should reference KDOT's annual program announcements for actual award rationale.",
+    "set_asides": [
+      {
+        "id": "system_preservation",
+        "label": "System Preservation Projects (KAIP)",
+        "allocation_pct": 60,
+        "eligibility_filter": "Maintenance, repair, and rehabilitation of existing facilities. Local match 5-10%."
+      },
+      {
+        "id": "modernization",
+        "label": "Modernization Projects (KAIP)",
+        "allocation_pct": 30,
+        "eligibility_filter": "Increase capacity, resolve line-of-sight problems, new facilities. Local match 25-50%."
+      },
+      {
+        "id": "design_planning",
+        "label": "Design / Planning Projects (KAIP)",
+        "allocation_pct": 10,
+        "eligibility_filter": "Evaluate and establish priorities for the airport's continued use."
+      }
+    ]
+  },
   "louisiana": {
     "schema_version": "1.0.0",
     "metadata": {
@@ -3410,6 +4645,276 @@
       "approval_process": "Two-step process: (1) eligibility determination, (2) confirmation of required information. Programmed projects shall be included within the Airport Construction and Development Priority Program. Funding flows through total approved calculated amounts for each airport and category. Subject to legislative approval; airport sponsors review draft program before legislative submission."
     },
     "disclaimer": "This model encoding is derived from the Louisiana Aviation Program Policy Manual (July 2024) and references LA Adm Code Title 70 Part IX. Specific point allocations within each category are placeholder tiers; states adopting this model should replace with their statute's exact values. The ACE Program 21.622% allocation reflects FY2025-2026 percentages and changes annually."
+  },
+  "michigan": {
+    "schema_version": "1.0.0",
+    "metadata": {
+      "name": "Michigan Airport Improvement Program",
+      "state": "Michigan",
+      "agency": "Michigan Department of Transportation (MDOT), Office of Aeronautics",
+      "model_version": "Current",
+      "last_updated": "2025-01-01",
+      "source_citation": "MDOT Office of Aeronautics public guidance. Michigan operates a state aviation fund supporting AIP-style grants for the state airport system. Detailed scoring rubric not publicly published.",
+      "decisions_log": [
+        {
+          "date": "2026-05-30",
+          "author": "APH m49 Sprint 11 reference encoder",
+          "decision": "Encoded Michigan as 6-criterion additive_100pt model using common Great-Lakes-state aviation funding patterns.",
+          "rationale": "Template-style encoding using documented program structure and common state-aviation-funding scoring patterns.",
+          "source": "MDOT Office of Aeronautics public guidance. Michigan operates a state aviation fund supporting AIP-style grants for the state airport system. Detailed scoring rubric not publicly published."
+        }
+      ]
+    },
+    "weighting_model": "additive_100pt",
+    "criteria": [
+      {
+        "id": "safety",
+        "label": "Safety",
+        "description": "Highest-priority category. RSA, obstruction removal, approach surfaces, signage, lighting safety upgrades.",
+        "max_points": 30,
+        "acrp_category": "safety_security",
+        "scoring_style": "select_one",
+        "project_field": "purpose",
+        "subcategories": [
+          {
+            "id": "safety_primary",
+            "label": "Primary safety purpose",
+            "score": 30,
+            "field_match": {
+              "field": "purpose",
+              "operator": "eq",
+              "value": "safety"
+            }
+          },
+          {
+            "id": "safety_secondary",
+            "label": "Secondary safety benefit",
+            "score": 15
+          },
+          {
+            "id": "no_safety",
+            "label": "Not safety-related",
+            "score": 0
+          }
+        ]
+      },
+      {
+        "id": "preservation",
+        "label": "Asset Preservation",
+        "description": "Maintains existing infrastructure. Pavement rehab, lighting/NAVAID preservation, building maintenance.",
+        "max_points": 25,
+        "acrp_category": "asset_preservation",
+        "scoring_style": "select_one",
+        "project_field": "purpose",
+        "subcategories": [
+          {
+            "id": "pavement_rehab",
+            "label": "Pavement rehabilitation",
+            "score": 25,
+            "field_match": {
+              "field": "purpose",
+              "operator": "eq",
+              "value": "rehabilitation"
+            }
+          },
+          {
+            "id": "maintenance",
+            "label": "General maintenance",
+            "score": 17,
+            "field_match": {
+              "field": "purpose",
+              "operator": "eq",
+              "value": "maintenance"
+            }
+          },
+          {
+            "id": "reconstruction",
+            "label": "Reconstruction (failed assets)",
+            "score": 11,
+            "field_match": {
+              "field": "purpose",
+              "operator": "eq",
+              "value": "reconstruction"
+            }
+          },
+          {
+            "id": "no_preservation",
+            "label": "Not preservation-related",
+            "score": 0
+          }
+        ]
+      },
+      {
+        "id": "federal_leverage",
+        "label": "Federal Funding Leverage",
+        "description": "Match for FAA AIP/BIL discretionary or entitlement grants.",
+        "max_points": 15,
+        "acrp_category": "revenue_cost",
+        "scoring_style": "select_one",
+        "project_field": "federal_funding_type",
+        "subcategories": [
+          {
+            "id": "federal_discretionary",
+            "label": "Federal discretionary / BIL",
+            "score": 15,
+            "field_match": {
+              "field": "federal_funding_type",
+              "operator": "eq",
+              "value": "discretionary"
+            }
+          },
+          {
+            "id": "federal_entitlement",
+            "label": "Federal entitlement (NPIAS)",
+            "score": 12,
+            "field_match": {
+              "field": "federal_funding_type",
+              "operator": "eq",
+              "value": "entitlement"
+            }
+          },
+          {
+            "id": "state_apportionment",
+            "label": "State apportionment",
+            "score": 7,
+            "field_match": {
+              "field": "federal_funding_type",
+              "operator": "eq",
+              "value": "state_apportionment"
+            }
+          },
+          {
+            "id": "no_federal",
+            "label": "State/local only",
+            "score": 4,
+            "field_match": {
+              "field": "federal_funding_type",
+              "operator": "eq",
+              "value": "no_federal"
+            }
+          }
+        ]
+      },
+      {
+        "id": "modernization",
+        "label": "Modernization / Capacity",
+        "description": "Capacity additions, modernization, sustainability upgrades.",
+        "max_points": 15,
+        "acrp_category": "level_of_service",
+        "scoring_style": "select_one",
+        "project_field": "purpose",
+        "subcategories": [
+          {
+            "id": "capacity",
+            "label": "Capacity addition",
+            "score": 15,
+            "field_match": {
+              "field": "purpose",
+              "operator": "eq",
+              "value": "capacity"
+            }
+          },
+          {
+            "id": "modernization",
+            "label": "Modernization / enhancement",
+            "score": 9,
+            "field_match": {
+              "field": "purpose",
+              "operator": "eq",
+              "value": "airport_enhancement"
+            }
+          },
+          {
+            "id": "planning",
+            "label": "Planning / study",
+            "score": 6,
+            "field_match": {
+              "field": "purpose",
+              "operator": "eq",
+              "value": "planning"
+            }
+          },
+          {
+            "id": "no_modernization",
+            "label": "None",
+            "score": 0
+          }
+        ]
+      },
+      {
+        "id": "system_plan_alignment",
+        "label": "Michigan Aviation System Plan Alignment",
+        "description": "Advances state system plan goals.",
+        "max_points": 10,
+        "acrp_category": "system_plan_alignment",
+        "scoring_style": "accumulating",
+        "subcategories": [
+          {
+            "id": "sasp_goal",
+            "label": "Advances state system plan goal",
+            "score": 6,
+            "field_match": {
+              "field": "system_plan_supported",
+              "operator": "eq",
+              "value": true
+            }
+          },
+          {
+            "id": "master_plan",
+            "label": "Consistent with current Master Plan / ALP",
+            "score": 4,
+            "field_match": {
+              "field": "master_plan_status",
+              "operator": "in",
+              "value": [
+                "updated_and_included",
+                "programmed_or_in_process"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "id": "compliance",
+        "label": "Compliance",
+        "description": "Maintains state airport license + FAA design standards compliance.",
+        "max_points": 5,
+        "acrp_category": "regulatory_mandate",
+        "scoring_style": "accumulating",
+        "subcategories": [
+          {
+            "id": "state_license",
+            "label": "Maintains state airport license",
+            "score": 3,
+            "field_match": {
+              "field": "licensing_status",
+              "operator": "eq",
+              "value": "compliant"
+            }
+          },
+          {
+            "id": "pavement_mgmt",
+            "label": "Active pavement management program",
+            "score": 2,
+            "field_match": {
+              "field": "pavement_management_program",
+              "operator": "eq",
+              "value": true
+            }
+          }
+        ]
+      }
+    ],
+    "governance": {
+      "decision_authority": "Michigan Department of Transportation (MDOT), Office of Aeronautics",
+      "decision_cadence": "annual",
+      "statute_required": true,
+      "scoring_authority": "Michigan Department of Transportation (MDOT), Office of Aeronautics",
+      "approval_process": "State aviation agency staff scores applications against published program structure; transportation commission or aeronautics commission approves annual program.",
+      "model_review_cycle_years": 5,
+      "statute_citation": "Michigan Aeronautics Code (Act 327 of 1945)"
+    },
+    "disclaimer": "TEMPLATE-STYLE ENCODING. MDOT Office of Aeronautics publishes program goals but not numerical scoring rubric. Michigan stakeholders should consult MDOT directly for actual project scoring methodology."
   },
   "mndot": {
     "schema_version": "1.0.0",
@@ -4474,6 +5979,292 @@
       "model_review_cycle_years": 5
     },
     "disclaimer": "Encoding mirrors ACRP Synthesis 123 (2023) summary of NDAC's 11-criterion dual objective/subjective process. ACRP does not publish NDAC's exact per-criterion point allocations; point values are inferred from documented relative priorities (safety high; preservation high; federal leverage high; revenue-producing low at the objective layer, with subjective layer recovering them). Verify against NDAC's internal scoring matrix before adoption."
+  },
+  "ohio": {
+    "schema_version": "1.0.0",
+    "metadata": {
+      "name": "Ohio Airport Improvement Program (OASIP)",
+      "state": "Ohio",
+      "agency": "Ohio Department of Transportation (ODOT), Office of Aviation",
+      "model_version": "Current (Direct Grant + Matching Grant + Supplemental Direct Grant)",
+      "last_updated": "2025-01-01",
+      "source_citation": "ODOT Office of Aviation grants documentation (transportation.ohio.gov/programs/aviation). Application procedure describes 'uniform and objective program for application with statewide selection criteria' for OASIP. Three grant categories: Direct, Matching (commercial service), Supplemental Direct.",
+      "decisions_log": [
+        {
+          "date": "2026-05-30",
+          "author": "APH m49 Sprint 11 reference encoder",
+          "decision": "Encoded Ohio with template-style framework matching ODOT Office of Aviation's three grant programs. Direct Grant for general aviation, Matching Grant for commercial service, Supplemental Direct for non-routine needs.",
+          "rationale": "Template-style encoding using documented program structure and common state-aviation-funding scoring patterns.",
+          "source": "ODOT Office of Aviation grants documentation (transportation.ohio.gov/programs/aviation). Application procedure describes 'uniform and objective program for application with statewide selection criteria' for OASIP. Three grant categories: Direct, Matching (commercial service), Supplemental Direct."
+        }
+      ]
+    },
+    "weighting_model": "additive_100pt",
+    "criteria": [
+      {
+        "id": "safety",
+        "label": "Safety",
+        "description": "Highest-priority category. RSA, obstruction removal, approach surfaces, signage, lighting safety upgrades.",
+        "max_points": 30,
+        "acrp_category": "safety_security",
+        "scoring_style": "select_one",
+        "project_field": "purpose",
+        "subcategories": [
+          {
+            "id": "safety_primary",
+            "label": "Primary safety purpose",
+            "score": 30,
+            "field_match": {
+              "field": "purpose",
+              "operator": "eq",
+              "value": "safety"
+            }
+          },
+          {
+            "id": "safety_secondary",
+            "label": "Secondary safety benefit",
+            "score": 15
+          },
+          {
+            "id": "no_safety",
+            "label": "Not safety-related",
+            "score": 0
+          }
+        ]
+      },
+      {
+        "id": "preservation",
+        "label": "Asset Preservation",
+        "description": "Maintains existing infrastructure. Pavement rehab, lighting/NAVAID preservation, building maintenance.",
+        "max_points": 25,
+        "acrp_category": "asset_preservation",
+        "scoring_style": "select_one",
+        "project_field": "purpose",
+        "subcategories": [
+          {
+            "id": "pavement_rehab",
+            "label": "Pavement rehabilitation",
+            "score": 25,
+            "field_match": {
+              "field": "purpose",
+              "operator": "eq",
+              "value": "rehabilitation"
+            }
+          },
+          {
+            "id": "maintenance",
+            "label": "General maintenance",
+            "score": 17,
+            "field_match": {
+              "field": "purpose",
+              "operator": "eq",
+              "value": "maintenance"
+            }
+          },
+          {
+            "id": "reconstruction",
+            "label": "Reconstruction (failed assets)",
+            "score": 11,
+            "field_match": {
+              "field": "purpose",
+              "operator": "eq",
+              "value": "reconstruction"
+            }
+          },
+          {
+            "id": "no_preservation",
+            "label": "Not preservation-related",
+            "score": 0
+          }
+        ]
+      },
+      {
+        "id": "federal_leverage",
+        "label": "Federal Funding Leverage",
+        "description": "Match for FAA AIP/BIL discretionary or entitlement grants.",
+        "max_points": 15,
+        "acrp_category": "revenue_cost",
+        "scoring_style": "select_one",
+        "project_field": "federal_funding_type",
+        "subcategories": [
+          {
+            "id": "federal_discretionary",
+            "label": "Federal discretionary / BIL",
+            "score": 15,
+            "field_match": {
+              "field": "federal_funding_type",
+              "operator": "eq",
+              "value": "discretionary"
+            }
+          },
+          {
+            "id": "federal_entitlement",
+            "label": "Federal entitlement (NPIAS)",
+            "score": 12,
+            "field_match": {
+              "field": "federal_funding_type",
+              "operator": "eq",
+              "value": "entitlement"
+            }
+          },
+          {
+            "id": "state_apportionment",
+            "label": "State apportionment",
+            "score": 7,
+            "field_match": {
+              "field": "federal_funding_type",
+              "operator": "eq",
+              "value": "state_apportionment"
+            }
+          },
+          {
+            "id": "no_federal",
+            "label": "State/local only",
+            "score": 4,
+            "field_match": {
+              "field": "federal_funding_type",
+              "operator": "eq",
+              "value": "no_federal"
+            }
+          }
+        ]
+      },
+      {
+        "id": "modernization",
+        "label": "Modernization / Capacity",
+        "description": "Capacity additions, modernization, sustainability upgrades.",
+        "max_points": 15,
+        "acrp_category": "level_of_service",
+        "scoring_style": "select_one",
+        "project_field": "purpose",
+        "subcategories": [
+          {
+            "id": "capacity",
+            "label": "Capacity addition",
+            "score": 15,
+            "field_match": {
+              "field": "purpose",
+              "operator": "eq",
+              "value": "capacity"
+            }
+          },
+          {
+            "id": "modernization",
+            "label": "Modernization / enhancement",
+            "score": 9,
+            "field_match": {
+              "field": "purpose",
+              "operator": "eq",
+              "value": "airport_enhancement"
+            }
+          },
+          {
+            "id": "planning",
+            "label": "Planning / study",
+            "score": 6,
+            "field_match": {
+              "field": "purpose",
+              "operator": "eq",
+              "value": "planning"
+            }
+          },
+          {
+            "id": "no_modernization",
+            "label": "None",
+            "score": 0
+          }
+        ]
+      },
+      {
+        "id": "system_plan_alignment",
+        "label": "Ohio Airport System Plan Alignment",
+        "description": "Advances state system plan goals.",
+        "max_points": 10,
+        "acrp_category": "system_plan_alignment",
+        "scoring_style": "accumulating",
+        "subcategories": [
+          {
+            "id": "sasp_goal",
+            "label": "Advances state system plan goal",
+            "score": 6,
+            "field_match": {
+              "field": "system_plan_supported",
+              "operator": "eq",
+              "value": true
+            }
+          },
+          {
+            "id": "master_plan",
+            "label": "Consistent with current Master Plan / ALP",
+            "score": 4,
+            "field_match": {
+              "field": "master_plan_status",
+              "operator": "in",
+              "value": [
+                "updated_and_included",
+                "programmed_or_in_process"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "id": "compliance",
+        "label": "Compliance",
+        "description": "Maintains state airport license + FAA design standards compliance.",
+        "max_points": 5,
+        "acrp_category": "regulatory_mandate",
+        "scoring_style": "accumulating",
+        "subcategories": [
+          {
+            "id": "state_license",
+            "label": "Maintains state airport license",
+            "score": 3,
+            "field_match": {
+              "field": "licensing_status",
+              "operator": "eq",
+              "value": "compliant"
+            }
+          },
+          {
+            "id": "pavement_mgmt",
+            "label": "Active pavement management program",
+            "score": 2,
+            "field_match": {
+              "field": "pavement_management_program",
+              "operator": "eq",
+              "value": true
+            }
+          }
+        ]
+      }
+    ],
+    "governance": {
+      "decision_authority": "Ohio Department of Transportation (ODOT), Office of Aviation",
+      "decision_cadence": "annual",
+      "statute_required": false,
+      "scoring_authority": "Ohio Department of Transportation (ODOT), Office of Aviation",
+      "approval_process": "State aviation agency staff scores applications against published program structure; transportation commission or aeronautics commission approves annual program.",
+      "model_review_cycle_years": 5
+    },
+    "disclaimer": "TEMPLATE-STYLE ENCODING. ODOT publishes grant application procedures and three grant categories but does not publish a numerical scoring rubric. The 6-criterion framework reflects documented program goals. Ohio stakeholders should consult the Office of Aviation (2829 W. Dublin-Granville Rd, Columbus) for actual award criteria.",
+    "set_asides": [
+      {
+        "id": "direct_grant",
+        "label": "Direct Grant (General Aviation)",
+        "allocation_pct": 60
+      },
+      {
+        "id": "matching_grant_cs",
+        "label": "Matching Grant (Commercial Service)",
+        "allocation_pct": 30
+      },
+      {
+        "id": "supplemental_direct",
+        "label": "Supplemental Direct Grant",
+        "allocation_pct": 10
+      }
+    ]
   },
   "oregon": {
     "schema_version": "1.0.0",
@@ -5566,6 +7357,275 @@
       "model_review_cycle_years": 1
     },
     "disclaimer": "Encoded from TxDOT ACIP 2026-2028 Executive Summary. The 5 project categories and their priority order are documented; specific numerical scoring is internal to the Aviation Division. Point values are inferred to preserve the documented priority ordering. Texas stakeholders should calibrate to TxDOT internal scoring before adoption."
+  },
+  "utah": {
+    "schema_version": "1.0.0",
+    "metadata": {
+      "name": "Utah State Aviation Program",
+      "state": "Utah",
+      "agency": "Utah Department of Transportation (UDOT), Aeronautics Division",
+      "model_version": "Current",
+      "last_updated": "2025-01-01",
+      "source_citation": "UDOT Aeronautics public program description. Utah supports state aviation funding via fuel-tax-funded Aeronautics Fund administered by UDOT Aeronautics Division.",
+      "decisions_log": [
+        {
+          "date": "2026-05-30",
+          "author": "APH m49 Sprint 11 reference encoder",
+          "decision": "Encoded Utah as 6-criterion model reflecting documented Aeronautics Division priorities. Utah's mountain-state airport network shares characteristics with Wyoming/Colorado/Idaho models.",
+          "rationale": "Template-style encoding using documented program structure and common state-aviation-funding scoring patterns.",
+          "source": "UDOT Aeronautics public program description. Utah supports state aviation funding via fuel-tax-funded Aeronautics Fund administered by UDOT Aeronautics Division."
+        }
+      ]
+    },
+    "weighting_model": "additive_100pt",
+    "criteria": [
+      {
+        "id": "safety",
+        "label": "Safety",
+        "description": "Highest-priority category. RSA, obstruction removal, approach surfaces, signage, lighting safety upgrades.",
+        "max_points": 30,
+        "acrp_category": "safety_security",
+        "scoring_style": "select_one",
+        "project_field": "purpose",
+        "subcategories": [
+          {
+            "id": "safety_primary",
+            "label": "Primary safety purpose",
+            "score": 30,
+            "field_match": {
+              "field": "purpose",
+              "operator": "eq",
+              "value": "safety"
+            }
+          },
+          {
+            "id": "safety_secondary",
+            "label": "Secondary safety benefit",
+            "score": 15
+          },
+          {
+            "id": "no_safety",
+            "label": "Not safety-related",
+            "score": 0
+          }
+        ]
+      },
+      {
+        "id": "preservation",
+        "label": "Asset Preservation",
+        "description": "Maintains existing infrastructure. Pavement rehab, lighting/NAVAID preservation, building maintenance.",
+        "max_points": 25,
+        "acrp_category": "asset_preservation",
+        "scoring_style": "select_one",
+        "project_field": "purpose",
+        "subcategories": [
+          {
+            "id": "pavement_rehab",
+            "label": "Pavement rehabilitation",
+            "score": 25,
+            "field_match": {
+              "field": "purpose",
+              "operator": "eq",
+              "value": "rehabilitation"
+            }
+          },
+          {
+            "id": "maintenance",
+            "label": "General maintenance",
+            "score": 17,
+            "field_match": {
+              "field": "purpose",
+              "operator": "eq",
+              "value": "maintenance"
+            }
+          },
+          {
+            "id": "reconstruction",
+            "label": "Reconstruction (failed assets)",
+            "score": 11,
+            "field_match": {
+              "field": "purpose",
+              "operator": "eq",
+              "value": "reconstruction"
+            }
+          },
+          {
+            "id": "no_preservation",
+            "label": "Not preservation-related",
+            "score": 0
+          }
+        ]
+      },
+      {
+        "id": "federal_leverage",
+        "label": "Federal Funding Leverage",
+        "description": "Match for FAA AIP/BIL discretionary or entitlement grants.",
+        "max_points": 15,
+        "acrp_category": "revenue_cost",
+        "scoring_style": "select_one",
+        "project_field": "federal_funding_type",
+        "subcategories": [
+          {
+            "id": "federal_discretionary",
+            "label": "Federal discretionary / BIL",
+            "score": 15,
+            "field_match": {
+              "field": "federal_funding_type",
+              "operator": "eq",
+              "value": "discretionary"
+            }
+          },
+          {
+            "id": "federal_entitlement",
+            "label": "Federal entitlement (NPIAS)",
+            "score": 12,
+            "field_match": {
+              "field": "federal_funding_type",
+              "operator": "eq",
+              "value": "entitlement"
+            }
+          },
+          {
+            "id": "state_apportionment",
+            "label": "State apportionment",
+            "score": 7,
+            "field_match": {
+              "field": "federal_funding_type",
+              "operator": "eq",
+              "value": "state_apportionment"
+            }
+          },
+          {
+            "id": "no_federal",
+            "label": "State/local only",
+            "score": 4,
+            "field_match": {
+              "field": "federal_funding_type",
+              "operator": "eq",
+              "value": "no_federal"
+            }
+          }
+        ]
+      },
+      {
+        "id": "modernization",
+        "label": "Modernization / Capacity",
+        "description": "Capacity additions, modernization, sustainability upgrades.",
+        "max_points": 15,
+        "acrp_category": "level_of_service",
+        "scoring_style": "select_one",
+        "project_field": "purpose",
+        "subcategories": [
+          {
+            "id": "capacity",
+            "label": "Capacity addition",
+            "score": 15,
+            "field_match": {
+              "field": "purpose",
+              "operator": "eq",
+              "value": "capacity"
+            }
+          },
+          {
+            "id": "modernization",
+            "label": "Modernization / enhancement",
+            "score": 9,
+            "field_match": {
+              "field": "purpose",
+              "operator": "eq",
+              "value": "airport_enhancement"
+            }
+          },
+          {
+            "id": "planning",
+            "label": "Planning / study",
+            "score": 6,
+            "field_match": {
+              "field": "purpose",
+              "operator": "eq",
+              "value": "planning"
+            }
+          },
+          {
+            "id": "no_modernization",
+            "label": "None",
+            "score": 0
+          }
+        ]
+      },
+      {
+        "id": "system_plan_alignment",
+        "label": "Utah Continuous Airport System Plan Alignment",
+        "description": "Advances state system plan goals.",
+        "max_points": 10,
+        "acrp_category": "system_plan_alignment",
+        "scoring_style": "accumulating",
+        "subcategories": [
+          {
+            "id": "sasp_goal",
+            "label": "Advances state system plan goal",
+            "score": 6,
+            "field_match": {
+              "field": "system_plan_supported",
+              "operator": "eq",
+              "value": true
+            }
+          },
+          {
+            "id": "master_plan",
+            "label": "Consistent with current Master Plan / ALP",
+            "score": 4,
+            "field_match": {
+              "field": "master_plan_status",
+              "operator": "in",
+              "value": [
+                "updated_and_included",
+                "programmed_or_in_process"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "id": "compliance",
+        "label": "Compliance",
+        "description": "Maintains state airport license + FAA design standards compliance.",
+        "max_points": 5,
+        "acrp_category": "regulatory_mandate",
+        "scoring_style": "accumulating",
+        "subcategories": [
+          {
+            "id": "state_license",
+            "label": "Maintains state airport license",
+            "score": 3,
+            "field_match": {
+              "field": "licensing_status",
+              "operator": "eq",
+              "value": "compliant"
+            }
+          },
+          {
+            "id": "pavement_mgmt",
+            "label": "Active pavement management program",
+            "score": 2,
+            "field_match": {
+              "field": "pavement_management_program",
+              "operator": "eq",
+              "value": true
+            }
+          }
+        ]
+      }
+    ],
+    "governance": {
+      "decision_authority": "Utah Department of Transportation (UDOT), Aeronautics Division",
+      "decision_cadence": "annual",
+      "statute_required": false,
+      "scoring_authority": "Utah Department of Transportation (UDOT), Aeronautics Division",
+      "approval_process": "State aviation agency staff scores applications against published program structure; transportation commission or aeronautics commission approves annual program.",
+      "model_review_cycle_years": 5
+    },
+    "disclaimer": "TEMPLATE-STYLE ENCODING. UDOT Aeronautics Division publishes program goals but not numerical scoring rubric. Utah stakeholders should consult UDOT directly for actual project scoring methodology."
   },
   "virginia": {
     "schema_version": "1.0.0",
@@ -8147,7 +10207,14 @@
       texas: "TxDOT ACIP 2026-2028",
       new_york: "NYSDOT AIR NY NOFA",
       colorado: "CDAG (WIMS, template)",
-      pennsylvania: "PennDOT BOA (template)"
+      pennsylvania: "PennDOT BOA (template)",
+      iowa: "Iowa DOT Aviation (template)",
+      kansas: "KAIP FY26 Guidelines",
+      ohio: "ODOT OASIP (template)",
+      michigan: "MDOT Aeronautics (template)",
+      utah: "UDOT Aeronautics (template)",
+      florida: "FDOT Aviation + hurricane",
+      georgia: "GDOT Aviation (template)"
     };
 
     // Group keys by source-quality cohort to keep parity with the action-bar dropdown
@@ -8155,6 +10222,7 @@
       { title: "Primary-source (verbatim from agency PDF)", keys: ["wyoming","mndot","aldot","louisiana","arizona"] },
       { title: "ACRP Synthesis 123 case examples (2023)", keys: ["idaho","illinois","virginia","washington","north_dakota"] },
       { title: "Public-doc encodings (state DOT websites)", keys: ["oregon","tennessee","california","texas","new_york","colorado","pennsylvania"] },
+      { title: "Template encodings (program structure only)", keys: ["iowa","kansas","ohio","michigan","utah","florida","georgia"] },
     ];
 
     function buildRow(k) {
@@ -8221,6 +10289,23 @@
   // ── Compare Models view ─────────────────────────────────────────
   let _compareSelected = [];
 
+  window.openQuickstart = function () {
+    document.getElementById("quickstartOverlay").style.display = "flex";
+  };
+  window.closeQuickstart = function () {
+    document.getElementById("quickstartOverlay").style.display = "none";
+    try { localStorage.setItem("aph_pm_quickstart_seen", "1"); } catch (e) {}
+  };
+
+  // Auto-open quickstart on first visit (no localStorage flag yet)
+  setTimeout(function () {
+    try {
+      if (!localStorage.getItem("aph_pm_quickstart_seen")) {
+        openQuickstart();
+      }
+    } catch (e) {}
+  }, 800);
+
   window.openCompareModels = function () {
     _compareSelected = [];
     renderComparePicker();
@@ -8242,6 +10327,7 @@
       { title: "Primary-source (verbatim)", keys: ["wyoming","mndot","aldot","louisiana","arizona"] },
       { title: "ACRP Syn 123 case examples", keys: ["idaho","illinois","virginia","washington","north_dakota"] },
       { title: "Public-doc encodings", keys: ["oregon","tennessee","california","texas","new_york","colorado","pennsylvania"] },
+      { title: "Template encodings", keys: ["iowa","kansas","ohio","michigan","utah","florida","georgia"] },
     ];
 
     function buildBtn(k) {
@@ -8426,6 +10512,10 @@
   window.exportPolicyLouisiana = function () {
     if (!window.PM_Generators) { alert("Generators not loaded yet."); return; }
     window.PM_Generators.generateLouisianaPolicyManual(activeConfig);
+  };
+  window.exportAdoptionPackage = function () {
+    if (!window.PM_Generators) { alert("Generators not loaded yet."); return; }
+    window.PM_Generators.generateAdoptionPackage(activeConfig, window.PM_SAMPLE_PROJECTS || [], window.PriorityEngine);
   };
 
   // ── Helpers ──────────────────────────────────────────────────────
