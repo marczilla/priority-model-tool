@@ -48,13 +48,13 @@ function assert(cond, msg) { if (!cond) throw new Error(msg); }
 
 test("embedded data extractable from HTML", () => {
   const { configs, projects } = extractEmbedded();
-  assert(Object.keys(configs).length === 24, "expected 24 reference configs");
+  assert(Object.keys(configs).length === 29, "expected 29 reference configs");
   assert(projects.length === 25, "expected 25 sample projects");
   assert(configs.wyoming && configs.mndot && configs.aldot && configs.louisiana,
          "all four reference configs should be present");
 });
 
-test("all 24 configs score all 25 projects without error", () => {
+test("all 29 configs score all 25 projects without error", () => {
   const { configs, projects } = extractEmbedded();
   for (const [name, cfg] of Object.entries(configs)) {
     const m = new Engine.PriorityModel(cfg);

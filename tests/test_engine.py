@@ -40,7 +40,7 @@ def _assert(cond, msg):
 def test_all_configs_score_all_projects():
     """Every reference config produces a score for every sample project (eligible or not)."""
     projects = load_projects(PROJECTS)
-    for cfg in ("wyoming.json", "mndot.json", "aldot.json", "louisiana.json", "idaho.json", "illinois.json", "virginia.json", "washington.json", "north_dakota.json", "arizona.json", "oregon.json", "tennessee.json", "california.json", "texas.json", "new_york.json", "colorado.json", "pennsylvania.json", "iowa.json", "kansas.json", "ohio.json", "michigan.json", "utah.json", "florida.json", "georgia.json"):
+    for cfg in ("wyoming.json", "mndot.json", "aldot.json", "louisiana.json", "idaho.json", "illinois.json", "virginia.json", "washington.json", "north_dakota.json", "arizona.json", "oregon.json", "tennessee.json", "california.json", "texas.json", "new_york.json", "colorado.json", "pennsylvania.json", "iowa.json", "kansas.json", "ohio.json", "michigan.json", "utah.json", "florida.json", "georgia.json", "missouri.json", "oklahoma.json", "wisconsin.json", "south_carolina.json", "maryland.json"):
         m = PriorityModel.from_file(CONFIGS / cfg)
         result = m.rank(projects)
         total = len(result.scored) + len(result.excluded)
@@ -77,7 +77,7 @@ def test_louisiana_excludes_non_npias():
 def test_audit_trail_complete():
     """Every project in every model must have an audit trail covering every criterion."""
     projects = load_projects(PROJECTS)
-    for cfg in ("wyoming.json", "mndot.json", "aldot.json", "louisiana.json", "idaho.json", "illinois.json", "virginia.json", "washington.json", "north_dakota.json", "arizona.json", "oregon.json", "tennessee.json", "california.json", "texas.json", "new_york.json", "colorado.json", "pennsylvania.json", "iowa.json", "kansas.json", "ohio.json", "michigan.json", "utah.json", "florida.json", "georgia.json"):
+    for cfg in ("wyoming.json", "mndot.json", "aldot.json", "louisiana.json", "idaho.json", "illinois.json", "virginia.json", "washington.json", "north_dakota.json", "arizona.json", "oregon.json", "tennessee.json", "california.json", "texas.json", "new_york.json", "colorado.json", "pennsylvania.json", "iowa.json", "kansas.json", "ohio.json", "michigan.json", "utah.json", "florida.json", "georgia.json", "missouri.json", "oklahoma.json", "wisconsin.json", "south_carolina.json", "maryland.json"):
         m = PriorityModel.from_file(CONFIGS / cfg)
         result = m.rank(projects)
         for p in result.scored:
@@ -100,7 +100,7 @@ def test_deterministic():
 def test_score_contributions_sum_to_base():
     """For non-formula models, sum of weighted contributions should equal base_score."""
     projects = load_projects(PROJECTS)
-    for cfg in ("wyoming.json", "mndot.json", "aldot.json", "louisiana.json", "idaho.json", "illinois.json", "virginia.json", "washington.json", "north_dakota.json", "arizona.json", "oregon.json", "tennessee.json", "california.json", "texas.json", "new_york.json", "colorado.json", "pennsylvania.json", "iowa.json", "kansas.json", "ohio.json", "michigan.json", "utah.json", "florida.json", "georgia.json"):
+    for cfg in ("wyoming.json", "mndot.json", "aldot.json", "louisiana.json", "idaho.json", "illinois.json", "virginia.json", "washington.json", "north_dakota.json", "arizona.json", "oregon.json", "tennessee.json", "california.json", "texas.json", "new_york.json", "colorado.json", "pennsylvania.json", "iowa.json", "kansas.json", "ohio.json", "michigan.json", "utah.json", "florida.json", "georgia.json", "missouri.json", "oklahoma.json", "wisconsin.json", "south_carolina.json", "maryland.json"):
         m = PriorityModel.from_file(CONFIGS / cfg)
         if m.weighting_model == "formula":
             continue
