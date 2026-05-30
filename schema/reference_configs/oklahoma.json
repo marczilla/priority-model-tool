@@ -1,0 +1,270 @@
+{
+  "schema_version": "1.0.0",
+  "metadata": {
+    "name": "Oklahoma Aeronautics Commission Capital Improvement Program",
+    "state": "Oklahoma",
+    "agency": "Oklahoma Aeronautics Commission (OAC)",
+    "model_version": "Current",
+    "last_updated": "2025-01-01",
+    "source_citation": "OAC public program description (oac.ok.gov). Oklahoma Aeronautics Commission is an independent state agency funding aviation through fuel-tax and gross production-tax revenue.",
+    "decisions_log": [
+      {
+        "date": "2026-05-30",
+        "author": "APH m49 Sprint 12 reference encoder",
+        "decision": "Encoded Oklahoma as 6-criterion additive_100pt template. Oklahoma's standalone aeronautics commission (rather than DOT division) gives it more direct programming authority.",
+        "rationale": "Template-style encoding using documented program structure.",
+        "source": "OAC public program description (oac.ok.gov). Oklahoma Aeronautics Commission is an independent state agency funding aviation through fuel-tax and gross production-tax revenue."
+      }
+    ]
+  },
+  "weighting_model": "additive_100pt",
+  "criteria": [
+    {
+      "id": "safety",
+      "label": "Safety",
+      "description": "Highest-priority category.",
+      "max_points": 30,
+      "acrp_category": "safety_security",
+      "scoring_style": "select_one",
+      "project_field": "purpose",
+      "subcategories": [
+        {
+          "id": "safety_primary",
+          "label": "Primary safety purpose",
+          "score": 30,
+          "field_match": {
+            "field": "purpose",
+            "operator": "eq",
+            "value": "safety"
+          }
+        },
+        {
+          "id": "safety_secondary",
+          "label": "Secondary safety benefit",
+          "score": 15
+        },
+        {
+          "id": "no_safety",
+          "label": "Not safety-related",
+          "score": 0
+        }
+      ]
+    },
+    {
+      "id": "preservation",
+      "label": "Asset Preservation",
+      "description": "Maintains existing infrastructure.",
+      "max_points": 25,
+      "acrp_category": "asset_preservation",
+      "scoring_style": "select_one",
+      "project_field": "purpose",
+      "subcategories": [
+        {
+          "id": "pavement_rehab",
+          "label": "Pavement rehabilitation",
+          "score": 25,
+          "field_match": {
+            "field": "purpose",
+            "operator": "eq",
+            "value": "rehabilitation"
+          }
+        },
+        {
+          "id": "maintenance",
+          "label": "General maintenance",
+          "score": 17,
+          "field_match": {
+            "field": "purpose",
+            "operator": "eq",
+            "value": "maintenance"
+          }
+        },
+        {
+          "id": "reconstruction",
+          "label": "Reconstruction (failed assets)",
+          "score": 11,
+          "field_match": {
+            "field": "purpose",
+            "operator": "eq",
+            "value": "reconstruction"
+          }
+        },
+        {
+          "id": "no_preservation",
+          "label": "Not preservation-related",
+          "score": 0
+        }
+      ]
+    },
+    {
+      "id": "federal_leverage",
+      "label": "Federal Funding Leverage",
+      "description": "Match for FAA AIP/BIL grants.",
+      "max_points": 15,
+      "acrp_category": "revenue_cost",
+      "scoring_style": "select_one",
+      "project_field": "federal_funding_type",
+      "subcategories": [
+        {
+          "id": "federal_discretionary",
+          "label": "Federal discretionary / BIL",
+          "score": 15,
+          "field_match": {
+            "field": "federal_funding_type",
+            "operator": "eq",
+            "value": "discretionary"
+          }
+        },
+        {
+          "id": "federal_entitlement",
+          "label": "Federal entitlement (NPIAS)",
+          "score": 12,
+          "field_match": {
+            "field": "federal_funding_type",
+            "operator": "eq",
+            "value": "entitlement"
+          }
+        },
+        {
+          "id": "state_apportionment",
+          "label": "State apportionment",
+          "score": 7,
+          "field_match": {
+            "field": "federal_funding_type",
+            "operator": "eq",
+            "value": "state_apportionment"
+          }
+        },
+        {
+          "id": "no_federal",
+          "label": "State/local only",
+          "score": 4,
+          "field_match": {
+            "field": "federal_funding_type",
+            "operator": "eq",
+            "value": "no_federal"
+          }
+        }
+      ]
+    },
+    {
+      "id": "modernization",
+      "label": "Modernization / Capacity",
+      "description": "Capacity additions, modernization.",
+      "max_points": 15,
+      "acrp_category": "level_of_service",
+      "scoring_style": "select_one",
+      "project_field": "purpose",
+      "subcategories": [
+        {
+          "id": "capacity",
+          "label": "Capacity addition",
+          "score": 15,
+          "field_match": {
+            "field": "purpose",
+            "operator": "eq",
+            "value": "capacity"
+          }
+        },
+        {
+          "id": "modernization",
+          "label": "Modernization / enhancement",
+          "score": 9,
+          "field_match": {
+            "field": "purpose",
+            "operator": "eq",
+            "value": "airport_enhancement"
+          }
+        },
+        {
+          "id": "planning",
+          "label": "Planning / study",
+          "score": 6,
+          "field_match": {
+            "field": "purpose",
+            "operator": "eq",
+            "value": "planning"
+          }
+        },
+        {
+          "id": "no_modernization",
+          "label": "None",
+          "score": 0
+        }
+      ]
+    },
+    {
+      "id": "system_plan_alignment",
+      "label": "Oklahoma Airport System Plan Alignment",
+      "description": "Advances state system plan goals.",
+      "max_points": 10,
+      "acrp_category": "system_plan_alignment",
+      "scoring_style": "accumulating",
+      "subcategories": [
+        {
+          "id": "sasp_goal",
+          "label": "Advances state system plan goal",
+          "score": 6,
+          "field_match": {
+            "field": "system_plan_supported",
+            "operator": "eq",
+            "value": true
+          }
+        },
+        {
+          "id": "master_plan",
+          "label": "Consistent with current Master Plan / ALP",
+          "score": 4,
+          "field_match": {
+            "field": "master_plan_status",
+            "operator": "in",
+            "value": [
+              "updated_and_included",
+              "programmed_or_in_process"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "compliance",
+      "label": "Compliance",
+      "description": "Maintains state airport license and FAA design standards.",
+      "max_points": 5,
+      "acrp_category": "regulatory_mandate",
+      "scoring_style": "accumulating",
+      "subcategories": [
+        {
+          "id": "state_license",
+          "label": "Maintains state airport license",
+          "score": 3,
+          "field_match": {
+            "field": "licensing_status",
+            "operator": "eq",
+            "value": "compliant"
+          }
+        },
+        {
+          "id": "pavement_mgmt",
+          "label": "Active pavement management program",
+          "score": 2,
+          "field_match": {
+            "field": "pavement_management_program",
+            "operator": "eq",
+            "value": true
+          }
+        }
+      ]
+    }
+  ],
+  "governance": {
+    "decision_authority": "Oklahoma Aeronautics Commission (OAC)",
+    "decision_cadence": "annual",
+    "statute_required": true,
+    "scoring_authority": "Oklahoma Aeronautics Commission (OAC)",
+    "approval_process": "State aviation agency staff scores applications; transportation/aeronautics commission approves annual program.",
+    "model_review_cycle_years": 5,
+    "statute_citation": "Oklahoma Aeronautics Act, 3 O.S. \u00a7 81 et seq."
+  },
+  "disclaimer": "TEMPLATE-STYLE ENCODING. OAC publishes program structure but not numerical scoring rubric. Oklahoma stakeholders should consult OAC directly for actual project scoring methodology."
+}
