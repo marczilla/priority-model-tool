@@ -1,0 +1,284 @@
+{
+  "schema_version": "1.0.0",
+  "metadata": {
+    "name": "Kansas Airport Improvement Program (KAIP)",
+    "state": "Kansas",
+    "agency": "Kansas Department of Transportation (KDOT); Kansas Aviation Division",
+    "model_version": "FY26 Guidelines (effective Jan 1, 2025)",
+    "last_updated": "2025-01-01",
+    "source_citation": "KAIP FY26 Guidelines (aviation.ks.gov/files/KAIP_FY26_Guidlines_EffJan1_2025.pdf). Three documented project categories: System Preservation, Modernization, Design/Planning. Local match 5-50% by category. ~$19M FY2026 ($53 projects).",
+    "decisions_log": [
+      {
+        "date": "2026-05-30",
+        "author": "APH m49 Sprint 11 reference encoder",
+        "decision": "Encoded Kansas with KAIP's 3 documented project categories as set-asides. Stated goal: 'maintain system runway condition rating of very good; minimize surface travel time to air ambulance pick-up; enhance airport/community economic development.'",
+        "rationale": "Template-style encoding using documented program structure and common state-aviation-funding scoring patterns.",
+        "source": "KAIP FY26 Guidelines (aviation.ks.gov/files/KAIP_FY26_Guidlines_EffJan1_2025.pdf). Three documented project categories: System Preservation, Modernization, Design/Planning. Local match 5-50% by category. ~$19M FY2026 ($53 projects)."
+      }
+    ]
+  },
+  "weighting_model": "additive_100pt",
+  "criteria": [
+    {
+      "id": "safety",
+      "label": "Safety",
+      "description": "Highest-priority category. RSA, obstruction removal, approach surfaces, signage, lighting safety upgrades.",
+      "max_points": 30,
+      "acrp_category": "safety_security",
+      "scoring_style": "select_one",
+      "project_field": "purpose",
+      "subcategories": [
+        {
+          "id": "safety_primary",
+          "label": "Primary safety purpose",
+          "score": 30,
+          "field_match": {
+            "field": "purpose",
+            "operator": "eq",
+            "value": "safety"
+          }
+        },
+        {
+          "id": "safety_secondary",
+          "label": "Secondary safety benefit",
+          "score": 15
+        },
+        {
+          "id": "no_safety",
+          "label": "Not safety-related",
+          "score": 0
+        }
+      ]
+    },
+    {
+      "id": "preservation",
+      "label": "System Preservation (KAIP category)",
+      "description": "Maintains existing infrastructure. Pavement rehab, lighting/NAVAID preservation, building maintenance.",
+      "max_points": 30,
+      "acrp_category": "asset_preservation",
+      "scoring_style": "select_one",
+      "project_field": "purpose",
+      "subcategories": [
+        {
+          "id": "pavement_rehab",
+          "label": "Pavement rehabilitation",
+          "score": 30,
+          "field_match": {
+            "field": "purpose",
+            "operator": "eq",
+            "value": "rehabilitation"
+          }
+        },
+        {
+          "id": "maintenance",
+          "label": "General maintenance",
+          "score": 21,
+          "field_match": {
+            "field": "purpose",
+            "operator": "eq",
+            "value": "maintenance"
+          }
+        },
+        {
+          "id": "reconstruction",
+          "label": "Reconstruction (failed assets)",
+          "score": 13,
+          "field_match": {
+            "field": "purpose",
+            "operator": "eq",
+            "value": "reconstruction"
+          }
+        },
+        {
+          "id": "no_preservation",
+          "label": "Not preservation-related",
+          "score": 0
+        }
+      ]
+    },
+    {
+      "id": "modernization",
+      "label": "Modernization / Capacity",
+      "description": "Capacity additions, modernization, sustainability upgrades.",
+      "max_points": 15,
+      "acrp_category": "level_of_service",
+      "scoring_style": "select_one",
+      "project_field": "purpose",
+      "subcategories": [
+        {
+          "id": "capacity",
+          "label": "Capacity addition",
+          "score": 15,
+          "field_match": {
+            "field": "purpose",
+            "operator": "eq",
+            "value": "capacity"
+          }
+        },
+        {
+          "id": "modernization",
+          "label": "Modernization / enhancement",
+          "score": 9,
+          "field_match": {
+            "field": "purpose",
+            "operator": "eq",
+            "value": "airport_enhancement"
+          }
+        },
+        {
+          "id": "planning",
+          "label": "Planning / study",
+          "score": 6,
+          "field_match": {
+            "field": "purpose",
+            "operator": "eq",
+            "value": "planning"
+          }
+        },
+        {
+          "id": "no_modernization",
+          "label": "None",
+          "score": 0
+        }
+      ]
+    },
+    {
+      "id": "federal_leverage",
+      "label": "Federal Funding Leverage",
+      "description": "Match for FAA AIP/BIL discretionary or entitlement grants.",
+      "max_points": 15,
+      "acrp_category": "revenue_cost",
+      "scoring_style": "select_one",
+      "project_field": "federal_funding_type",
+      "subcategories": [
+        {
+          "id": "federal_discretionary",
+          "label": "Federal discretionary / BIL",
+          "score": 15,
+          "field_match": {
+            "field": "federal_funding_type",
+            "operator": "eq",
+            "value": "discretionary"
+          }
+        },
+        {
+          "id": "federal_entitlement",
+          "label": "Federal entitlement (NPIAS)",
+          "score": 12,
+          "field_match": {
+            "field": "federal_funding_type",
+            "operator": "eq",
+            "value": "entitlement"
+          }
+        },
+        {
+          "id": "state_apportionment",
+          "label": "State apportionment",
+          "score": 7,
+          "field_match": {
+            "field": "federal_funding_type",
+            "operator": "eq",
+            "value": "state_apportionment"
+          }
+        },
+        {
+          "id": "no_federal",
+          "label": "State/local only",
+          "score": 4,
+          "field_match": {
+            "field": "federal_funding_type",
+            "operator": "eq",
+            "value": "no_federal"
+          }
+        }
+      ]
+    },
+    {
+      "id": "air_ambulance_access",
+      "label": "Air Ambulance Access Improvement",
+      "description": "KAIP stated goal: minimize surface travel time to air ambulance pick-up locations.",
+      "max_points": 5,
+      "acrp_category": "community_impact",
+      "scoring_style": "select_one",
+      "subcategories": [
+        {
+          "id": "ambulance_critical",
+          "label": "Critical to air ambulance access",
+          "score": 5
+        },
+        {
+          "id": "ambulance_secondary",
+          "label": "Secondary benefit",
+          "score": 2
+        },
+        {
+          "id": "no_ambulance",
+          "label": "No air ambulance benefit",
+          "score": 0
+        }
+      ]
+    },
+    {
+      "id": "system_plan_alignment",
+      "label": "Kansas Airport System Plan Alignment",
+      "description": "Advances state system plan goals.",
+      "max_points": 5,
+      "acrp_category": "system_plan_alignment",
+      "scoring_style": "accumulating",
+      "subcategories": [
+        {
+          "id": "sasp_goal",
+          "label": "Advances state system plan goal",
+          "score": 3,
+          "field_match": {
+            "field": "system_plan_supported",
+            "operator": "eq",
+            "value": true
+          }
+        },
+        {
+          "id": "master_plan",
+          "label": "Consistent with current Master Plan / ALP",
+          "score": 2,
+          "field_match": {
+            "field": "master_plan_status",
+            "operator": "in",
+            "value": [
+              "updated_and_included",
+              "programmed_or_in_process"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "governance": {
+    "decision_authority": "Kansas Department of Transportation (KDOT); Kansas Aviation Division",
+    "decision_cadence": "annual",
+    "statute_required": false,
+    "scoring_authority": "Kansas Department of Transportation (KDOT); Kansas Aviation Division",
+    "approval_process": "State aviation agency staff scores applications against published program structure; transportation commission or aeronautics commission approves annual program.",
+    "model_review_cycle_years": 5
+  },
+  "disclaimer": "TEMPLATE-STYLE ENCODING per KAIP FY26 Guidelines. Kansas Aviation Division publishes program structure and 3 project categories (System Preservation, Modernization, Design/Planning) plus local-match ranges but does not publish a numerical scoring matrix. Kansas stakeholders should reference KDOT's annual program announcements for actual award rationale.",
+  "set_asides": [
+    {
+      "id": "system_preservation",
+      "label": "System Preservation Projects (KAIP)",
+      "allocation_pct": 60,
+      "eligibility_filter": "Maintenance, repair, and rehabilitation of existing facilities. Local match 5-10%."
+    },
+    {
+      "id": "modernization",
+      "label": "Modernization Projects (KAIP)",
+      "allocation_pct": 30,
+      "eligibility_filter": "Increase capacity, resolve line-of-sight problems, new facilities. Local match 25-50%."
+    },
+    {
+      "id": "design_planning",
+      "label": "Design / Planning Projects (KAIP)",
+      "allocation_pct": 10,
+      "eligibility_filter": "Evaluate and establish priorities for the airport's continued use."
+    }
+  ]
+}

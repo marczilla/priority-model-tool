@@ -1,0 +1,270 @@
+{
+  "schema_version": "1.0.0",
+  "metadata": {
+    "name": "Iowa Aviation Capital Improvement Program",
+    "state": "Iowa",
+    "agency": "Iowa Department of Transportation, Aviation Bureau",
+    "model_version": "FY2026 (Transportation Commission approved August 2025)",
+    "last_updated": "2025-08-12",
+    "source_citation": "Iowa DOT Aviation Bureau program description; Iowa Aviation Funding Programs page (iowadot.gov/aviation). Airports stratified into 5 system-plan roles; Aviation Bureau administers AIP-style program funded through State Aviation Fund.",
+    "decisions_log": [
+      {
+        "date": "2026-05-30",
+        "author": "APH m49 Sprint 11 reference encoder",
+        "decision": "Encoded Iowa as additive_100pt with state-aviation pattern (safety > preservation > modernization > federal leverage). Service-level tiers (Levels 1/2/3 = commercial / non-commercial public-use / other public-owned) are encoded as system plan alignment.",
+        "rationale": "Template-style encoding using documented program structure and common state-aviation-funding scoring patterns.",
+        "source": "Iowa DOT Aviation Bureau program description; Iowa Aviation Funding Programs page (iowadot.gov/aviation). Airports stratified into 5 system-plan roles; Aviation Bureau administers AIP-style program funded through State Aviation Fund."
+      }
+    ]
+  },
+  "weighting_model": "additive_100pt",
+  "criteria": [
+    {
+      "id": "safety",
+      "label": "Safety",
+      "description": "Highest-priority category. RSA, obstruction removal, approach surfaces, signage, lighting safety upgrades.",
+      "max_points": 30,
+      "acrp_category": "safety_security",
+      "scoring_style": "select_one",
+      "project_field": "purpose",
+      "subcategories": [
+        {
+          "id": "safety_primary",
+          "label": "Primary safety purpose",
+          "score": 30,
+          "field_match": {
+            "field": "purpose",
+            "operator": "eq",
+            "value": "safety"
+          }
+        },
+        {
+          "id": "safety_secondary",
+          "label": "Secondary safety benefit",
+          "score": 15
+        },
+        {
+          "id": "no_safety",
+          "label": "Not safety-related",
+          "score": 0
+        }
+      ]
+    },
+    {
+      "id": "preservation",
+      "label": "Asset Preservation",
+      "description": "Maintains existing infrastructure. Pavement rehab, lighting/NAVAID preservation, building maintenance.",
+      "max_points": 25,
+      "acrp_category": "asset_preservation",
+      "scoring_style": "select_one",
+      "project_field": "purpose",
+      "subcategories": [
+        {
+          "id": "pavement_rehab",
+          "label": "Pavement rehabilitation",
+          "score": 25,
+          "field_match": {
+            "field": "purpose",
+            "operator": "eq",
+            "value": "rehabilitation"
+          }
+        },
+        {
+          "id": "maintenance",
+          "label": "General maintenance",
+          "score": 17,
+          "field_match": {
+            "field": "purpose",
+            "operator": "eq",
+            "value": "maintenance"
+          }
+        },
+        {
+          "id": "reconstruction",
+          "label": "Reconstruction (failed assets)",
+          "score": 11,
+          "field_match": {
+            "field": "purpose",
+            "operator": "eq",
+            "value": "reconstruction"
+          }
+        },
+        {
+          "id": "no_preservation",
+          "label": "Not preservation-related",
+          "score": 0
+        }
+      ]
+    },
+    {
+      "id": "federal_leverage",
+      "label": "Federal Funding Leverage",
+      "description": "Match for FAA AIP/BIL discretionary or entitlement grants.",
+      "max_points": 15,
+      "acrp_category": "revenue_cost",
+      "scoring_style": "select_one",
+      "project_field": "federal_funding_type",
+      "subcategories": [
+        {
+          "id": "federal_discretionary",
+          "label": "Federal discretionary / BIL",
+          "score": 15,
+          "field_match": {
+            "field": "federal_funding_type",
+            "operator": "eq",
+            "value": "discretionary"
+          }
+        },
+        {
+          "id": "federal_entitlement",
+          "label": "Federal entitlement (NPIAS)",
+          "score": 12,
+          "field_match": {
+            "field": "federal_funding_type",
+            "operator": "eq",
+            "value": "entitlement"
+          }
+        },
+        {
+          "id": "state_apportionment",
+          "label": "State apportionment",
+          "score": 7,
+          "field_match": {
+            "field": "federal_funding_type",
+            "operator": "eq",
+            "value": "state_apportionment"
+          }
+        },
+        {
+          "id": "no_federal",
+          "label": "State/local only",
+          "score": 4,
+          "field_match": {
+            "field": "federal_funding_type",
+            "operator": "eq",
+            "value": "no_federal"
+          }
+        }
+      ]
+    },
+    {
+      "id": "modernization",
+      "label": "Modernization / Capacity",
+      "description": "Capacity additions, modernization, sustainability upgrades.",
+      "max_points": 15,
+      "acrp_category": "level_of_service",
+      "scoring_style": "select_one",
+      "project_field": "purpose",
+      "subcategories": [
+        {
+          "id": "capacity",
+          "label": "Capacity addition",
+          "score": 15,
+          "field_match": {
+            "field": "purpose",
+            "operator": "eq",
+            "value": "capacity"
+          }
+        },
+        {
+          "id": "modernization",
+          "label": "Modernization / enhancement",
+          "score": 9,
+          "field_match": {
+            "field": "purpose",
+            "operator": "eq",
+            "value": "airport_enhancement"
+          }
+        },
+        {
+          "id": "planning",
+          "label": "Planning / study",
+          "score": 6,
+          "field_match": {
+            "field": "purpose",
+            "operator": "eq",
+            "value": "planning"
+          }
+        },
+        {
+          "id": "no_modernization",
+          "label": "None",
+          "score": 0
+        }
+      ]
+    },
+    {
+      "id": "system_plan_alignment",
+      "label": "Iowa Aviation System Plan Alignment",
+      "description": "Advances state system plan goals.",
+      "max_points": 10,
+      "acrp_category": "system_plan_alignment",
+      "scoring_style": "accumulating",
+      "subcategories": [
+        {
+          "id": "sasp_goal",
+          "label": "Advances state system plan goal",
+          "score": 6,
+          "field_match": {
+            "field": "system_plan_supported",
+            "operator": "eq",
+            "value": true
+          }
+        },
+        {
+          "id": "master_plan",
+          "label": "Consistent with current Master Plan / ALP",
+          "score": 4,
+          "field_match": {
+            "field": "master_plan_status",
+            "operator": "in",
+            "value": [
+              "updated_and_included",
+              "programmed_or_in_process"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "compliance",
+      "label": "Compliance",
+      "description": "Maintains state airport license + FAA design standards compliance.",
+      "max_points": 5,
+      "acrp_category": "regulatory_mandate",
+      "scoring_style": "accumulating",
+      "subcategories": [
+        {
+          "id": "state_license",
+          "label": "Maintains state airport license",
+          "score": 3,
+          "field_match": {
+            "field": "licensing_status",
+            "operator": "eq",
+            "value": "compliant"
+          }
+        },
+        {
+          "id": "pavement_mgmt",
+          "label": "Active pavement management program",
+          "score": 2,
+          "field_match": {
+            "field": "pavement_management_program",
+            "operator": "eq",
+            "value": true
+          }
+        }
+      ]
+    }
+  ],
+  "governance": {
+    "decision_authority": "Iowa Department of Transportation, Aviation Bureau",
+    "decision_cadence": "annual",
+    "statute_required": true,
+    "scoring_authority": "Iowa Department of Transportation, Aviation Bureau",
+    "approval_process": "State aviation agency staff scores applications against published program structure; transportation commission or aeronautics commission approves annual program.",
+    "model_review_cycle_years": 5,
+    "statute_citation": "Iowa Code Chapter 328"
+  },
+  "disclaimer": "TEMPLATE-STYLE ENCODING. Iowa DOT publishes program structure but not numerical scoring rubric. The 6-criterion framework reflects documented Iowa Aviation Bureau priorities (safety, preservation, federal leverage). Iowa stakeholders should obtain the actual project-evaluation methodology from the Aviation Bureau before adoption."
+}
